@@ -1,15 +1,19 @@
-const CACHE_NAME = 'rayka-buoy-v3';
+const CACHE_NAME = 'rayka-buoy-v4';
 
-// لیست تمام CDNها و فایل‌های داخلی که باید آفلاین ذخیره شوند
-const ASSETS_TO_CACHE = [
+// فایل‌های داخلی (اگر یکی نبود، نصب SW خراب نمی‌شود)
+const LOCAL_ASSETS = [
   './',
-  './index.html', // اگر اسم فایل اصلی شما dashboard (13)_2.html است، همان را بگذارید
+  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
   './icon-192-dark.png',
-  './icon-512-dark.png',
-  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css',
+  './icon-512-dark.png'
+];
+
+// CDNها (باید با آدرس‌های داخل index.html یکی باشند)
+const CDN_ASSETS = [
+  'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
   'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
@@ -18,72 +22,58 @@ const ASSETS_TO_CACHE = [
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js'
 ];
 
-// ۱. رویداد Install: ذخیره فایل‌ها در Cache
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled([...LOCAL_ASSETS, ...CDN_ASSETS].map((url) => cache.add(url)))
+    )
   );
   self.skipWaiting();
 });
 
-// ۲. رویداد Activate: پاک‌سازی کش‌های قدیمی
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
+    )
   );
   self.clients.claim();
 });
 
-// ۳. رویداد Fetch: دریافت اطلاعات
 self.addEventListener('fetch', (event) => {
-  // ۱. عدم ذخیره‌سازی درخواست‌های مستقیم دیتابیس Supabase و WebSocket
-  if (event.request.url.includes('supabase.co') || event.request.url.startsWith('wss://')) {
-    return;
-  }
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  if (req.url.includes('supabase.co') || req.url.startsWith('wss://')) return;
 
-  // ۲. عدم کش کردن درخواست‌های غیر GET (مانند POST/PUT)
-  if (event.request.method !== 'GET') {
-    return;
-  }
+  const url = new URL(req.url);
+  const isPage = req.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname === '/';
 
-  // ۳. استراتژی: اول بررسی کش (سریع‌تر و بدون خطا در آفلاین)، در صورت عدم وجود -> دریافت از شبکه
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // اگر فایل در کش بود، همان را برمی‌گرداند و در پس‌زمینه اپدیت می‌کند
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, networkResponse);
-            });
+  // صفحه اصلی: اول شبکه (همیشه نسخه جدید)، اگر آفلاین بود از کش
+  if (isPage) {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200) {
+            const copy = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put('./index.html', copy));
           }
-        }).catch(() => {/* آنلاین نیست، نادیده بگیر */});
+          return res;
+        })
+        .catch(() => caches.match('./index.html').then((r) => r || caches.match(req)))
+    );
+    return;
+  }
 
-        return cachedResponse;
-      }
-
-      // اگر در کش نبود، از شبکه دریافت کن
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-          return networkResponse;
+  // بقیه: اول کش، بعد شبکه
+  event.respondWith(
+    caches.match(req).then((cached) => {
+      if (cached) return cached;
+      return fetch(req).then((res) => {
+        if (res && res.status === 200) {
+          const copy = res.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(req, copy));
         }
-
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
-
-        return networkResponse;
+        return res;
       });
     })
   );
