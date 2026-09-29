@@ -3102,6 +3102,13 @@
 
         async function enterApp() {
             await loadFleetFromServer();
+            if (appState.buoyId) applyBuoy(appState.buoyId);
+            refreshBuoyDependentTexts();
+            // حالا که ناوگان بارگذاری شد، آخرین تله‌متری را بگیر و اشتراک زنده را وصل کن
+            if (appState.connectionMode === 'online' && supabaseReady) {
+                fetchLatestTelemetryForAllBuoys();
+                subscribeToBuoyRealtime();
+            }
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-shell').style.display = 'block';
             applyRolePermissions();
@@ -3214,7 +3221,8 @@
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
-            updateBatteryIcon(initialBuoy.soc);
+            // ناوگان در این لحظه هنوز خالی است (بعد از ورود از سرور می‌آید)؛ پس initialBuoy ممکن است undefined باشد
+            updateBatteryIcon(initialBuoy ? initialBuoy.soc : null);
             refreshBuoyDependentTexts();
 
             renderMissionBar();
