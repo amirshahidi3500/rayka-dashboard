@@ -1620,6 +1620,10 @@
                             };
                             enterApp();
                         });
+                })
+                .catch((err) => {
+                    console.error('login error:', err);
+                    showAuthError((err && err.message) ? err.message : t.errBadCredentials);
                 });
         }
 
@@ -2511,12 +2515,24 @@
         // in that case it's deferred and applied as soon as the map becomes visible again
         let pendingMapFocus = null;
         function focusMapOnBuoy(b) {
-            if (!map) return;
+            if (!map || !b) return;
             const mapVisible = document.getElementById('sec-recent-data').style.display !== 'none';
 
             if (mapVisible) {
                 map.invalidateSize();
-                map.flyTo([b.lat, b.lon], 9, { duration: 0.8 });
+                const lat = Number(b.lat), lon = Number(b.lon);
+                if (!isFinite(lat) || !isFinite(lon)) return;
+                const target = L.latLng(lat, lon);
+                const size = map.getSize();
+                const dist = map.getCenter().distanceTo(target);
+                // flyTo وقتی مقصد همان مرکز فعلی است یا نقشه اندازه صفر دارد، مختصات NaN تولید می‌کند
+                if (dist < 5 && map.getZoom() === 9) {
+                    // همین الان همان‌جاست؛ کاری لازم نیست
+                } else if (dist < 5 || size.x === 0 || size.y === 0) {
+                    map.setView(target, 9, { animate: false });
+                } else {
+                    map.flyTo(target, 9, { duration: 0.8 });
+                }
                 pendingMapFocus = null;
             } else {
                 pendingMapFocus = b;
@@ -2596,7 +2612,17 @@
                 setTimeout(() => {
                     map.invalidateSize();
                     const target = pendingMapFocus || buoysFleet.find(x => x.id === appState.buoyId);
-                    if (target) map.flyTo([target.lat, target.lon], 9, { duration: 0.8 });
+                    if (target) {
+                        pendingMapFocus = null;
+                        const pt = L.latLng(Number(target.lat), Number(target.lon));
+                        if (isFinite(pt.lat) && isFinite(pt.lng)) {
+                            if (map.getCenter().distanceTo(pt) < 5 || map.getSize().x === 0) {
+                                map.setView(pt, 9, { animate: false });
+                            } else {
+                                map.flyTo(pt, 9, { duration: 0.8 });
+                            }
+                        }
+                    }
                     pendingMapFocus = null;
                 }, 300);
             }
@@ -3101,18 +3127,25 @@
         }
 
         async function enterApp() {
-            await loadFleetFromServer();
-            if (appState.buoyId) applyBuoy(appState.buoyId);
-            refreshBuoyDependentTexts();
-            // حالا که ناوگان بارگذاری شد، آخرین تله‌متری را بگیر و اشتراک زنده را وصل کن
-            if (appState.connectionMode === 'online' && supabaseReady) {
-                fetchLatestTelemetryForAllBuoys();
-                subscribeToBuoyRealtime();
-            }
+            // ناوگان را بگیر؛ حتی اگر خطا داد، داشبورد باید باز شود
+            try { await loadFleetFromServer(); } catch (e) { console.error('loadFleetFromServer:', e); }
+
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-shell').style.display = 'block';
-            applyRolePermissions();
-            showSection('recent-data');
+            try { applyRolePermissions(); } catch (e) { console.error('applyRolePermissions:', e); }
+            try { showSection('recent-data'); } catch (e) { console.error('showSection:', e); }
+
+            // بعد از بارگذاری ناوگان: نمایش بویه فعال، آخرین تله‌متری و اشتراک زنده
+            try {
+                if (appState.buoyId) applyBuoy(appState.buoyId);
+                refreshBuoyDependentTexts();
+            } catch (e) { console.error('applyBuoy:', e); }
+            try {
+                if (appState.connectionMode === 'online' && supabaseReady) {
+                    Promise.resolve(fetchLatestTelemetryForAllBuoys()).catch(e => console.error('fetchLatest:', e));
+                    subscribeToBuoyRealtime();
+                }
+            } catch (e) { console.error('realtime:', e); }
         }
 
         // Lock/hide every control that sends a command to the buoy when the user is a guest
