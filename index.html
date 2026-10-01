@@ -1646,7 +1646,8 @@
 
             sb.rpc('find_host_by_referral', { p_mobile: hostMobile, p_referral: referralCode })
                 .then(({ data, error }) => {
-                    if (error || !data || data.length === 0) { showAuthError(t.errHostNotFound); return; }
+                    if (error) { console.error('find_host_by_referral error:', error); showAuthError(error.message); return; }
+                    if (!data || data.length === 0) { showAuthError(t.errHostNotFound); return; }
                     const host = data[0];
 
                     return sb.auth.signInAnonymously().then(({ data: authData, error: authErr }) => {
