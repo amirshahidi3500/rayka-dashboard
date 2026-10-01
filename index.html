@@ -1606,7 +1606,9 @@
 
                 // Set the password so the host can also log in with email + password later.
                 const { error: pwErr } = await sb.auth.updateUser({ password: pendingSignup.password });
-                if (pwErr) { console.warn(pwErr); showAuthError(t.errSignupFailed); return; }
+                // اگر قبلاً (در تلاش ناموفق قبلی) همین رمز ذخیره شده باشد، Supabase خطای same_password می‌دهد؛ مشکلی نیست.
+                const samePw = pwErr && (pwErr.code === 'same_password' || /different from the old password/i.test(pwErr.message || ''));
+                if (pwErr && !samePw) { console.warn(pwErr); showAuthError(t.errSignupFailed); return; }
 
                 // ستون referral_code در جدول hosts اجباری (NOT NULL) است، پس همین‌جا یک کد یکتا می‌سازیم.
                 const makeRefCode = () => {
