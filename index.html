@@ -1608,20 +1608,35 @@
                 const { error: pwErr } = await sb.auth.updateUser({ password: pendingSignup.password });
                 if (pwErr) { console.warn(pwErr); showAuthError(t.errSignupFailed); return; }
 
-                const hostRow = {
-                    id: uid,
-                    username: pendingSignup.username,
-                    email: pendingSignup.email,
-                    mobile: pendingSignup.mobile
+                // ستون referral_code در جدول hosts اجباری (NOT NULL) است، پس همین‌جا یک کد یکتا می‌سازیم.
+                const makeRefCode = () => {
+                    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                    let c = '';
+                    for (let i = 0; i < 6; i++) c += chars[Math.floor(Math.random() * chars.length)];
+                    return c;
                 };
-                const { data: row, error: dbErr } = await sb.from('hosts').upsert(hostRow).select().single();
-                if (dbErr) { console.warn(dbErr); showAuthError(t.errSignupFailed); return; }
 
-                // host_code توسط یک تریگر در دیتابیس به‌صورت خودکار و یکتا تولید می‌شود؛
-                // همان را به‌عنوان کد معرف استفاده می‌کنیم.
-                const { data: updatedRow, error: updErr2 } = await sb.from('hosts')
-                    .update({ referral_code: row.host_code }).eq('id', uid).select().single();
-                const finalRow = updErr2 ? row : updatedRow;
+                let row = null, dbErr = null;
+                for (let attempt = 0; attempt < 5; attempt++) {
+                    const res = await sb.from('hosts').upsert({
+                        id: uid,
+                        username: pendingSignup.username,
+                        email: pendingSignup.email,
+                        mobile: pendingSignup.mobile,
+                        referral_code: makeRefCode()
+                    }).select().single();
+                    row = res.data; dbErr = res.error;
+                    if (!dbErr || dbErr.code !== '23505') break; // فقط در صورت تکراری بودن کد دوباره تلاش کن
+                }
+                if (dbErr || !row) { console.warn(dbErr); showAuthError(t.errSignupFailed); return; }
+
+                // اگر تریگر دیتابیس host_code ساخته باشد، همان را به‌عنوان کد معرف استفاده می‌کنیم.
+                let finalRow = row;
+                if (row.host_code) {
+                    const { data: updatedRow, error: updErr2 } = await sb.from('hosts')
+                        .update({ referral_code: row.host_code }).eq('id', uid).select().single();
+                    if (!updErr2 && updatedRow) finalRow = updatedRow;
+                }
 
                 currentUser = {
                     role: 'host', uid: uid, username: finalRow.username,
@@ -3268,7 +3283,7 @@
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
-            updateBatteryIcon(initialBuoy.soc);
+            if (initialBuoy) updateBatteryIcon(initialBuoy.soc);
             refreshBuoyDependentTexts();
 
             renderMissionBar();
