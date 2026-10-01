@@ -570,16 +570,20 @@
                             </button>
                         </div>
                         <div class="mb-3">
-                            <input type="text" class="form-control" id="hostSignupMobile" placeholder="شماره موبایل (با کد کشور، مثلاً +98912...)" data-i18n-ph="phMobile">
+                            <input type="text" class="form-control" id="hostSignupMobile" placeholder="شماره موبایل (مثلاً 0912...)" data-i18n-ph="phMobile">
                         </div>
                         <button class="btn btn-primary w-100" onclick="sendActivationCode()" data-i18n="btnSendCode">ارسال کد فعال‌سازی</button>
                     </div>
                     <div id="host-signup-step2" style="display:none;">
-                        <p class="text-muted small" id="txt-activation-hint" data-i18n="activationHint">کد فعال‌سازی به شماره شما پیامک شد.</p>
+                        <p class="text-muted small" id="txt-activation-hint" data-i18n="activationHint">کد فعال‌سازی به ایمیل شما ارسال شد.</p>
                         <div class="mb-3">
                             <input type="text" class="form-control" id="hostActivationCode" placeholder="کد فعال‌سازی" data-i18n-ph="phActivationCode">
                         </div>
                         <button class="btn btn-success w-100" onclick="confirmActivation()" data-i18n="btnActivate">فعال‌سازی و ورود</button>
+                        <div class="d-flex justify-content-between mt-2">
+                            <button type="button" class="btn btn-link btn-sm p-0" onclick="sendActivationCode(true)" data-i18n="btnResendCode">ارسال مجدد کد</button>
+                            <button type="button" class="btn btn-link btn-sm p-0" onclick="backToSignupStep1()" data-i18n="btnBackEditEmail">ویرایش ایمیل</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -875,7 +879,7 @@
                         <input type="text" class="form-control form-control-sm" id="newBuoyLocation" placeholder="نام محل" style="max-width:160px;">
                         <button class="btn btn-sm btn-success" onclick="addNewBuoy()"><i class="fa-solid fa-check"></i></button>
                     </div>
-                    <p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پیامک بویه باید دقیقاً از همین شماره سیم ارسال شود؛ شناسه و پارت نامبر بویه به‌صورت خودکار توسط سرور ساخته می‌شود.</p>
+                    <p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پارت نامبر باید دقیقاً با شماره‌ای که سخت‌افزار بویه در پیامک خود می‌فرستد (فیلد ID) یکی باشد و پس از ثبت، دیگر قابل تغییر نیست.</p>
                     <p class="locked-note mt-2 mb-0" id="txt-fleet-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span id="txt-fleet-locked-text" data-i18n="fleetLockedText">افزودن/حذف بویه فقط برای میزبان ممکن است</span></p>
                 </div>
 
@@ -1139,10 +1143,9 @@
         // ===== SUPABASE CONFIG =====
         // TODO: replace with your real Supabase project values
         // (Supabase Dashboard > Project Settings > API > Project URL / anon public key)
-        // NOTE: you must also enable "Phone" as a sign-in provider under
-        // Authentication > Providers, and connect an SMS gateway there
-        // (Twilio / MessageBird / Vonage, or a custom "Send SMS Hook" Edge
-        // Function if you need an Iranian SMS provider like Kavenegar).
+        // NOTE: host signup now uses EMAIL OTP. In the Supabase dashboard enable the
+        // "Email" provider, set up a Custom SMTP server (Authentication > Emails > SMTP),
+        // and make sure the "Confirm signup" and "Magic Link" email templates contain {{ .Token }}.
         const SUPABASE_URL = 'https://gyjynftzwdcfjjgyuetr.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5anluZnR6d2RjZmpqZ3l1ZXRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzNzgyODAsImV4cCI6MjEwNDk1NDI4MH0.OWZSraPCyxj_hs1ddaHP9RA9D9CppT8jnFcKNGUaio8';
         
@@ -1529,80 +1532,108 @@
             }
         }
 
-        // Step 1 of host signup: verify phone ownership via a real SMS OTP sent through Supabase
-        function sendActivationCode() {
+        // Step 1 of host signup: verify EMAIL ownership via a one-time code (Supabase Email OTP).
+        // (SMS is no longer used here, because Iranian numbers cannot receive SMS from foreign gateways.)
+        function sendActivationCode(isResend) {
             const t = translations[currentLang()];
-            const username = document.getElementById('hostSignupUsername').value.trim();
-            const email = document.getElementById('hostSignupEmail').value.trim();
-            const password = document.getElementById('hostSignupPassword').value.trim();
-            const mobile = document.getElementById('hostSignupMobile').value.trim();
+            let username, email, password, mobile;
+            if (isResend && pendingSignup) {
+                ({ username, email, password, mobile } = pendingSignup);
+            } else {
+                username = document.getElementById('hostSignupUsername').value.trim();
+                email = document.getElementById('hostSignupEmail').value.trim().toLowerCase();
+                password = document.getElementById('hostSignupPassword').value.trim();
+                mobile = document.getElementById('hostSignupMobile').value.trim();
+            }
 
             if (!username || !email || !password || !mobile) { showAuthError(t.errFillAllFields); return; }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showAuthError(t.errBadEmail); return; }
+            if (password.length < 6) { showAuthError(t.errWeakPassword); return; }
             if (!supabaseReady) { showAuthError(t.errSupabaseNotConfigured); return; }
 
             pendingSignup = { username, email, password, mobile };
 
-            sb.auth.signInWithOtp({ phone: mobile }).then(({ error }) => {
+            sb.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } }).then(({ error }) => {
                 if (error) {
                     console.warn(error);
-                    showAuthError(t.errSendCodeFailed);
+                    const msg = String(error.message || '').toLowerCase();
+                    if (error.status === 429 || msg.includes('rate limit') || msg.includes('seconds')) {
+                        showAuthError(t.errRateLimit);
+                    } else {
+                        showAuthError(t.errSendCodeFailed);
+                    }
                     return;
                 }
                 document.getElementById('host-signup-step1').style.display = 'none';
                 document.getElementById('host-signup-step2').style.display = 'block';
                 hideAuthError();
+            }).catch((err) => {
+                console.warn(err);
+                showAuthError(t.errSendCodeFailed);
             });
         }
 
-        // Step 2 of host signup: confirm the OTP (this both verifies the phone AND creates
-        // the Supabase Auth user), then attach email/password to that same account and
-        // write the profile row into the "hosts" table.
-        function confirmActivation() {
+        // Go back from the code step to the form (e.g. wrong email typed)
+        function backToSignupStep1() {
+            document.getElementById('host-signup-step2').style.display = 'none';
+            document.getElementById('host-signup-step1').style.display = 'block';
+            document.getElementById('hostActivationCode').value = '';
+            hideAuthError();
+        }
+
+        // Step 2 of host signup: confirm the emailed code (this verifies the email AND creates
+        // the Supabase Auth user), then set the password and write the profile row into "hosts".
+        async function confirmActivation() {
             const t = translations[currentLang()];
-            const code = document.getElementById('hostActivationCode').value.trim();
+            const code = document.getElementById('hostActivationCode').value.trim().replace(/\s+/g, '');
             if (!pendingSignup) { showAuthError(t.errWrongCode); return; }
+            if (!code) { showAuthError(t.errWrongCode); return; }
 
-            sb.auth.verifyOtp({ phone: pendingSignup.mobile, token: code, type: 'sms' })
-                .then(({ data, error }) => {
-                    if (error) { console.warn(error); showAuthError(t.errWrongCode); return; }
+            try {
+                const { data, error } = await sb.auth.verifyOtp({ email: pendingSignup.email, token: code, type: 'email' });
+                if (error || !data || !data.user) { console.warn(error); showAuthError(t.errWrongCode); return; }
+                const uid = data.user.id;
 
-                    const uid = data.user.id;
+                // If this email already belongs to a registered host, don't overwrite their profile.
+                const { data: existing } = await sb.from('hosts').select('id').eq('id', uid).maybeSingle();
+                if (existing) {
+                    await sb.auth.signOut();
+                    pendingSignup = null;
+                    backToSignupStep1();
+                    showAuthError(t.errEmailExists);
+                    return;
+                }
 
-                    // Let the host also log in later with email/password on any device.
-                    return sb.auth.updateUser({ email: pendingSignup.email, password: pendingSignup.password })
-                        .then(({ error: updErr }) => {
-                            if (updErr) console.warn('Could not attach email/password to account:', updErr);
+                // Set the password so the host can also log in with email + password later.
+                const { error: pwErr } = await sb.auth.updateUser({ password: pendingSignup.password });
+                if (pwErr) { console.warn(pwErr); showAuthError(t.errSignupFailed); return; }
 
-                            const hostRow = {
-                                id: uid,
-                                username: pendingSignup.username,
-                                email: pendingSignup.email,
-                                mobile: pendingSignup.mobile
-                            };
+                const hostRow = {
+                    id: uid,
+                    username: pendingSignup.username,
+                    email: pendingSignup.email,
+                    mobile: pendingSignup.mobile
+                };
+                const { data: row, error: dbErr } = await sb.from('hosts').upsert(hostRow).select().single();
+                if (dbErr) { console.warn(dbErr); showAuthError(t.errSignupFailed); return; }
 
-                            return sb.from('hosts').upsert(hostRow).select().single()
-                                .then(({ data: row, error: dbErr }) => {
-                                    if (dbErr) { console.warn(dbErr); showAuthError(t.errSignupFailed); return; }
-                                    // host_code توسط یک تریگر در دیتابیس به‌صورت خودکار و یکتا تولید می‌شود؛
-                                    // همان را به‌عنوان کد معرف استفاده می‌کنیم تا هر میزبان قطعاً کد منحصربه‌فرد داشته باشد.
-                                    return sb.from('hosts').update({ referral_code: row.host_code }).eq('id', uid).select().single()
-                                        .then(({ data: updatedRow, error: updErr2 }) => {
-                                            const finalRow = updErr2 ? row : updatedRow;
-                                            currentUser = {
-                                                role: 'host', uid: uid, username: finalRow.username,
-                                                email: finalRow.email, mobile: finalRow.mobile,
-                                                referralCode: finalRow.referral_code || finalRow.host_code
-                                            };
-                                            pendingSignup = null;
-                                            enterApp();
-                                        });
-                                });
-                        });
-                })
-                .catch((err) => {
-                    console.warn(err);
-                    showAuthError(t.errSignupFailed);
-                });
+                // host_code توسط یک تریگر در دیتابیس به‌صورت خودکار و یکتا تولید می‌شود؛
+                // همان را به‌عنوان کد معرف استفاده می‌کنیم.
+                const { data: updatedRow, error: updErr2 } = await sb.from('hosts')
+                    .update({ referral_code: row.host_code }).eq('id', uid).select().single();
+                const finalRow = updErr2 ? row : updatedRow;
+
+                currentUser = {
+                    role: 'host', uid: uid, username: finalRow.username,
+                    email: finalRow.email, mobile: finalRow.mobile,
+                    referralCode: finalRow.referral_code || finalRow.host_code
+                };
+                pendingSignup = null;
+                enterApp();
+            } catch (err) {
+                console.warn(err);
+                showAuthError(t.errSignupFailed);
+            }
         }
 
         // Real Supabase email/password login - works from any device once online
@@ -1625,10 +1656,6 @@
                             };
                             enterApp();
                         });
-                })
-                .catch((err) => {
-                    console.error('login error:', err);
-                    showAuthError((err && err.message) ? err.message : t.errBadCredentials);
                 });
         }
 
@@ -1646,8 +1673,7 @@
 
             sb.rpc('find_host_by_referral', { p_mobile: hostMobile, p_referral: referralCode })
                 .then(({ data, error }) => {
-                    if (error) { console.error('find_host_by_referral error:', error); showAuthError(error.message); return; }
-                    if (!data || data.length === 0) { showAuthError(t.errHostNotFound); return; }
+                    if (error || !data || data.length === 0) { showAuthError(t.errHostNotFound); return; }
                     const host = data[0];
 
                     return sb.auth.signInAnonymously().then(({ data: authData, error: authErr }) => {
@@ -1788,7 +1814,13 @@
                 phGuestUsername: 'نام کاربری شما',
                 phHostMobile: 'شماره موبایل میزبان',
                 phReferralCode: 'کد معرف میزبان',
-                activationHint: 'یک کد فعال‌سازی واقعی به شماره موبایل شما پیامک می‌شود.',
+                activationHint: 'کد فعال‌سازی به ایمیل شما ارسال شد. (پوشه Spam را هم بررسی کنید)',
+                btnResendCode: 'ارسال مجدد کد',
+                btnBackEditEmail: 'ویرایش ایمیل',
+                errBadEmail: 'ایمیل واردشده معتبر نیست',
+                errWeakPassword: 'رمز عبور باید حداقل ۶ کاراکتر باشد',
+                errRateLimit: 'تعداد درخواست‌ها زیاد است؛ کمی صبر کنید و دوباره تلاش کنید',
+                errEmailExists: 'این ایمیل قبلاً به‌عنوان میزبان ثبت شده است؛ از بخش «ورود» استفاده کنید',
                 roleHost: 'میزبان',
                 roleGuestObserver: 'مهمان (ناظر)',
                 errFillAllFields: 'لطفاً همه فیلدها را پر کنید',
@@ -1797,7 +1829,7 @@
                 errBadCredentials: 'ایمیل یا رمز عبور اشتباه است',
                 errHostNotFound: 'میزبانی با این شماره موبایل و کد معرف پیدا نشد',
                 errSupabaseNotConfigured: 'سرور هنوز پیکربندی نشده است (SUPABASE_URL / SUPABASE_ANON_KEY را تکمیل کنید)',
-                errSendCodeFailed: 'ارسال کد فعال‌سازی ناموفق بود؛ شماره موبایل یا اتصال اینترنت را بررسی کنید',
+                errSendCodeFailed: 'ارسال کد فعال‌سازی ناموفق بود؛ ایمیل یا اتصال اینترنت را بررسی کنید',
                 errSignupFailed: 'ثبت‌نام ناموفق بود؛ شاید این ایمیل قبلاً ثبت شده باشد',
                 cannotDeleteLast: 'حداقل باید یک بویه در ناوگان باقی بماند',
                 confirmDeleteBuoy: 'آیا از حذف بویه {id} مطمئن هستید؟',
@@ -1907,7 +1939,13 @@
                 phGuestUsername: 'Your Username',
                 phHostMobile: 'Host\'s Mobile Number',
                 phReferralCode: 'Host Referral Code',
-                activationHint: 'A real activation code will be texted to your mobile number.',
+                activationHint: 'An activation code was emailed to you. (Check your Spam folder too)',
+                btnResendCode: 'Resend code',
+                btnBackEditEmail: 'Edit email',
+                errBadEmail: 'Please enter a valid email address',
+                errWeakPassword: 'Password must be at least 6 characters',
+                errRateLimit: 'Too many requests; please wait a moment and try again',
+                errEmailExists: 'This email is already registered as a host; please use Sign In',
                 roleHost: 'Host',
                 roleGuestObserver: 'Guest (Observer)',
                 errFillAllFields: 'Please fill in all fields',
@@ -1916,7 +1954,7 @@
                 errBadCredentials: 'Incorrect email or password',
                 errHostNotFound: 'No host found with this mobile number and referral code',
                 errSupabaseNotConfigured: 'The server is not configured yet (finish the SUPABASE_URL / SUPABASE_ANON_KEY config)',
-                errSendCodeFailed: 'Could not send the activation code; check the mobile number or your internet connection',
+                errSendCodeFailed: 'Could not send the activation code; check the email address or your internet connection',
                 errSignupFailed: 'Signup failed; this email may already be registered',
                 cannotDeleteLast: 'At least one buoy must remain in the fleet',
                 confirmDeleteBuoy: 'Are you sure you want to delete buoy {id}?',
@@ -2026,7 +2064,13 @@
                 phGuestUsername: 'اسم المستخدم الخاص بك',
                 phHostMobile: 'رقم جوال المضيف',
                 phReferralCode: 'كود إحالة المضيف',
-                activationHint: 'سيتم إرسال رمز تفعيل حقيقي إلى رقم جوالك عبر رسالة نصية.',
+                activationHint: 'تم إرسال رمز التفعيل إلى بريدك الإلكتروني. (تحقق من مجلد الرسائل غير المرغوبة أيضاً)',
+                btnResendCode: 'إعادة إرسال الرمز',
+                btnBackEditEmail: 'تعديل البريد',
+                errBadEmail: 'البريد الإلكتروني غير صالح',
+                errWeakPassword: 'يجب أن تكون كلمة المرور 6 أحرف على الأقل',
+                errRateLimit: 'عدد الطلبات كبير؛ انتظر قليلاً ثم حاول مجدداً',
+                errEmailExists: 'هذا البريد مسجل بالفعل كمضيف؛ استخدم تسجيل الدخول',
                 roleHost: 'مضيف',
                 roleGuestObserver: 'ضيف (مراقب)',
                 errFillAllFields: 'الرجاء تعبئة جميع الحقول',
@@ -2035,7 +2079,7 @@
                 errBadCredentials: 'البريد الإلكتروني أو كلمة المرور غير صحيحة',
                 errHostNotFound: 'لم يتم العثور على مضيف بهذا الرقم وكود الإحالة',
                 errSupabaseNotConfigured: 'الخادم غير مُهيأ بعد (أكمل إعدادات SUPABASE_URL / SUPABASE_ANON_KEY)',
-                errSendCodeFailed: 'فشل إرسال رمز التفعيل؛ تحقق من رقم الجوال أو الاتصال بالإنترنت',
+                errSendCodeFailed: 'فشل إرسال رمز التفعيل؛ تحقق من البريد الإلكتروني أو الاتصال بالإنترنت',
                 errSignupFailed: 'فشل التسجيل؛ ربما يكون هذا البريد الإلكتروني مسجلاً بالفعل',
                 cannotDeleteLast: 'يجب أن تبقى عوامة واحدة على الأقل في الأسطول',
                 confirmDeleteBuoy: 'هل أنت متأكد من حذف العوامة {id}؟',
@@ -2521,24 +2565,12 @@
         // in that case it's deferred and applied as soon as the map becomes visible again
         let pendingMapFocus = null;
         function focusMapOnBuoy(b) {
-            if (!map || !b) return;
+            if (!map) return;
             const mapVisible = document.getElementById('sec-recent-data').style.display !== 'none';
 
             if (mapVisible) {
                 map.invalidateSize();
-                const lat = Number(b.lat), lon = Number(b.lon);
-                if (!isFinite(lat) || !isFinite(lon)) return;
-                const target = L.latLng(lat, lon);
-                const size = map.getSize();
-                const dist = map.getCenter().distanceTo(target);
-                // flyTo وقتی مقصد همان مرکز فعلی است یا نقشه اندازه صفر دارد، مختصات NaN تولید می‌کند
-                if (dist < 5 && map.getZoom() === 9) {
-                    // همین الان همان‌جاست؛ کاری لازم نیست
-                } else if (dist < 5 || size.x === 0 || size.y === 0) {
-                    map.setView(target, 9, { animate: false });
-                } else {
-                    map.flyTo(target, 9, { duration: 0.8 });
-                }
+                map.flyTo([b.lat, b.lon], 9, { duration: 0.8 });
                 pendingMapFocus = null;
             } else {
                 pendingMapFocus = b;
@@ -2571,9 +2603,6 @@
         }
 
         function showSection(section) {
-            if (currentUser && currentUser.role !== 'host' && section !== 'recent-data') {
-                section = 'recent-data';
-            }
             // Revert any unsaved preview (theme/language/interval/connection mode) back to the
             // last committed state, and reset the pending buoy selection back to the actual active buoy
             applyThemeState(appState.theme);
@@ -2621,17 +2650,7 @@
                 setTimeout(() => {
                     map.invalidateSize();
                     const target = pendingMapFocus || buoysFleet.find(x => x.id === appState.buoyId);
-                    if (target) {
-                        pendingMapFocus = null;
-                        const pt = L.latLng(Number(target.lat), Number(target.lon));
-                        if (isFinite(pt.lat) && isFinite(pt.lng)) {
-                            if (map.getCenter().distanceTo(pt) < 5 || map.getSize().x === 0) {
-                                map.setView(pt, 9, { animate: false });
-                            } else {
-                                map.flyTo(pt, 9, { duration: 0.8 });
-                            }
-                        }
-                    }
+                    if (target) map.flyTo([target.lat, target.lon], 9, { duration: 0.8 });
                     pendingMapFocus = null;
                 }, 300);
             }
@@ -3136,25 +3155,11 @@
         }
 
         async function enterApp() {
-            // ناوگان را بگیر؛ حتی اگر خطا داد، داشبورد باید باز شود
-            try { await loadFleetFromServer(); } catch (e) { console.error('loadFleetFromServer:', e); }
-
+            await loadFleetFromServer();
             document.getElementById('auth-screen').style.display = 'none';
             document.getElementById('app-shell').style.display = 'block';
-            try { applyRolePermissions(); } catch (e) { console.error('applyRolePermissions:', e); }
-            try { showSection('recent-data'); } catch (e) { console.error('showSection:', e); }
-
-            // بعد از بارگذاری ناوگان: نمایش بویه فعال، آخرین تله‌متری و اشتراک زنده
-            try {
-                if (appState.buoyId) applyBuoy(appState.buoyId);
-                refreshBuoyDependentTexts();
-            } catch (e) { console.error('applyBuoy:', e); }
-            try {
-                if (appState.connectionMode === 'online' && supabaseReady) {
-                    Promise.resolve(fetchLatestTelemetryForAllBuoys()).catch(e => console.error('fetchLatest:', e));
-                    subscribeToBuoyRealtime();
-                }
-            } catch (e) { console.error('realtime:', e); }
+            applyRolePermissions();
+            showSection('recent-data');
         }
 
         // Lock/hide every control that sends a command to the buoy when the user is a guest
@@ -3164,13 +3169,7 @@
             const roleBadge = document.getElementById('user-role-badge');
             roleBadge.className = 'role-badge ' + (isHost ? 'host' : 'guest');
             roleBadge.innerText = isHost ? t.roleHost : t.roleGuestObserver;
-            
-            // مهمان فقط به صفحه‌ی اصلی («داشبورد و تله‌متری») دسترسی دارد؛
-            // بقیه‌ی آیتم‌های منوی همبرگری کاملاً مخفی می‌شوند.
-            document.getElementById('menu-link-fleet-parent').style.display = isHost ? 'flex' : 'none';
-            document.getElementById('menu-link-history').style.display = isHost ? 'block' : 'none';
-            const settingsLink = document.querySelector('.nav-link-custom[data-section="settings"]');
-            if (settingsLink) settingsLink.style.display = isHost ? 'block' : 'none';
+
             // Fleet: add/delete buoy locked for guest
             document.getElementById('add-buoy-block').style.display = isHost ? 'block' : 'none';
             document.getElementById('txt-fleet-locked-note').style.display = isHost ? 'none' : 'block';
@@ -3269,8 +3268,7 @@
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
-            // ناوگان در این لحظه هنوز خالی است (بعد از ورود از سرور می‌آید)؛ پس initialBuoy ممکن است undefined باشد
-            updateBatteryIcon(initialBuoy ? initialBuoy.soc : null);
+            updateBatteryIcon(initialBuoy.soc);
             refreshBuoyDependentTexts();
 
             renderMissionBar();
