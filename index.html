@@ -875,7 +875,7 @@
                         <input type="text" class="form-control form-control-sm" id="newBuoyLocation" placeholder="نام محل" style="max-width:160px;">
                         <button class="btn btn-sm btn-success" onclick="addNewBuoy()"><i class="fa-solid fa-check"></i></button>
                     </div>
-                    <p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پارت نامبر باید دقیقاً با شماره‌ای که سخت‌افزار بویه در پیامک خود می‌فرستد (فیلد ID) یکی باشد و پس از ثبت، دیگر قابل تغییر نیست.</p>
+                    <p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پیامک بویه باید دقیقاً از همین شماره سیم ارسال شود؛ شناسه و پارت نامبر بویه به‌صورت خودکار توسط سرور ساخته می‌شود.</p>
                     <p class="locked-note mt-2 mb-0" id="txt-fleet-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span id="txt-fleet-locked-text" data-i18n="fleetLockedText">افزودن/حذف بویه فقط برای میزبان ممکن است</span></p>
                 </div>
 
@@ -1573,24 +1573,29 @@
                         .then(({ error: updErr }) => {
                             if (updErr) console.warn('Could not attach email/password to account:', updErr);
 
-                            const referralCode = 'RAYKA-' + Math.floor(1000 + Math.random() * 8999);
                             const hostRow = {
                                 id: uid,
                                 username: pendingSignup.username,
                                 email: pendingSignup.email,
-                                mobile: pendingSignup.mobile,
-                                referral_code: referralCode
+                                mobile: pendingSignup.mobile
                             };
 
                             return sb.from('hosts').upsert(hostRow).select().single()
                                 .then(({ data: row, error: dbErr }) => {
                                     if (dbErr) { console.warn(dbErr); showAuthError(t.errSignupFailed); return; }
-                                    currentUser = {
-                                        role: 'host', uid: uid, username: row.username,
-                                        email: row.email, mobile: row.mobile, referralCode: row.referral_code
-                                    };
-                                    pendingSignup = null;
-                                    enterApp();
+                                    // host_code توسط یک تریگر در دیتابیس به‌صورت خودکار و یکتا تولید می‌شود؛
+                                    // همان را به‌عنوان کد معرف استفاده می‌کنیم تا هر میزبان قطعاً کد منحصربه‌فرد داشته باشد.
+                                    return sb.from('hosts').update({ referral_code: row.host_code }).eq('id', uid).select().single()
+                                        .then(({ data: updatedRow, error: updErr2 }) => {
+                                            const finalRow = updErr2 ? row : updatedRow;
+                                            currentUser = {
+                                                role: 'host', uid: uid, username: finalRow.username,
+                                                email: finalRow.email, mobile: finalRow.mobile,
+                                                referralCode: finalRow.referral_code || finalRow.host_code
+                                            };
+                                            pendingSignup = null;
+                                            enterApp();
+                                        });
                                 });
                         });
                 })
@@ -2565,6 +2570,9 @@
         }
 
         function showSection(section) {
+            if (currentUser && currentUser.role !== 'host' && section !== 'recent-data') {
+                section = 'recent-data';
+            }
             // Revert any unsaved preview (theme/language/interval/connection mode) back to the
             // last committed state, and reset the pending buoy selection back to the actual active buoy
             applyThemeState(appState.theme);
@@ -3155,7 +3163,13 @@
             const roleBadge = document.getElementById('user-role-badge');
             roleBadge.className = 'role-badge ' + (isHost ? 'host' : 'guest');
             roleBadge.innerText = isHost ? t.roleHost : t.roleGuestObserver;
-
+            
+            // مهمان فقط به صفحه‌ی اصلی («داشبورد و تله‌متری») دسترسی دارد؛
+            // بقیه‌ی آیتم‌های منوی همبرگری کاملاً مخفی می‌شوند.
+            document.getElementById('menu-link-fleet-parent').style.display = isHost ? 'flex' : 'none';
+            document.getElementById('menu-link-history').style.display = isHost ? 'block' : 'none';
+            const settingsLink = document.querySelector('.nav-link-custom[data-section="settings"]');
+            if (settingsLink) settingsLink.style.display = isHost ? 'block' : 'none';
             // Fleet: add/delete buoy locked for guest
             document.getElementById('add-buoy-block').style.display = isHost ? 'block' : 'none';
             document.getElementById('txt-fleet-locked-note').style.display = isHost ? 'none' : 'block';
