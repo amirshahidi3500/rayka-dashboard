@@ -19,11 +19,11 @@
 <!-- Leaflet CSS for Map -->
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
 <!-- Chart.js -->
-<script></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Leaflet JS -->
-<script></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <!-- Supabase JS client (auth + database + realtime) -->
-<script></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
         :root {
             --bg-main: #0f172a;
@@ -1420,7 +1420,7 @@ html[data-bs-theme="light"] .rayka-topbar{
 </div>
 </div>
 <!-- Bootstrap JS -->
-<script></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
         // FLEET DATA (بویه‌های کاربر)
         // مهم: دیگر هیچ داده سنسور فرضی/آزمایشی در اینجا ساخته نمی‌شود. هر بویه فقط با
@@ -3006,7 +3006,7 @@ html[data-bs-theme="light"] .rayka-topbar{
             applyConnectionModeState(appState.connectionMode);
             pendingState = { ...appState, smsRecipients: [...appState.smsRecipients] };
             renderPhoneRows();
-            updateTopRobotPowerButton();
+            document.getElementById('robotPowerToggle').checked = appState.robotPower;
             updateCloudSyncStatus();
             hideSaveFeedback('settings-save-feedback');
             hideSaveFeedback('fleet-save-feedback');
@@ -3331,8 +3331,6 @@ html[data-bs-theme="light"] .rayka-topbar{
             document.documentElement.dir = t.dir;
             document.documentElement.lang = lang;
             document.getElementById('langSelect').value = lang;
-            const sidebarMenu = document.getElementById('sidebarMenu');
-            if (sidebarMenu) { sidebarMenu.classList.toggle('offcanvas-end', t.dir === 'rtl'); sidebarMenu.classList.toggle('offcanvas-start', t.dir === 'ltr'); }
 
             document.getElementById('txt-app-title').innerText = t.appTitle;
             document.getElementById('txt-menu-title').innerText = t.menuTitle;
@@ -3520,72 +3518,7 @@ html[data-bs-theme="light"] .rayka-topbar{
             renderPhoneRows();
         }
 
-        // ===== MAP FULLSCREEN VIEW =====
-        function toggleMapFullscreen() {
-            const shell = document.getElementById('mapVisualShell');
-            if (!shell) return;
-            if (document.fullscreenElement === shell) {
-                document.exitFullscreen();
-            } else if (shell.requestFullscreen) {
-                shell.requestFullscreen();
-            }
-        }
-
-        function updateMapFullscreenButton() {
-            const shell = document.getElementById('mapVisualShell');
-            const btn = document.getElementById('mapFullscreenBtn');
-            if (!shell || !btn) return;
-            const isFull = document.fullscreenElement === shell;
-            btn.innerHTML = isFull
-                ? '<i class="fa-solid fa-compress"></i>'
-                : '<i class="fa-solid fa-expand"></i>';
-            btn.title = isFull ? 'خروج از حالت تمام‌صفحه' : 'تمام‌صفحه کردن نقشه';
-            btn.setAttribute('aria-label', btn.title);
-            if (map) setTimeout(() => map.invalidateSize(), 120);
-        }
-
-        document.addEventListener('fullscreenchange', updateMapFullscreenButton);
-
-        function requestRobotPowerToggleFromSwitch(el) {
-            if (el) el.checked = !!appState.robotPower;
-            requestRobotPowerToggle();
-        }
-
-        function toggleDisplayControl(checked) {
-            // UI control only; the existing telemetry/data logic remains untouched.
-            const el = document.getElementById('displayControlSwitch');
-            if (el) el.checked = !!checked;
-        }
-
         // ===== ROBOT MASTER POWER SWITCH (host only - sends a command to the buoy) =====
-        let pendingRobotPowerChoice = null;
-
-        function requestRobotPowerToggle() {
-            if (!currentUser || currentUser.role !== 'host') return;
-            pendingRobotPowerChoice = !appState.robotPower;
-            const stateEl = document.getElementById('txt-power-confirm-state');
-            if (stateEl) stateEl.innerText = pendingRobotPowerChoice ? 'وضعیت انتخاب‌شده: روشن' : 'وضعیت انتخاب‌شده: خاموش';
-            const modalEl = document.getElementById('robotPowerConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.show();
-        }
-
-        function confirmRobotPowerToggle() {
-            if (pendingRobotPowerChoice === null) return;
-            appState.robotPower = pendingRobotPowerChoice;
-            pendingState.robotPower = pendingRobotPowerChoice;
-            const modalEl = document.getElementById('robotPowerConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.hide();
-            pendingRobotPowerChoice = null;
-            updateTopRobotPowerButton();
-        }
-
-        function updateTopRobotPowerButton() {
-            const sw = document.getElementById('powerControlSwitch');
-            if (sw) sw.checked = !!appState.robotPower;
-        }
-
         function previewRobotPower(checked) {
             pendingState.robotPower = checked;
         }
@@ -3654,9 +3587,8 @@ html[data-bs-theme="light"] .rayka-topbar{
             document.getElementById('btn-add-phone').disabled = !isHost;
 
             // Settings: robot power switch locked for guest
-            const powerSwitch = document.getElementById('powerControlSwitch');
-            if (powerSwitch) powerSwitch.disabled = !isHost;
-            updateTopRobotPowerButton();
+            document.getElementById('robotPowerToggle').disabled = !isHost;
+            document.getElementById('txt-robot-locked-note').style.display = isHost ? 'none' : 'block';
 
             // Dashboard: RS485 socket switch locked for guest
             document.getElementById('rs485Toggle').disabled = !isHost;
@@ -3740,7 +3672,7 @@ html[data-bs-theme="light"] .rayka-topbar{
             applyIntervalInputsFromSeconds(appState.smsIntervalSeconds);
             applyConnectionModeState(appState.connectionMode);
             updateHistoryMenuState();
-            updateTopRobotPowerButton();
+            document.getElementById('robotPowerToggle').checked = appState.robotPower;
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
