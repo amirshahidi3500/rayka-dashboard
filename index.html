@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" data-bs-theme="dark">
+
+<html data-bs-theme="dark" dir="rtl" lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAYRA Fleet & Marine Buoy Control System</title>
-    <!-- PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Leaflet CSS for Map -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Supabase JS client (auth + database + realtime) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SAYRA Fleet &amp; Marine Buoy Control System</title>
+<!-- PWA -->
+<link href="manifest.json" rel="manifest"/>
+<meta content="#0f172a" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<link href="icon-192.png" rel="apple-touch-icon"/>
+<!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- FontAwesome Icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Leaflet CSS for Map -->
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- Supabase JS client (auth + database + realtime) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
         :root {
             --bg-main: #0f172a;
             --card-bg: #1e293b;
@@ -55,8 +56,8 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* Dashboard boxes: all the same size */
-        .sx-box { min-height: 150px; }
+        /* Dashboard boxes: compact responsive layout */
+        .sx-box { min-height: 122px; padding: 12px !important; }
         .sx-sub { font-size: 0.75rem; color: var(--subtext-color); }
         .sx-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 0.85rem; padding: 2px 0; }
         .support-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; color: inherit; text-decoration: none; margin-bottom: 8px; }
@@ -517,530 +518,636 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
-    </style>
-</head>
+    
+        /* ===== Visual-only refinement: responsive cards, depth, light-theme relief, page motion ===== */
+        [data-bs-theme="light"] {
+            --bg-main: #f6f8fb;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #0f172a;
+            --subtext-color: #64748b;
+        }
 
+        .card,
+        .auth-card,
+        .modal-content {
+            border-color: var(--border-color);
+            box-shadow:
+                0 2px 5px rgba(15, 23, 42, 0.05),
+                0 8px 22px rgba(15, 23, 42, 0.07);
+            transition:
+                background-color 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .auth-card,
+        [data-bs-theme="dark"] .modal-content {
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.16),
+                0 10px 26px rgba(0, 0, 0, 0.18);
+        }
+
+        .card:hover {
+            box-shadow:
+                0 4px 9px rgba(15, 23, 42, 0.07),
+                0 12px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        [data-bs-theme="dark"] .card:hover {
+            box-shadow:
+                0 4px 9px rgba(0, 0, 0, 0.20),
+                0 14px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        /* The compact dashboard cards remain readable on narrow phones. */
+        .sx-box {
+            overflow: hidden;
+        }
+
+        .sx-box .sx-row {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 575.98px) {
+            .sx-box {
+                min-height: 112px;
+                padding: 10px !important;
+            }
+
+            .sx-box .metric-val {
+                font-size: 1.15rem;
+            }
+
+            .sx-box .status-block-value {
+                font-size: 0.92rem !important;
+            }
+
+            .sx-box .sx-row {
+                font-size: 0.72rem;
+                gap: 4px;
+            }
+
+            .sx-box .badge {
+                font-size: 0.66rem;
+            }
+
+            .sx-box .form-check-input {
+                transform: scale(1.05) !important;
+            }
+        }
+
+        /* iPhone-like soft motion when changing dashboard sections.
+           Presentation only; no navigation/data logic is changed. */
+        #sec-recent-data,
+        #sec-fleet,
+        #sec-buoy-detail,
+        #sec-history,
+        #sec-settings,
+        #sec-support {
+            animation: sayraPageIn 0.34s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+        }
+
+        @keyframes sayraPageIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px) scale(0.992);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #sec-recent-data,
+            #sec-fleet,
+            #sec-buoy-detail,
+            #sec-history,
+            #sec-settings,
+            #sec-support {
+                animation: none;
+            }
+        }
+
+        /* ===== RAYKA dashboard compact layout v2 ===== */
+        .sx-top-metrics, .sx-bottom-metrics { margin-inline: -0.25rem; }
+        .sx-top-metrics > [class*="col-"], .sx-bottom-metrics > [class*="col-"] { padding-inline: .25rem; }
+        .sx-box {
+            height: 108px;
+            min-height: 108px !important;
+            padding: 10px !important;
+            border-radius: 14px !important;
+            overflow: hidden;
+        }
+        .sx-box .text-muted.small { font-size: .68rem !important; }
+        .sx-box .metric-val { font-size: 1.12rem !important; line-height: 1.15; }
+        .sx-box .status-block-value { font-size: .9rem !important; line-height: 1.1; }
+        .sx-box .sx-row { font-size: .68rem !important; margin-top: .25rem !important; }
+        .sx-box .sx-sub { font-size: .64rem !important; }
+        .sx-box .fa-lg { font-size: .95rem !important; }
+        .sx-box .form-check-input { transform: scale(1.05) !important; }
+        .sx-box .btn { font-size: .58rem !important; padding: .18rem .35rem !important; }
+        .sx-bottom-metrics { margin-bottom: 1rem !important; }
+        .rayka-power-btn { min-width: 38px; height: 32px; border-radius: 10px; }
+        .power-confirm-icon { font-size: 2rem; margin-bottom: 10px; color: #f59e0b; }
+        @media (max-width: 575.98px) {
+            .sx-top-metrics, .sx-bottom-metrics { margin-inline: -0.12rem; }
+            .sx-top-metrics > [class*="col-"], .sx-bottom-metrics > [class*="col-"] { padding-inline: .12rem; }
+            .sx-box { height: 96px; min-height: 96px !important; padding: 8px !important; border-radius: 12px !important; }
+            .sx-box .text-muted.small { font-size: .57rem !important; }
+            .sx-box .metric-val { font-size: .92rem !important; }
+            .sx-box .status-block-value { font-size: .76rem !important; }
+            .sx-box .sx-row { font-size: .57rem !important; gap: 3px; }
+            .sx-box .sx-sub { font-size: .54rem !important; }
+            .sx-box .fa-lg { font-size: .82rem !important; }
+            .sx-box .btn { font-size: .5rem !important; padding: .12rem .24rem !important; }
+            .rayka-power-btn { min-width: 34px; height: 30px; padding-inline: .45rem; }
+        }
+</style>
+</link></head>
 <body class="p-2 p-md-4">
+<div id="auth-screen">
+<div class="auth-card">
+<h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه مدیریت بویه‌های سایرا</h4>
+<p class="text-muted text-center small mb-4" data-i18n="authSubtitle" id="txt-auth-subtitle">برای ورود، نقش خودتان را انتخاب کنید</p>
+<!-- Role selector -->
+<div class="d-flex gap-2 mb-4" id="role-selector">
+<button class="role-select-btn active" id="role-btn-host" onclick="selectRole('host')">
+<i class="fa-solid fa-user-shield d-block fs-4 mb-1"></i>
+<span data-i18n="roleHostLabel" id="txt-role-host">میزبان</span>
+</button>
+<button class="role-select-btn" id="role-btn-guest" onclick="selectRole('guest')">
+<i class="fa-solid fa-user d-block fs-4 mb-1"></i>
+<span data-i18n="roleGuestLabel" id="txt-role-guest">مهمان</span>
+</button>
+</div>
+<!-- HOST PANEL -->
+<div id="host-panel">
+<div class="d-flex justify-content-center gap-2 mb-3">
+<button class="auth-subtoggle active" data-i18n="hostModeLogin" id="host-mode-login-btn" onclick="setHostMode('login')">ورود</button>
+<button class="auth-subtoggle" data-i18n="hostModeSignup" id="host-mode-signup-btn" onclick="setHostMode('signup')">ثبت‌نام میزبان جدید</button>
+</div>
+<!-- Host Login (Supabase email/password) -->
+<div id="host-login-form">
+<div class="mb-2">
+<input class="form-control" data-i18n-ph="phEmail" id="hostLoginUsername" placeholder="ایمیل" type="email"/>
+</div>
+<div class="mb-3 password-wrapper">
+<input class="form-control" data-i18n-ph="phPassword" id="hostLoginPassword" placeholder="رمز عبور" type="password"/>
+<button class="password-toggle-btn" onclick="togglePasswordVisibility('hostLoginPassword', this)" tabindex="-1" type="button">
+<i class="fa-solid fa-eye"></i>
+</button>
+</div>
+<button class="btn btn-primary w-100" data-i18n="btnHostLogin" onclick="hostLoginSubmit()">ورود به عنوان میزبان</button>
+</div>
+<!-- Host Signup -->
+<div id="host-signup-form" style="display:none;">
+<div id="host-signup-step1">
+<div class="mb-2">
+<input class="form-control" data-i18n-ph="phUsername" id="hostSignupUsername" placeholder="نام کاربری" type="text"/>
+</div>
+<div class="mb-2">
+<input class="form-control" data-i18n-ph="phEmail" id="hostSignupEmail" placeholder="ایمیل" type="email"/>
+</div>
+<div class="mb-2 password-wrapper">
+<input class="form-control" data-i18n-ph="phPassword" id="hostSignupPassword" placeholder="رمز عبور" type="password"/>
+<button class="password-toggle-btn" onclick="togglePasswordVisibility('hostSignupPassword', this)" tabindex="-1" type="button">
+<i class="fa-solid fa-eye"></i>
+</button>
+</div>
+<div class="mb-3">
+<input class="form-control" data-i18n-ph="phMobile" id="hostSignupMobile" placeholder="شماره موبایل (مثلاً 0912...)" type="text"/>
+</div>
+<button class="btn btn-primary w-100" data-i18n="btnSendCode" onclick="sendActivationCode()">ارسال کد فعال‌سازی</button>
+</div>
+<div id="host-signup-step2" style="display:none;">
+<p class="text-muted small" data-i18n="activationHint" id="txt-activation-hint">کد فعال‌سازی به ایمیل شما ارسال شد.</p>
+<div class="mb-3">
+<input class="form-control" data-i18n-ph="phActivationCode" id="hostActivationCode" placeholder="کد فعال‌سازی" type="text"/>
+</div>
+<button class="btn btn-success w-100" data-i18n="btnActivate" onclick="confirmActivation()">فعال‌سازی و ورود</button>
+<div class="d-flex justify-content-between mt-2">
+<button class="btn btn-link btn-sm p-0" data-i18n="btnResendCode" onclick="sendActivationCode(true)" type="button">ارسال مجدد کد</button>
+<button class="btn btn-link btn-sm p-0" data-i18n="btnBackEditEmail" onclick="backToSignupStep1()" type="button">ویرایش ایمیل</button>
+</div>
+</div>
+</div>
+</div>
+<!-- GUEST PANEL -->
+<div id="guest-panel" style="display:none;">
+<p class="text-muted small mb-3" data-i18n="guestDesc" id="txt-guest-desc">برای ورود به عنوان مهمان (ناظر)، اطلاعات میزبان اصلی را وارد کنید.</p>
+<div class="mb-2">
+<input class="form-control" data-i18n-ph="phGuestUsername" id="guestUsername" placeholder="نام کاربری شما" type="text"/>
+</div>
+<div class="mb-2">
+<input class="form-control" data-i18n-ph="phHostMobile" id="guestHostMobile" placeholder="شماره موبایل میزبان" type="text"/>
+</div>
+<div class="mb-3">
+<input class="form-control" data-i18n-ph="phReferralCode" id="guestReferralCode" placeholder="کد معرف میزبان" type="text"/>
+</div>
+<button class="btn btn-warning w-100" data-i18n="btnGuestLogin" onclick="guestLoginSubmit()">ورود به عنوان مهمان</button>
+</div>
+<p class="auth-error mt-3 mb-0" id="auth-error-msg"></p>
+<p class="text-muted text-center small mt-2 mb-0" id="txt-otp-note" style="display:none;"></p>
+</div>
+</div>
+<!-- ===== MAIN APP SHELL (hidden until login) ===== -->
+<div id="app-shell" style="display:none;">
+<!-- TOP NAVBAR -->
+<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary flex-wrap gap-2">
+<div class="d-flex align-items-center gap-3">
+<button class="btn btn-outline-primary" data-bs-target="#sidebarMenu" data-bs-toggle="offcanvas" type="button">
+<i class="fa-solid fa-bars fa-lg"></i>
+</button>
+<div>
+<h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های سایرا</span></h4>
+<small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
+</div>
+</div>
+<div class="d-flex align-items-center gap-2">
+<span class="badge status-badge" id="badge-gsm"><i class="fa-solid fa-signal me-1"></i>GSM</span>
+<span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
+<span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>ESP32</span>
+<span class="role-badge" id="user-role-badge">-</span>
+<button class="btn btn-sm btn-outline-warning rayka-power-btn" id="btn-top-robot-power" onclick="requestRobotPowerToggle()" title="روشن/خاموش کردن بویه" type="button"><i class="fa-solid fa-power-off"></i></button><button class="btn btn-sm btn-outline-danger" id="btn-logout" onclick="logout()" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
+</div>
+</div>
+<!-- OFFCANVAS SIDEBAR MENU -->
+<div class="offcanvas offcanvas-start" id="sidebarMenu" tabindex="-1">
+<div class="offcanvas-header border-bottom border-secondary">
+<h5 class="offcanvas-title" id="txt-menu-title"><i class="fa-solid fa-compass me-2 text-primary"></i>منوی ناوبری</h5>
+<button class="btn-close btn-close-white" data-bs-dismiss="offcanvas" type="button"></button>
+</div>
+<div class="offcanvas-body">
+<a class="nav-link-custom active" data-section="recent-data" href="#" onclick="showSection('recent-data'); return false;">
+<i class="fa-solid fa-chart-line me-2"></i><span id="txt-menu-recent">۱. داشبورد و تله‌متری</span>
+</a>
+<a class="nav-link-custom has-submenu" href="#" id="menu-link-fleet-parent" onclick="toggleFleetSubmenu(); return false;">
+<i class="fa-solid fa-layer-group me-2"></i><span id="txt-menu-fleet">۲. بویه‌های من (ناوگان)</span>
+<i class="fa-solid fa-chevron-down submenu-chevron"></i>
+</a>
+<div class="nav-submenu" id="fleet-submenu">
+<a class="nav-link-sub" data-section="fleet" href="#" onclick="showSection('fleet'); return false;">
+<i class="fa-solid fa-list-ol me-2"></i><span id="txt-menu-fleet-count">تعداد بویه‌ها (افزودن / ویرایش / حذف)</span>
+</a>
+<a class="nav-link-sub" data-section="buoy-detail" href="#" onclick="showSection('buoy-detail'); return false;">
+<i class="fa-solid fa-circle-info me-2"></i><span id="txt-menu-fleet-detail">اطلاعات جامع هر بویه</span>
+</a>
+</div>
+<a class="nav-link-custom" data-section="history" href="#" id="menu-link-history" onclick="goToHistorySection(); return false;">
+<i class="fa-solid fa-clock-rotate-left me-2"></i><span id="txt-menu-history">۳. اطلاعات پیشین بویه</span>
+<i class="fa-solid fa-lock ms-auto small text-muted" id="history-lock-icon" style="display:none;"></i>
+</a>
+<div class="text-danger small mb-2 px-2" id="history-locked-notice" style="display:none;">
+<i class="fa-solid fa-triangle-exclamation me-1"></i><span id="txt-history-locked-msg">این بخش فقط در حالت آنلاین در دسترس است</span>
+</div>
+<a class="nav-link-custom" data-section="settings" href="#" onclick="showSection('settings'); return false;">
+<i class="fa-solid fa-gear me-2"></i><span id="txt-menu-settings">۴. تنظیمات سیستم</span>
+</a>
+<a class="nav-link-custom" data-section="support" href="#" onclick="showSection('support'); return false;">
+<i class="fa-solid fa-headset me-2"></i><span data-i18n="menuSupport">۵. پشتیبانی</span>
+</a>
+</div>
+</div>
+<!-- MAIN CONTENT AREA -->
+<div aria-hidden="true" class="modal fade" id="robotPowerConfirmModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered modal-sm">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="txt-power-confirm-title"><i class="fa-solid fa-power-off me-2 text-warning"></i>تأیید تغییر وضعیت بویه</h5>
+<button aria-label="Close" class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body text-center">
+<div class="power-confirm-icon"><i class="fa-solid fa-power-off"></i></div>
+<p class="mb-1 fw-bold" id="txt-power-confirm-question">آیا مطمئن هستید می‌خواهید وضعیت روشن/خاموش بویه را تغییر دهید؟</p>
+<p class="text-muted small mb-0" id="txt-power-confirm-state">—</p>
+</div>
+<div class="modal-footer justify-content-center gap-2">
+<button class="btn btn-secondary" data-bs-dismiss="modal" id="txt-power-confirm-no" type="button">خیر</button>
+<button class="btn btn-warning" id="btn-power-confirm-yes" onclick="confirmRobotPowerToggle()" type="button">بله</button>
+</div>
+</div>
+</div>
+</div><div id="main-content">
+<!-- SECTION 1: RECENT DATA & TELEMETRY -->
+<div id="sec-recent-data">
+<!-- EMERGENCY WATER LEAK ALERT BANNER -->
+<div class="leak-emergency-banner" id="leak-emergency-banner">
+<i class="fa-solid fa-triangle-exclamation me-2"></i>
+<span id="txt-leak-emergency-banner">هشدار! نشتی آب تشخیص داده شد. خاموشی اضطراری بویه توصیه می‌شود.</span>
+</div>
+<!-- OFFLINE MODE BANNER -->
+<div class="offline-banner" id="offline-banner">
+<i class="fa-solid fa-wifi me-1"></i>
+<span id="txt-offline-banner"><b>حالت آفلاین فعال است:</b> داده‌ها مستقیماً از وای‌فای محلی دستگاه (ارسال‌شده توسط برنامه Tasker به شبکه خصوصی بویه‌ها) خوانده می‌شود، نه از سرور آنلاین.</span>
+</div>
+<!-- Metrics Cards -->
+<div class="row g-2 mb-3 sx-top-metrics">
 
-    <div id="auth-screen">
-        <div class="auth-card">
-            <h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه مدیریت بویه‌های سایرا</h4>
-            <p class="text-muted text-center small mb-4" id="txt-auth-subtitle" data-i18n="authSubtitle">برای ورود، نقش خودتان را انتخاب کنید</p>
 
-            <!-- Role selector -->
-            <div class="d-flex gap-2 mb-4" id="role-selector">
-                <button class="role-select-btn active" id="role-btn-host" onclick="selectRole('host')">
-                    <i class="fa-solid fa-user-shield d-block fs-4 mb-1"></i>
-                    <span id="txt-role-host" data-i18n="roleHostLabel">میزبان</span>
-                </button>
-                <button class="role-select-btn" id="role-btn-guest" onclick="selectRole('guest')">
-                    <i class="fa-solid fa-user d-block fs-4 mb-1"></i>
-                    <span id="txt-role-guest" data-i18n="roleGuestLabel">مهمان</span>
-                </button>
-            </div>
 
-            <!-- HOST PANEL -->
-            <div id="host-panel">
-                <div class="d-flex justify-content-center gap-2 mb-3">
-                    <button class="auth-subtoggle active" id="host-mode-login-btn" onclick="setHostMode('login')" data-i18n="hostModeLogin">ورود</button>
-                    <button class="auth-subtoggle" id="host-mode-signup-btn" onclick="setHostMode('signup')" data-i18n="hostModeSignup">ثبت‌نام میزبان جدید</button>
-                </div>
 
-                <!-- Host Login (Supabase email/password) -->
-                <div id="host-login-form">
-                    <div class="mb-2">
-                        <input type="email" class="form-control" id="hostLoginUsername" placeholder="ایمیل" data-i18n-ph="phEmail">
-                    </div>
-                    <div class="mb-3 password-wrapper">
-                        <input type="password" class="form-control" id="hostLoginPassword" placeholder="رمز عبور" data-i18n-ph="phPassword">
-                        <button type="button" class="password-toggle-btn" tabindex="-1" onclick="togglePasswordVisibility('hostLoginPassword', this)">
-                            <i class="fa-solid fa-eye"></i>
-                        </button>
-                    </div>
-                    <button class="btn btn-primary w-100" onclick="hostLoginSubmit()" data-i18n="btnHostLogin">ورود به عنوان میزبان</button>
-                </div>
 
-                <!-- Host Signup -->
-                <div id="host-signup-form" style="display:none;">
-                    <div id="host-signup-step1">
-                        <div class="mb-2">
-                            <input type="text" class="form-control" id="hostSignupUsername" placeholder="نام کاربری" data-i18n-ph="phUsername">
-                        </div>
-                        <div class="mb-2">
-                            <input type="email" class="form-control" id="hostSignupEmail" placeholder="ایمیل" data-i18n-ph="phEmail">
-                        </div>
-                        <div class="mb-2 password-wrapper">
-                            <input type="password" class="form-control" id="hostSignupPassword" placeholder="رمز عبور" data-i18n-ph="phPassword">
-                            <button type="button" class="password-toggle-btn" tabindex="-1" onclick="togglePasswordVisibility('hostSignupPassword', this)">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                        </div>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="hostSignupMobile" placeholder="شماره موبایل (مثلاً 0912...)" data-i18n-ph="phMobile">
-                        </div>
-                        <button class="btn btn-primary w-100" onclick="sendActivationCode()" data-i18n="btnSendCode">ارسال کد فعال‌سازی</button>
-                    </div>
-                    <div id="host-signup-step2" style="display:none;">
-                        <p class="text-muted small" id="txt-activation-hint" data-i18n="activationHint">کد فعال‌سازی به ایمیل شما ارسال شد.</p>
-                        <div class="mb-3">
-                            <input type="text" class="form-control" id="hostActivationCode" placeholder="کد فعال‌سازی" data-i18n-ph="phActivationCode">
-                        </div>
-                        <button class="btn btn-success w-100" onclick="confirmActivation()" data-i18n="btnActivate">فعال‌سازی و ورود</button>
-                        <div class="d-flex justify-content-between mt-2">
-                            <button type="button" class="btn btn-link btn-sm p-0" onclick="sendActivationCode(true)" data-i18n="btnResendCode">ارسال مجدد کد</button>
-                            <button type="button" class="btn btn-link btn-sm p-0" onclick="backToSignupStep1()" data-i18n="btnBackEditEmail">ویرایش ایمیل</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- GUEST PANEL -->
-            <div id="guest-panel" style="display:none;">
-                <p class="text-muted small mb-3" id="txt-guest-desc" data-i18n="guestDesc">برای ورود به عنوان مهمان (ناظر)، اطلاعات میزبان اصلی را وارد کنید.</p>
-                <div class="mb-2">
-                    <input type="text" class="form-control" id="guestUsername" placeholder="نام کاربری شما" data-i18n-ph="phGuestUsername">
-                </div>
-                <div class="mb-2">
-                    <input type="text" class="form-control" id="guestHostMobile" placeholder="شماره موبایل میزبان" data-i18n-ph="phHostMobile">
-                </div>
-                <div class="mb-3">
-                    <input type="text" class="form-control" id="guestReferralCode" placeholder="کد معرف میزبان" data-i18n-ph="phReferralCode">
-                </div>
-                <button class="btn btn-warning w-100" onclick="guestLoginSubmit()" data-i18n="btnGuestLogin">ورود به عنوان مهمان</button>
-            </div>
 
-            <p class="auth-error mt-3 mb-0" id="auth-error-msg"></p>
-            <p class="text-muted text-center small mt-2 mb-0" id="txt-otp-note" style="display:none;"></p>
-        </div>
-    </div>
 
-    <!-- ===== MAIN APP SHELL (hidden until login) ===== -->
-    <div id="app-shell" style="display:none;">
 
-    <!-- TOP NAVBAR -->
-    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
-                <i class="fa-solid fa-bars fa-lg"></i>
-            </button>
-            <div>
-                <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های سایرا</span></h4>
-                <small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
-            </div>
-        </div>
-        <div class="d-flex align-items-center gap-2">
-            <span class="badge status-badge" id="badge-gsm"><i class="fa-solid fa-signal me-1"></i>GSM</span>
-            <span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
-            <span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>ESP32</span>
-            <span class="role-badge" id="user-role-badge">-</span>
-            <button class="btn btn-sm btn-outline-danger" onclick="logout()" title="خروج" id="btn-logout"><i class="fa-solid fa-right-from-bracket"></i></button>
-        </div>
-    </div>
-
-    <!-- OFFCANVAS SIDEBAR MENU -->
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarMenu">
-        <div class="offcanvas-header border-bottom border-secondary">
-            <h5 class="offcanvas-title" id="txt-menu-title"><i class="fa-solid fa-compass me-2 text-primary"></i>منوی ناوبری</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
-        <div class="offcanvas-body">
-
-            <a href="#" class="nav-link-custom active" data-section="recent-data" onclick="showSection('recent-data'); return false;">
-                <i class="fa-solid fa-chart-line me-2"></i><span id="txt-menu-recent">۱. داشبورد و تله‌متری</span>
-            </a>
-
-            <a href="#" class="nav-link-custom has-submenu" id="menu-link-fleet-parent" onclick="toggleFleetSubmenu(); return false;">
-                <i class="fa-solid fa-layer-group me-2"></i><span id="txt-menu-fleet">۲. بویه‌های من (ناوگان)</span>
-                <i class="fa-solid fa-chevron-down submenu-chevron"></i>
-            </a>
-            <div class="nav-submenu" id="fleet-submenu">
-                <a href="#" class="nav-link-sub" data-section="fleet" onclick="showSection('fleet'); return false;">
-                    <i class="fa-solid fa-list-ol me-2"></i><span id="txt-menu-fleet-count">تعداد بویه‌ها (افزودن / ویرایش / حذف)</span>
-                </a>
-                <a href="#" class="nav-link-sub" data-section="buoy-detail" onclick="showSection('buoy-detail'); return false;">
-                    <i class="fa-solid fa-circle-info me-2"></i><span id="txt-menu-fleet-detail">اطلاعات جامع هر بویه</span>
-                </a>
-            </div>
-
-            <a href="#" class="nav-link-custom" id="menu-link-history" data-section="history" onclick="goToHistorySection(); return false;">
-                <i class="fa-solid fa-clock-rotate-left me-2"></i><span id="txt-menu-history">۳. اطلاعات پیشین بویه</span>
-                <i class="fa-solid fa-lock ms-auto small text-muted" id="history-lock-icon" style="display:none;"></i>
-            </a>
-            <div class="text-danger small mb-2 px-2" id="history-locked-notice" style="display:none;">
-                <i class="fa-solid fa-triangle-exclamation me-1"></i><span id="txt-history-locked-msg">این بخش فقط در حالت آنلاین در دسترس است</span>
-            </div>
-
-            <a href="#" class="nav-link-custom" data-section="settings" onclick="showSection('settings'); return false;">
-                <i class="fa-solid fa-gear me-2"></i><span id="txt-menu-settings">۴. تنظیمات سیستم</span>
-            </a>
-
-            <a href="#" class="nav-link-custom" data-section="support" onclick="showSection('support'); return false;">
-                <i class="fa-solid fa-headset me-2"></i><span data-i18n="menuSupport">۵. پشتیبانی</span>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- MAIN CONTENT AREA -->
-    <div id="main-content">
-
-        <!-- SECTION 1: RECENT DATA & TELEMETRY -->
-        <div id="sec-recent-data">
-
-            <!-- EMERGENCY WATER LEAK ALERT BANNER -->
-            <div class="leak-emergency-banner" id="leak-emergency-banner">
-                <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                <span id="txt-leak-emergency-banner">هشدار! نشتی آب تشخیص داده شد. خاموشی اضطراری بویه توصیه می‌شود.</span>
-            </div>
-
-            <!-- OFFLINE MODE BANNER -->
-            <div class="offline-banner" id="offline-banner">
-                <i class="fa-solid fa-wifi me-1"></i>
-                <span id="txt-offline-banner"><b>حالت آفلاین فعال است:</b> داده‌ها مستقیماً از وای‌فای محلی دستگاه (ارسال‌شده توسط برنامه Tasker به شبکه خصوصی بویه‌ها) خوانده می‌شود، نه از سرور آنلاین.</span>
-            </div>
-
-            <!-- Metrics Cards -->
-            <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4 col-xl-3">
-                    <div class="card p-3 sx-box">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
-                            <span class="battery-icon-wrap">
-                                <i class="fa-solid fa-battery-full text-success" id="battery-icon"></i>
-                            </span>
-                        </div>
-                        <div class="metric-val status-ok mt-2"><span id="val-bat">12.6</span>V <small class="fs-6 text-muted">(<span id="val-soc">92</span>%)</small></div>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
+<div class="col-4 col-xl-2">
+<div class="card p-3 sx-box">
+<div class="d-flex justify-content-between align-items-center">
+<span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
+<span class="battery-icon-wrap">
+<i class="fa-solid fa-battery-full text-success" id="battery-icon"></i>
+</span>
+</div>
+<div class="metric-val status-ok mt-2"><span id="val-bat">12.6</span>V <small class="fs-6 text-muted">(<span id="val-soc">92</span>%)</small></div>
+</div>
+</div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gsm-status">متصل</div>
-<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gps-status">متصل</div>
 <div class="sx-row mt-2"><span class="sx-sub" id="txt-satellites-label">ماهواره‌های متصل</span><b id="val-satellites">9</b></div>
-<div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div>
-<div class="col-6 col-md-4 col-xl-3">
-                    <div class="card p-3 sx-box">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
-                            <i class="fa-solid fa-location-dot text-primary"></i>
-                        </div>
-                        <div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-4 col-xl-3">
-                    <div class="card p-3 sx-box" id="leak-card">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
-                            <i class="fa-solid fa-droplet text-info" id="leak-icon"></i>
-                        </div>
-                        <div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div>
-                        <button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button>
-                    </div>
-                </div>
-
-                <div class="col-6 col-md-4 col-xl-3">
-                    <div class="card p-3 sx-box">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
-                            <i class="fa-solid fa-plug text-warning"></i>
-                        </div>
-                        <div class="d-flex align-items-center justify-content-between mt-2">
-                            <span class="fw-bold" id="val-rs485-status">وصل</span>
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-lock lock-badge" id="rs485-lock-icon" style="display:none;"></i>
-                                <div class="form-check form-switch">
-                                    <input class="form-check-input" type="checkbox" id="rs485Toggle" checked style="transform: scale(1.3);" onchange="toggleRs485(this.checked)">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
+<div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div></div>
+<!-- GPS MAP SECTION -->
+<div class="row mb-4">
+<div class="col-12">
+<div class="card p-3">
+<div class="d-flex justify-content-between align-items-center mb-2">
+<h6 class="card-title mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i><span id="txt-map-title">نقشه زنده موقعیت بویه‌ها روی دریا</span></h6>
+<small class="text-muted" id="txt-map-hint">روی هر بویه روی نقشه کلیک کنید تا اطلاعاتش لود شود</small>
+</div>
+<div id="gpsMap"></div>
+<!-- MINIMAL QUICK BUOY SWITCHER -->
+<div class="quick-switch-wrap">
+<span class="quick-switch-label" id="txt-quick-switch-label">سوییچ سریع:</span>
+<div class="dropdown">
+<button aria-expanded="false" class="quick-switch-btn dropdown-toggle" data-bs-toggle="dropdown" id="quickSwitchBtn" type="button">
+<span class="mini-buoy-icon"><i class="fa-solid fa-anchor"></i></span>
+<span id="quickSwitchCurrentName">بویه ۱ (بوشهر)</span>
+</button>
+<ul aria-labelledby="quickSwitchBtn" class="dropdown-menu quick-switch-menu" id="quickSwitchMenu">
+<!-- Populated by JS -->
+</ul>
+</div>
+</div>
+</div>
+</div>
+</div><div class="row g-2 mb-4 sx-bottom-metrics"><div class="col-4 col-xl-2">
+<div class="card p-3 sx-box">
+<div class="d-flex justify-content-between align-items-center">
+<span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
+<i class="fa-solid fa-location-dot text-primary"></i>
+</div>
+<div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div>
+</div>
+</div><div class="col-4 col-xl-2">
+<div class="card p-3 sx-box" id="leak-card">
+<div class="d-flex justify-content-between align-items-center">
+<span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
+<i class="fa-solid fa-droplet text-info" id="leak-icon"></i>
+</div>
+<div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div>
+<button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button>
+</div>
+</div><div class="col-4 col-xl-2">
+<div class="card p-3 sx-box">
+<div class="d-flex justify-content-between align-items-center">
+<span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
+<i class="fa-solid fa-plug text-warning"></i>
+</div>
+<div class="d-flex align-items-center justify-content-between mt-2">
+<span class="fw-bold" id="val-rs485-status">وصل</span>
+<div class="d-flex align-items-center gap-2">
+<i class="fa-solid fa-lock lock-badge" id="rs485-lock-icon" style="display:none;"></i>
+<div class="form-check form-switch">
+<input checked="" class="form-check-input" id="rs485Toggle" onchange="toggleRs485(this.checked)" style="transform: scale(1.3);" type="checkbox"/>
+</div>
+</div>
+</div>
+</div>
+</div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
-<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
+<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div>
-<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
+<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
 <div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
-<div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" style="font-size:.78rem;font-variant-numeric:tabular-nums;" id="val-mission-next">—</b></div>
-<div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div>
-            </div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" id="val-mission-next" style="font-size:.78rem;font-variant-numeric:tabular-nums;">—</b></div>
+<div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div></div>
+</div>
+<!-- SECTION 2: FLEET MANAGEMENT (بویه‌های من) -->
+<div id="sec-fleet" style="display: none;">
+<div class="card p-4 mx-auto" style="max-width: 800px;">
+<h4 class="fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-ship me-2 text-primary"></i><span id="txt-fleet-heading">لیست بویه‌های خریداری‌شده کاربر</span></h4>
+<p class="text-muted small mb-3" id="txt-fleet-desc">مجموعه بویه‌های فعال شما در این حساب کاربری. جهت مشاهده اطلاعات کامل هر بویه، آن را انتخاب کنید.</p>
+<!-- Add buoy (host only) -->
+<div class="mb-3" id="add-buoy-block">
+<button class="btn btn-sm btn-outline-success" onclick="toggleAddBuoyForm()"><i class="fa-solid fa-plus me-1"></i><span data-i18n="addBuoyBtn" id="txt-add-buoy-btn">افزودن بویه جدید</span></button>
+<div class="buoy-add-row mt-2" id="add-buoy-form" style="display:none;">
+<input class="form-control form-control-sm" id="newBuoySimNumber" placeholder="شماره سیم بویه (مثلاً 09120000000)" style="max-width:220px;" type="text"/>
+<input class="form-control form-control-sm" id="newBuoyName" placeholder="نام بویه (مثلاً بویه ۴ - چابهار)" type="text"/>
+<input class="form-control form-control-sm" id="newBuoyLocation" placeholder="نام محل" style="max-width:160px;" type="text"/>
+<button class="btn btn-sm btn-success" onclick="addNewBuoy()"><i class="fa-solid fa-check"></i></button>
+</div>
+<p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پارت نامبر باید دقیقاً با شماره‌ای که سخت‌افزار بویه در پیامک خود می‌فرستد (فیلد ID) یکی باشد و پس از ثبت، دیگر قابل تغییر نیست.</p>
+<p class="locked-note mt-2 mb-0" id="txt-fleet-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span data-i18n="fleetLockedText" id="txt-fleet-locked-text">افزودن/حذف بویه فقط برای میزبان ممکن است</span></p>
+</div>
+<div class="row g-3" id="fleet-card-container">
+<!-- Dynamic Buoy Cards Inserted Here -->
+</div>
+<button class="btn btn-primary w-100 mt-4" id="txt-btn-save-fleet" onclick="saveBuoySelection()">ذخیره انتخاب بویه</button>
+<div class="save-feedback" id="fleet-save-feedback"><i class="fa-solid fa-circle-check me-1"></i><span id="txt-fleet-saved-msg">انتخاب شما ذخیره و به بویه فعال اعمال شد</span></div>
+</div>
+</div>
+<!-- SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) -->
+<div id="sec-buoy-detail" style="display: none;">
+<div class="card p-3 mb-3">
+<h6 class="mb-2"><i class="fa-solid fa-anchor me-2 text-primary"></i>انتخاب بویه</h6>
+<div class="d-flex gap-2 overflow-auto pb-1" id="buoy-detail-tabs"></div>
+</div>
+<!-- MISSION TIMER BAR -->
+<div class="card p-3 mb-3">
+<div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+<h6 class="mb-0" id="txt-mission-title"><i class="fa-solid fa-hourglass-half me-2 text-primary"></i>وضعیت ماموریت (۱۴ روزه)</h6>
+<span class="badge bg-primary" id="val-mission-countdown">--</span>
+</div>
+<div class="row g-3">
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-mission-start-label">شروع ماموریت</div>
+<div class="mission-stat-value" id="val-mission-start">--</div>
+</div>
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-mission-end-label">پایان ماموریت</div>
+<div class="mission-stat-value" id="val-mission-end">--</div>
+</div>
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-sent-count-label">ارسال‌های انجام‌شده</div>
+<div class="mission-stat-value text-success" id="val-sent-count">--</div>
+</div>
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-remaining-count-label">ارسال‌های باقی‌مانده</div>
+<div class="mission-stat-value text-info" id="val-remaining-count">--</div>
+</div>
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-fixed-interval-label">زمان ثابت هر ارسال</div>
+<div class="mission-stat-value" id="val-fixed-interval">--</div>
+</div>
+<div class="col-6 col-md-2">
+<div class="mission-stat-label" id="txt-next-send-label">تا ارسال بعدی</div>
+<div class="mission-stat-value text-warning" id="val-next-send">--</div>
+</div>
+</div>
+</div>
+<div id="buoy-detail-content"><!-- Populated by JS --></div>
+</div>
+<!-- SECTION: HISTORICAL BUOY DATA (only meaningful in Online mode) -->
+<div id="sec-history" style="display: none;">
+<div class="card p-4 mx-auto" style="max-width: 800px;">
+<h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i><span id="txt-history-heading">اطلاعات پیشین بویه</span></h4>
+<p class="text-muted small mb-3" id="txt-history-desc">روند شارژ باتری و دما در ۷ روز اخیر برای بویه فعال.</p>
+<p class="history-note mb-3"><i class="fa-solid fa-server me-1"></i><span id="txt-history-buoy-label">بویه:</span> <b id="val-history-buoy-name">-</b></p>
+<canvas height="140" id="historyChart"></canvas>
+<p class="history-note mt-3 mb-0" id="txt-history-note"><i class="fa-solid fa-circle-info me-1"></i>این بخش پس از اتصال به سرور آنلاین، آرشیو کامل داده‌های هر بویه را نمایش خواهد داد.</p>
+</div>
+</div>
+<!-- SECTION 3: SYSTEM SETTINGS -->
+<div id="sec-settings" style="display: none;">
+<div class="card p-4 mx-auto" style="max-width: 650px;">
+<h4 class="fw-bold mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-sliders me-2 text-warning"></i><span id="txt-setting-heading">تنظیمات سیستم و تم</span></h4>
+<!-- Connection Mode Toggle (Online / Offline) -->
+<div class="mb-4">
+<label class="form-label fw-bold" id="txt-connmode-label">حالت اتصال داده (Online / Offline):</label>
+<div class="d-flex gap-3">
+<button class="btn theme-toggle-btn w-50 active" id="btn-mode-online" onclick="previewConnectionMode('online')">
+<i class="fa-solid fa-cloud me-2"></i><span id="txt-mode-online-btn">آنلاین (سرور)</span>
+</button>
+<button class="btn theme-toggle-btn w-50" id="btn-mode-offline" onclick="previewConnectionMode('offline')">
+<i class="fa-solid fa-wifi me-2"></i><span id="txt-mode-offline-btn">آفلاین (وای‌فای محلی)</span>
+</button>
+</div>
+<p class="text-muted small mt-2 mb-0" id="txt-connmode-desc">در حالت آنلاین، اطلاعات از سرور اختصاصی دریافت می‌شود و آرشیو اطلاعات پیشین هر بویه در دسترس است. در حالت آفلاین، برنامه اطلاعات را مستقیماً از وای‌فای محلی گوشی (که با Tasker از بویه‌ها دریافت می‌شود) می‌خواند و آرشیو پیشین در دسترس نیست.</p>
+<div class="mt-3">
+<label class="form-label small text-muted mb-1" for="local-server-url">آدرس سرور محلی (فقط برای حالت آفلاین - مثلاً آدرس هات‌اسپات مودم/گوشی Tasker):</label>
+<input class="form-control form-control-sm" id="local-server-url" placeholder="http://192.168.4.1:8080/latest.json" type="text"/>
+</div>
+</div>
+<!-- Theme Toggle -->
+<div class="mb-4">
+<label class="form-label fw-bold" id="txt-theme-label">تم ظاهری داشبورد (Theme):</label>
+<div class="d-flex gap-3">
+<button class="btn theme-toggle-btn w-50 active" id="btn-theme-dark" onclick="previewTheme('dark')">
+<i class="fa-solid fa-moon me-2"></i><span id="txt-theme-dark-btn">حالت تاریک (Dark)</span>
+</button>
+<button class="btn theme-toggle-btn w-50" id="btn-theme-light" onclick="previewTheme('light')">
+<i class="fa-solid fa-sun me-2"></i><span id="txt-theme-light-btn">حالت روشن (Light)</span>
+</button>
+</div>
+</div>
+<!-- Language Selection -->
+<div class="mb-4">
+<label class="form-label fw-bold" id="txt-lang-select-label">زبان داشبورد (Language):</label>
+<select class="form-select border-secondary" id="langSelect" onchange="previewLanguage(this.value)">
+<option selected="" value="fa">فارسی (Persian)</option>
+<option value="en">English (انگلیسی)</option>
+<option value="ar">العربية (عربی)</option>
+</select>
+</div>
+<!-- Custom Send Interval (Hours / Minutes / Seconds) -->
+<div class="mb-2">
+<label class="form-label fw-bold" id="txt-interval-label">بازه ارسال پیامک دوره‌ای به ساحل (دلخواه):</label>
+<div class="hms-input-group">
+<div class="hms-input-item">
+<input class="form-control" id="intervalHours" min="0" oninput="previewInterval()" type="number"/>
+<span class="hms-unit-label" id="txt-unit-hours">ساعت</span>
+</div>
+<div class="hms-input-item">
+<input class="form-control" id="intervalMinutes" max="59" min="0" oninput="previewInterval()" type="number"/>
+<span class="hms-unit-label" id="txt-unit-minutes">دقیقه</span>
+</div>
+<div class="hms-input-item">
+<input class="form-control" id="intervalSeconds" max="59" min="0" oninput="previewInterval()" type="number"/>
+<span class="hms-unit-label" id="txt-unit-seconds">ثانیه</span>
+</div>
+</div>
+<p class="text-muted small mt-2 mb-0" id="txt-interval-preview"></p>
+</div>
+<!-- SMS Recipient Phone Numbers (host only - sends command config to the buoy) -->
+<div class="mb-4 mt-4" id="phone-numbers-block">
+<label class="form-label fw-bold" data-i18n="phonesLabel" id="txt-phones-label">شماره‌های گیرنده گزارش پیامکی از بویه:</label>
+<div id="phone-numbers-list"><!-- rows injected by JS --></div>
+<button class="btn btn-sm btn-outline-primary mt-1" id="btn-add-phone" onclick="addPhoneRow()"><i class="fa-solid fa-plus me-1"></i><span data-i18n="addPhoneBtn" id="txt-add-phone-btn">افزودن شماره</span></button>
+<p class="locked-note mt-2 mb-0" id="txt-phones-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span data-i18n="phonesLockedText" id="txt-phones-locked-text">این بخش فقط برای میزبان قابل تغییر است</span></p>
+</div>
+<!-- Robot master power switch (host only - sends command to the buoy) -->
 
-            <!-- GPS MAP SECTION -->
-            <div class="row mb-4">
-                <div class="col-12">
-                    <div class="card p-3">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="card-title mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i><span id="txt-map-title">نقشه زنده موقعیت بویه‌ها روی دریا</span></h6>
-                            <small class="text-muted" id="txt-map-hint">روی هر بویه روی نقشه کلیک کنید تا اطلاعاتش لود شود</small>
-                        </div>
-                        <div id="gpsMap"></div>
-
-                        <!-- MINIMAL QUICK BUOY SWITCHER -->
-                        <div class="quick-switch-wrap">
-                            <span class="quick-switch-label" id="txt-quick-switch-label">سوییچ سریع:</span>
-                            <div class="dropdown">
-                                <button class="quick-switch-btn dropdown-toggle" type="button" id="quickSwitchBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="mini-buoy-icon"><i class="fa-solid fa-anchor"></i></span>
-                                    <span id="quickSwitchCurrentName">بویه ۱ (بوشهر)</span>
-                                </button>
-                                <ul class="dropdown-menu quick-switch-menu" id="quickSwitchMenu" aria-labelledby="quickSwitchBtn">
-                                    <!-- Populated by JS -->
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION 2: FLEET MANAGEMENT (بویه‌های من) -->
-        <div id="sec-fleet" style="display: none;">
-            <div class="card p-4 mx-auto" style="max-width: 800px;">
-                <h4 class="fw-bold mb-3 border-bottom border-secondary pb-2"><i class="fa-solid fa-ship me-2 text-primary"></i><span id="txt-fleet-heading">لیست بویه‌های خریداری‌شده کاربر</span></h4>
-                <p class="text-muted small mb-3" id="txt-fleet-desc">مجموعه بویه‌های فعال شما در این حساب کاربری. جهت مشاهده اطلاعات کامل هر بویه، آن را انتخاب کنید.</p>
-
-                <!-- Add buoy (host only) -->
-                <div class="mb-3" id="add-buoy-block">
-                    <button class="btn btn-sm btn-outline-success" onclick="toggleAddBuoyForm()"><i class="fa-solid fa-plus me-1"></i><span id="txt-add-buoy-btn" data-i18n="addBuoyBtn">افزودن بویه جدید</span></button>
-                    <div class="buoy-add-row mt-2" id="add-buoy-form" style="display:none;">
-                        <input type="text" class="form-control form-control-sm" id="newBuoySimNumber" placeholder="شماره سیم بویه (مثلاً 09120000000)" style="max-width:220px;">
-                        <input type="text" class="form-control form-control-sm" id="newBuoyName" placeholder="نام بویه (مثلاً بویه ۴ - چابهار)">
-                        <input type="text" class="form-control form-control-sm" id="newBuoyLocation" placeholder="نام محل" style="max-width:160px;">
-                        <button class="btn btn-sm btn-success" onclick="addNewBuoy()"><i class="fa-solid fa-check"></i></button>
-                    </div>
-                    <p class="text-muted small mt-1 mb-0" id="txt-part-number-hint"><i class="fa-solid fa-circle-info me-1"></i>پارت نامبر باید دقیقاً با شماره‌ای که سخت‌افزار بویه در پیامک خود می‌فرستد (فیلد ID) یکی باشد و پس از ثبت، دیگر قابل تغییر نیست.</p>
-                    <p class="locked-note mt-2 mb-0" id="txt-fleet-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span id="txt-fleet-locked-text" data-i18n="fleetLockedText">افزودن/حذف بویه فقط برای میزبان ممکن است</span></p>
-                </div>
-
-                <div class="row g-3" id="fleet-card-container">
-                    <!-- Dynamic Buoy Cards Inserted Here -->
-                </div>
-
-                <button class="btn btn-primary w-100 mt-4" id="txt-btn-save-fleet" onclick="saveBuoySelection()">ذخیره انتخاب بویه</button>
-                <div class="save-feedback" id="fleet-save-feedback"><i class="fa-solid fa-circle-check me-1"></i><span id="txt-fleet-saved-msg">انتخاب شما ذخیره و به بویه فعال اعمال شد</span></div>
-            </div>
-        </div>
-
-        <!-- SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) -->
-        <div id="sec-buoy-detail" style="display: none;">
-            <div class="card p-3 mb-3">
-                <h6 class="mb-2"><i class="fa-solid fa-anchor me-2 text-primary"></i>انتخاب بویه</h6>
-                <div class="d-flex gap-2 overflow-auto pb-1" id="buoy-detail-tabs"></div>
-            </div>
-            <!-- MISSION TIMER BAR -->
-            <div class="card p-3 mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                    <h6 class="mb-0" id="txt-mission-title"><i class="fa-solid fa-hourglass-half me-2 text-primary"></i>وضعیت ماموریت (۱۴ روزه)</h6>
-                    <span class="badge bg-primary" id="val-mission-countdown">--</span>
-                </div>
-                <div class="row g-3">
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-mission-start-label">شروع ماموریت</div>
-                        <div class="mission-stat-value" id="val-mission-start">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-mission-end-label">پایان ماموریت</div>
-                        <div class="mission-stat-value" id="val-mission-end">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-sent-count-label">ارسال‌های انجام‌شده</div>
-                        <div class="mission-stat-value text-success" id="val-sent-count">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-remaining-count-label">ارسال‌های باقی‌مانده</div>
-                        <div class="mission-stat-value text-info" id="val-remaining-count">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-fixed-interval-label">زمان ثابت هر ارسال</div>
-                        <div class="mission-stat-value" id="val-fixed-interval">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-next-send-label">تا ارسال بعدی</div>
-                        <div class="mission-stat-value text-warning" id="val-next-send">--</div>
-                    </div>
-                </div>
-            </div>
-            <div id="buoy-detail-content"><!-- Populated by JS --></div>
-        </div>
-
-        <!-- SECTION: HISTORICAL BUOY DATA (only meaningful in Online mode) -->
-        <div id="sec-history" style="display: none;">
-            <div class="card p-4 mx-auto" style="max-width: 800px;">
-                <h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i><span id="txt-history-heading">اطلاعات پیشین بویه</span></h4>
-                <p class="text-muted small mb-3" id="txt-history-desc">روند شارژ باتری و دما در ۷ روز اخیر برای بویه فعال.</p>
-                <p class="history-note mb-3"><i class="fa-solid fa-server me-1"></i><span id="txt-history-buoy-label">بویه:</span> <b id="val-history-buoy-name">-</b></p>
-                <canvas id="historyChart" height="140"></canvas>
-                <p class="history-note mt-3 mb-0" id="txt-history-note"><i class="fa-solid fa-circle-info me-1"></i>این بخش پس از اتصال به سرور آنلاین، آرشیو کامل داده‌های هر بویه را نمایش خواهد داد.</p>
-            </div>
-        </div>
-
-        <!-- SECTION 3: SYSTEM SETTINGS -->
-        <div id="sec-settings" style="display: none;">
-            <div class="card p-4 mx-auto" style="max-width: 650px;">
-                <h4 class="fw-bold mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-sliders me-2 text-warning"></i><span id="txt-setting-heading">تنظیمات سیستم و تم</span></h4>
-
-                <!-- Connection Mode Toggle (Online / Offline) -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold" id="txt-connmode-label">حالت اتصال داده (Online / Offline):</label>
-                    <div class="d-flex gap-3">
-                        <button class="btn theme-toggle-btn w-50 active" id="btn-mode-online" onclick="previewConnectionMode('online')">
-                            <i class="fa-solid fa-cloud me-2"></i><span id="txt-mode-online-btn">آنلاین (سرور)</span>
-                        </button>
-                        <button class="btn theme-toggle-btn w-50" id="btn-mode-offline" onclick="previewConnectionMode('offline')">
-                            <i class="fa-solid fa-wifi me-2"></i><span id="txt-mode-offline-btn">آفلاین (وای‌فای محلی)</span>
-                        </button>
-                    </div>
-                    <p class="text-muted small mt-2 mb-0" id="txt-connmode-desc">در حالت آنلاین، اطلاعات از سرور اختصاصی دریافت می‌شود و آرشیو اطلاعات پیشین هر بویه در دسترس است. در حالت آفلاین، برنامه اطلاعات را مستقیماً از وای‌فای محلی گوشی (که با Tasker از بویه‌ها دریافت می‌شود) می‌خواند و آرشیو پیشین در دسترس نیست.</p>
-                    <div class="mt-3">
-                        <label class="form-label small text-muted mb-1" for="local-server-url">آدرس سرور محلی (فقط برای حالت آفلاین - مثلاً آدرس هات‌اسپات مودم/گوشی Tasker):</label>
-                        <input type="text" class="form-control form-control-sm" id="local-server-url" placeholder="http://192.168.4.1:8080/latest.json">
-                    </div>
-                </div>
-
-                <!-- Theme Toggle -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold" id="txt-theme-label">تم ظاهری داشبورد (Theme):</label>
-                    <div class="d-flex gap-3">
-                        <button class="btn theme-toggle-btn w-50 active" id="btn-theme-dark" onclick="previewTheme('dark')">
-                            <i class="fa-solid fa-moon me-2"></i><span id="txt-theme-dark-btn">حالت تاریک (Dark)</span>
-                        </button>
-                        <button class="btn theme-toggle-btn w-50" id="btn-theme-light" onclick="previewTheme('light')">
-                            <i class="fa-solid fa-sun me-2"></i><span id="txt-theme-light-btn">حالت روشن (Light)</span>
-                        </button>
-                    </div>
-                </div>
-
-
-                <!-- Language Selection -->
-                <div class="mb-4">
-                    <label class="form-label fw-bold" id="txt-lang-select-label">زبان داشبورد (Language):</label>
-                    <select class="form-select border-secondary" id="langSelect" onchange="previewLanguage(this.value)">
-                        <option value="fa" selected>فارسی (Persian)</option>
-                        <option value="en">English (انگلیسی)</option>
-                        <option value="ar">العربية (عربی)</option>
-                    </select>
-                </div>
-
-                <!-- Custom Send Interval (Hours / Minutes / Seconds) -->
-                <div class="mb-2">
-                    <label class="form-label fw-bold" id="txt-interval-label">بازه ارسال پیامک دوره‌ای به ساحل (دلخواه):</label>
-                    <div class="hms-input-group">
-                        <div class="hms-input-item">
-                            <input type="number" min="0" class="form-control" id="intervalHours" oninput="previewInterval()">
-                            <span class="hms-unit-label" id="txt-unit-hours">ساعت</span>
-                        </div>
-                        <div class="hms-input-item">
-                            <input type="number" min="0" max="59" class="form-control" id="intervalMinutes" oninput="previewInterval()">
-                            <span class="hms-unit-label" id="txt-unit-minutes">دقیقه</span>
-                        </div>
-                        <div class="hms-input-item">
-                            <input type="number" min="0" max="59" class="form-control" id="intervalSeconds" oninput="previewInterval()">
-                            <span class="hms-unit-label" id="txt-unit-seconds">ثانیه</span>
-                        </div>
-                    </div>
-                    <p class="text-muted small mt-2 mb-0" id="txt-interval-preview"></p>
-                </div>
-
-                <!-- SMS Recipient Phone Numbers (host only - sends command config to the buoy) -->
-                <div class="mb-4 mt-4" id="phone-numbers-block">
-                    <label class="form-label fw-bold" id="txt-phones-label" data-i18n="phonesLabel">شماره‌های گیرنده گزارش پیامکی از بویه:</label>
-                    <div id="phone-numbers-list"><!-- rows injected by JS --></div>
-                    <button class="btn btn-sm btn-outline-primary mt-1" id="btn-add-phone" onclick="addPhoneRow()"><i class="fa-solid fa-plus me-1"></i><span id="txt-add-phone-btn" data-i18n="addPhoneBtn">افزودن شماره</span></button>
-                    <p class="locked-note mt-2 mb-0" id="txt-phones-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span id="txt-phones-locked-text" data-i18n="phonesLockedText">این بخش فقط برای میزبان قابل تغییر است</span></p>
-                </div>
-
-                <!-- Robot master power switch (host only - sends command to the buoy) -->
-                <div class="mb-4" id="robot-switch-block">
-                    <label class="form-label fw-bold d-flex justify-content-between align-items-center">
-                        <span id="txt-robot-switch-label" data-i18n="robotSwitchLabel">روشن/خاموش کردن ربات (بویه):</span>
-                        <div class="form-check form-switch mb-0">
-                            <input class="form-check-input" type="checkbox" id="robotPowerToggle" checked style="transform: scale(1.3);" onchange="previewRobotPower(this.checked)">
-                        </div>
-                    </label>
-                    <p class="locked-note mb-0" id="txt-robot-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span id="txt-robot-locked-text" data-i18n="robotLockedText">این کلید فرمانی است و فقط میزبان می‌تواند تغییرش دهد</span></p>
-                </div>
-
-                <p class="text-muted small mb-4 mt-3" id="txt-settings-hint"><i class="fa-solid fa-circle-info me-1"></i>تغییرات فقط پیش‌نمایش هستن؛ برای ثبت نهایی باید دکمه ذخیره رو بزنید.</p>
-
-                <button class="btn btn-primary w-100 mt-2" id="txt-btn-save" onclick="saveSettings()">ذخیره تنظیمات در ESP32</button>
-                <div class="save-feedback" id="settings-save-feedback"><i class="fa-solid fa-circle-check me-1"></i><span id="txt-settings-saved-msg">تنظیمات ذخیره شد</span></div>
-
-                <!-- Referral code (host only) -->
-                <div class="mt-4 pt-3 border-top border-secondary" id="referral-code-block" style="display:none;">
-                    <label class="form-label fw-bold" id="txt-referral-label" data-i18n="referralLabel">کد معرف شما برای دعوت مهمان:</label>
-                    <div class="referral-code-box" id="val-referral-code">-</div>
-                </div>
-
-                <!-- Cloud sync status (Supabase) -->
-                <div class="mt-4 pt-3 border-top border-secondary" id="cloud-sync-block">
-                    <label class="form-label fw-bold" id="txt-cloudsync-label" data-i18n="cloudsyncLabel">وضعیت اتصال به سرور ابری:</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-circle-check text-success" id="cloud-sync-icon"></i>
-                        <span id="val-cloud-sync-status">-</span>
-                    </div>
-                    <p class="locked-note mt-1 mb-0" id="txt-cloudsync-note" data-i18n="cloudsyncNote">داده‌ها هنگام اتصال به اینترنت خودکار با سرور همگام می‌شوند و برای مشاهده آفلاین روی همین دستگاه کش می‌شوند.</p>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- SECTION: SUPPORT -->
-        <div id="sec-support" style="display: none;">
-            <div class="card p-4 mx-auto" style="max-width: 650px;">
-                <h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-headset me-2 text-primary"></i><span data-i18n="supportTitle">پشتیبانی</span></h4>
-                <p class="text-muted small mb-3" data-i18n="supportIntro">برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.</p>
-                <div id="support-links"></div>
-            </div>
-        </div>
-
-    </div>
-
-    </div> <!-- /#app-shell -->
-
-    <!-- EDIT BUOY MODAL -->
-    <div class="modal fade" id="editBuoyModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header border-bottom border-secondary">
-                    <h5 class="modal-title"><i class="fa-solid fa-pen me-2 text-primary"></i>ویرایش اطلاعات بویه</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="editBuoyId">
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">پارت نامبر بویه (قفل‌شده)</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="editBuoyPartNumber" disabled>
-                            <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
-                        </div>
-                        <p class="text-muted small mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>پس از ثبت بویه، پارت نامبر دیگر قابل تغییر نیست؛ برای تغییر آن باید کل بویه حذف و دوباره با پارت نامبر جدید اضافه شود.</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">نام بویه</label>
-                        <input type="text" class="form-control" id="editBuoyName">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label small text-muted">نام محل استقرار</label>
-                        <input type="text" class="form-control" id="editBuoyLocation">
-                    </div>
-                </div>
-                <div class="modal-footer border-top border-secondary">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">انصراف</button>
-                    <button type="button" class="btn btn-primary" onclick="saveBuoyEdit()">ذخیره تغییرات</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
+<p class="text-muted small mb-4 mt-3" id="txt-settings-hint"><i class="fa-solid fa-circle-info me-1"></i>تغییرات فقط پیش‌نمایش هستن؛ برای ثبت نهایی باید دکمه ذخیره رو بزنید.</p>
+<button class="btn btn-primary w-100 mt-2" id="txt-btn-save" onclick="saveSettings()">ذخیره تنظیمات در ESP32</button>
+<div class="save-feedback" id="settings-save-feedback"><i class="fa-solid fa-circle-check me-1"></i><span id="txt-settings-saved-msg">تنظیمات ذخیره شد</span></div>
+<!-- Referral code (host only) -->
+<div class="mt-4 pt-3 border-top border-secondary" id="referral-code-block" style="display:none;">
+<label class="form-label fw-bold" data-i18n="referralLabel" id="txt-referral-label">کد معرف شما برای دعوت مهمان:</label>
+<div class="referral-code-box" id="val-referral-code">-</div>
+</div>
+<!-- Cloud sync status (Supabase) -->
+<div class="mt-4 pt-3 border-top border-secondary" id="cloud-sync-block">
+<label class="form-label fw-bold" data-i18n="cloudsyncLabel" id="txt-cloudsync-label">وضعیت اتصال به سرور ابری:</label>
+<div class="d-flex align-items-center gap-2">
+<i class="fa-solid fa-circle-check text-success" id="cloud-sync-icon"></i>
+<span id="val-cloud-sync-status">-</span>
+</div>
+<p class="locked-note mt-1 mb-0" data-i18n="cloudsyncNote" id="txt-cloudsync-note">داده‌ها هنگام اتصال به اینترنت خودکار با سرور همگام می‌شوند و برای مشاهده آفلاین روی همین دستگاه کش می‌شوند.</p>
+</div>
+</div>
+</div>
+<!-- SECTION: SUPPORT -->
+<div id="sec-support" style="display: none;">
+<div class="card p-4 mx-auto" style="max-width: 650px;">
+<h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-headset me-2 text-primary"></i><span data-i18n="supportTitle">پشتیبانی</span></h4>
+<p class="text-muted small mb-3" data-i18n="supportIntro">برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.</p>
+<div id="support-links"></div>
+</div>
+</div>
+</div>
+</div> <!-- /#app-shell -->
+<!-- EDIT BUOY MODAL -->
+<div class="modal fade" id="editBuoyModal" tabindex="-1">
+<div class="modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header border-bottom border-secondary">
+<h5 class="modal-title"><i class="fa-solid fa-pen me-2 text-primary"></i>ویرایش اطلاعات بویه</h5>
+<button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button>
+</div>
+<div class="modal-body">
+<input id="editBuoyId" type="hidden"/>
+<div class="mb-3">
+<label class="form-label small text-muted">پارت نامبر بویه (قفل‌شده)</label>
+<div class="input-group">
+<input class="form-control" disabled="" id="editBuoyPartNumber" type="text"/>
+<span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+</div>
+<p class="text-muted small mt-1 mb-0"><i class="fa-solid fa-circle-info me-1"></i>پس از ثبت بویه، پارت نامبر دیگر قابل تغییر نیست؛ برای تغییر آن باید کل بویه حذف و دوباره با پارت نامبر جدید اضافه شود.</p>
+</div>
+<div class="mb-3">
+<label class="form-label small text-muted">نام بویه</label>
+<input class="form-control" id="editBuoyName" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label small text-muted">نام محل استقرار</label>
+<input class="form-control" id="editBuoyLocation" type="text"/>
+</div>
+</div>
+<div class="modal-footer border-top border-secondary">
+<button class="btn btn-outline-secondary" data-bs-dismiss="modal" type="button">انصراف</button>
+<button class="btn btn-primary" onclick="saveBuoyEdit()" type="button">ذخیره تغییرات</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
         // FLEET DATA (بویه‌های کاربر)
         // مهم: دیگر هیچ داده سنسور فرضی/آزمایشی در اینجا ساخته نمی‌شود. هر بویه فقط با
         // «هویت» (شناسه، نام، محل استقرار اولیه‌ای که میزبان هنگام افزودن بویه وارد می‌کند)
@@ -2625,7 +2732,7 @@
             applyConnectionModeState(appState.connectionMode);
             pendingState = { ...appState, smsRecipients: [...appState.smsRecipients] };
             renderPhoneRows();
-            document.getElementById('robotPowerToggle').checked = appState.robotPower;
+            updateTopRobotPowerButton();
             updateCloudSyncStatus();
             hideSaveFeedback('settings-save-feedback');
             hideSaveFeedback('fleet-save-feedback');
@@ -3138,6 +3245,37 @@
         }
 
         // ===== ROBOT MASTER POWER SWITCH (host only - sends a command to the buoy) =====
+        let pendingRobotPowerChoice = null;
+
+        function requestRobotPowerToggle() {
+            if (!currentUser || currentUser.role !== 'host') return;
+            pendingRobotPowerChoice = !appState.robotPower;
+            const stateEl = document.getElementById('txt-power-confirm-state');
+            if (stateEl) stateEl.innerText = pendingRobotPowerChoice ? 'وضعیت انتخاب‌شده: روشن' : 'وضعیت انتخاب‌شده: خاموش';
+            const modalEl = document.getElementById('robotPowerConfirmModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+
+        function confirmRobotPowerToggle() {
+            if (pendingRobotPowerChoice === null) return;
+            appState.robotPower = pendingRobotPowerChoice;
+            pendingState.robotPower = pendingRobotPowerChoice;
+            const modalEl = document.getElementById('robotPowerConfirmModal');
+            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.hide();
+            pendingRobotPowerChoice = null;
+            updateTopRobotPowerButton();
+        }
+
+        function updateTopRobotPowerButton() {
+            const btn = document.getElementById('btn-top-robot-power');
+            if (!btn) return;
+            btn.classList.toggle('btn-outline-success', !!appState.robotPower);
+            btn.classList.toggle('btn-outline-warning', !appState.robotPower);
+            btn.setAttribute('aria-label', appState.robotPower ? 'خاموش کردن بویه' : 'روشن کردن بویه');
+        }
+
         function previewRobotPower(checked) {
             pendingState.robotPower = checked;
         }
@@ -3206,8 +3344,9 @@
             document.getElementById('btn-add-phone').disabled = !isHost;
 
             // Settings: robot power switch locked for guest
-            document.getElementById('robotPowerToggle').disabled = !isHost;
-            document.getElementById('txt-robot-locked-note').style.display = isHost ? 'none' : 'block';
+            const topPowerBtn = document.getElementById('btn-top-robot-power');
+            if (topPowerBtn) topPowerBtn.disabled = !isHost;
+            updateTopRobotPowerButton();
 
             // Dashboard: RS485 socket switch locked for guest
             document.getElementById('rs485Toggle').disabled = !isHost;
@@ -3291,7 +3430,7 @@
             applyIntervalInputsFromSeconds(appState.smsIntervalSeconds);
             applyConnectionModeState(appState.connectionMode);
             updateHistoryMenuState();
-            document.getElementById('robotPowerToggle').checked = appState.robotPower;
+            updateTopRobotPowerButton();
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
@@ -3313,9 +3452,8 @@
             if (localUrlInput) localUrlInput.value = appState.localServerUrl || '';
         };
     </script>
-
-    <!-- PWA: register service worker for offline app-shell caching -->
-    <script>
+<!-- PWA: register service worker for offline app-shell caching -->
+<script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').catch(err => {
