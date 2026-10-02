@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rayka-buoy-v4';
+const CACHE_NAME = 'sayra-buoy-v5';
 
 // فایل‌های داخلی (اگر یکی نبود، نصب SW خراب نمی‌شود)
 const LOCAL_ASSETS = [
