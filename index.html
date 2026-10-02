@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAYKA Fleet & Marine Buoy Control System</title>
+    <title>SAYRA Fleet & Marine Buoy Control System</title>
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#0f172a">
@@ -55,6 +55,12 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
+        /* Dashboard boxes: all the same size */
+        .sx-box { min-height: 150px; }
+        .sx-sub { font-size: 0.75rem; color: var(--subtext-color); }
+        .sx-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 0.85rem; padding: 2px 0; }
+        .support-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; color: inherit; text-decoration: none; margin-bottom: 8px; }
+        .support-link:hover { border-color: var(--accent); color: inherit; }
         .status-ok { color: #10b981; }
         .status-danger { color: #ef4444; }
         .metric-val { font-size: 1.5rem; font-weight: bold; }
@@ -518,7 +524,7 @@
 
     <div id="auth-screen">
         <div class="auth-card">
-            <h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه مدیریت بویه‌های رایکا</h4>
+            <h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه مدیریت بویه‌های سایرا</h4>
             <p class="text-muted text-center small mb-4" id="txt-auth-subtitle" data-i18n="authSubtitle">برای ورود، نقش خودتان را انتخاب کنید</p>
 
             <!-- Role selector -->
@@ -618,7 +624,7 @@
                 <i class="fa-solid fa-bars fa-lg"></i>
             </button>
             <div>
-                <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های رایکا</span></h4>
+                <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های سایرا</span></h4>
                 <small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
             </div>
         </div>
@@ -668,6 +674,10 @@
                 <i class="fa-solid fa-gear me-2"></i><span id="txt-menu-settings">۴. تنظیمات سیستم</span>
             </a>
 
+            <a href="#" class="nav-link-custom" data-section="support" onclick="showSection('support'); return false;">
+                <i class="fa-solid fa-headset me-2"></i><span data-i18n="menuSupport">۵. پشتیبانی</span>
+            </a>
+
         </div>
     </div>
 
@@ -689,76 +699,10 @@
                 <span id="txt-offline-banner"><b>حالت آفلاین فعال است:</b> داده‌ها مستقیماً از وای‌فای محلی دستگاه (ارسال‌شده توسط برنامه Tasker به شبکه خصوصی بویه‌ها) خوانده می‌شود، نه از سرور آنلاین.</span>
             </div>
 
-            <!-- CONNECTIVITY STATUS BAR (GSM / GPS) -->
-            <div class="card p-3 mb-3">
-                <div class="row g-3">
-                    <div class="col-6 col-md-3">
-                        <div class="status-block">
-                            <i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i>
-                            <div>
-                                <div class="text-muted small" id="txt-gsm-label">وضعیت GSM</div>
-                                <div class="status-block-value" id="val-gsm-status">متصل</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="status-block">
-                            <i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i>
-                            <div>
-                                <div class="text-muted small" id="txt-gps-label">وضعیت GPS</div>
-                                <div class="status-block-value" id="val-gps-status">متصل</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="text-muted small" id="txt-satellites-label">ماهواره‌های متصل</div>
-                        <div class="status-block-value" id="val-satellites">9</div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <div class="text-muted small" id="txt-speed-label">سرعت بویه</div>
-                        <div class="status-block-value" id="val-speed">0.4 km/h</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MISSION TIMER BAR -->
-            <div class="card p-3 mb-3">
-                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
-                    <h6 class="mb-0" id="txt-mission-title"><i class="fa-solid fa-hourglass-half me-2 text-primary"></i>وضعیت ماموریت (۱۴ روزه)</h6>
-                    <span class="badge bg-primary" id="val-mission-countdown">--</span>
-                </div>
-                <div class="row g-3">
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-mission-start-label">شروع ماموریت</div>
-                        <div class="mission-stat-value" id="val-mission-start">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-mission-end-label">پایان ماموریت</div>
-                        <div class="mission-stat-value" id="val-mission-end">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-sent-count-label">ارسال‌های انجام‌شده</div>
-                        <div class="mission-stat-value text-success" id="val-sent-count">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-remaining-count-label">ارسال‌های باقی‌مانده</div>
-                        <div class="mission-stat-value text-info" id="val-remaining-count">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-fixed-interval-label">زمان ثابت هر ارسال</div>
-                        <div class="mission-stat-value" id="val-fixed-interval">--</div>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <div class="mission-stat-label" id="txt-next-send-label">تا ارسال بعدی</div>
-                        <div class="mission-stat-value text-warning" id="val-next-send">--</div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Metrics Cards -->
             <div class="row g-3 mb-4">
-                <div class="col-6 col-md-3">
-                    <div class="card p-3">
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
                             <span class="battery-icon-wrap">
@@ -769,8 +713,15 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-3">
-                    <div class="card p-3">
+                <div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
+<div class="status-block-value mt-2 fs-5" id="val-gsm-status">متصل</div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div>
+<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
+<div class="status-block-value mt-2 fs-5" id="val-gps-status">متصل</div>
+<div class="sx-row mt-2"><span class="sx-sub" id="txt-satellites-label">ماهواره‌های متصل</span><b id="val-satellites">9</b></div>
+<div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div>
+<div class="col-6 col-md-4 col-xl-3">
+                    <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
                             <i class="fa-solid fa-location-dot text-primary"></i>
@@ -779,8 +730,8 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-3">
-                    <div class="card p-3" id="leak-card">
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="card p-3 sx-box" id="leak-card">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
                             <i class="fa-solid fa-droplet text-info" id="leak-icon"></i>
@@ -790,8 +741,8 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-3">
-                    <div class="card p-3">
+                <div class="col-6 col-md-4 col-xl-3">
+                    <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
                             <i class="fa-solid fa-plug text-warning"></i>
@@ -807,6 +758,16 @@
                         </div>
                     </div>
                 </div>
+<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
+<div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
+<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div>
+<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
+<div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div>
+<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div>
+<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
+<div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" style="font-size:.78rem;font-variant-numeric:tabular-nums;" id="val-mission-next">—</b></div>
+<div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div>
             </div>
 
             <!-- GPS MAP SECTION -->
@@ -831,33 +792,6 @@
                                     <!-- Populated by JS -->
                                 </ul>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Telemetry Charts & Temps -->
-            <div class="row g-3">
-                <div class="col-md-8">
-                    <div class="card p-3">
-                        <h6 class="card-title mb-3"><i class="fa-solid fa-chart-area me-2 text-primary"></i><span id="txt-chart-title">روند ولتاژ و جریان لحظه‌ای</span></h6>
-                        <canvas id="telemetryChart" height="110"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card p-3">
-                        <h6 class="card-title mb-3"><i class="fa-solid fa-temperature-half me-2 text-danger"></i><span id="txt-temp-title">دمای سنسورها (DS18B20)</span></h6>
-                        <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
-                            <span id="txt-temp-in">دمای داخل محفظه:</span>
-                            <span class="badge bg-primary fs-6"><span id="val-temp-in">28.5</span> °C</span>
-                        </div>
-                        <div class="d-flex justify-content-between py-2 border-bottom border-secondary">
-                            <span id="txt-temp-out">دمای بیرون (دریا):</span>
-                            <span class="badge bg-info fs-6"><span id="val-temp-out">31.2</span> °C</span>
-                        </div>
-                        <div class="d-flex justify-content-between py-2">
-                            <span id="txt-rh-in">رطوبت داخل محفظه:</span>
-                            <span class="badge bg-warning text-dark fs-6"><span id="val-rh">42</span>%</span>
                         </div>
                     </div>
                 </div>
@@ -897,6 +831,39 @@
             <div class="card p-3 mb-3">
                 <h6 class="mb-2"><i class="fa-solid fa-anchor me-2 text-primary"></i>انتخاب بویه</h6>
                 <div class="d-flex gap-2 overflow-auto pb-1" id="buoy-detail-tabs"></div>
+            </div>
+            <!-- MISSION TIMER BAR -->
+            <div class="card p-3 mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                    <h6 class="mb-0" id="txt-mission-title"><i class="fa-solid fa-hourglass-half me-2 text-primary"></i>وضعیت ماموریت (۱۴ روزه)</h6>
+                    <span class="badge bg-primary" id="val-mission-countdown">--</span>
+                </div>
+                <div class="row g-3">
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-mission-start-label">شروع ماموریت</div>
+                        <div class="mission-stat-value" id="val-mission-start">--</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-mission-end-label">پایان ماموریت</div>
+                        <div class="mission-stat-value" id="val-mission-end">--</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-sent-count-label">ارسال‌های انجام‌شده</div>
+                        <div class="mission-stat-value text-success" id="val-sent-count">--</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-remaining-count-label">ارسال‌های باقی‌مانده</div>
+                        <div class="mission-stat-value text-info" id="val-remaining-count">--</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-fixed-interval-label">زمان ثابت هر ارسال</div>
+                        <div class="mission-stat-value" id="val-fixed-interval">--</div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <div class="mission-stat-label" id="txt-next-send-label">تا ارسال بعدی</div>
+                        <div class="mission-stat-value text-warning" id="val-next-send">--</div>
+                    </div>
+                </div>
             </div>
             <div id="buoy-detail-content"><!-- Populated by JS --></div>
         </div>
@@ -1020,6 +987,15 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- SECTION: SUPPORT -->
+        <div id="sec-support" style="display: none;">
+            <div class="card p-4 mx-auto" style="max-width: 650px;">
+                <h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-headset me-2 text-primary"></i><span data-i18n="supportTitle">پشتیبانی</span></h4>
+                <p class="text-muted small mb-3" data-i18n="supportIntro">برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.</p>
+                <div id="support-links"></div>
+            </div>
         </div>
 
     </div>
@@ -1741,11 +1717,11 @@
         const translations = {
             fa: {
                 dir: 'rtl',
-                appTitle: 'سامانه مدیریت بویه‌های رایکا',
+                appTitle: 'سامانه مدیریت بویه‌های سایرا',
                 menuTitle: 'منوی ناوبری',
                 menuRecent: '۱. داشبورد و تله‌متری',
                 menuFleet: '۲. بویه‌های من (ناوگان)',
-                menuSettings: '۳. تنظیمات سیستم',
+                menuSettings: '۴. تنظیمات سیستم',
                 bat: 'شارژ باتری (INA219)',
                 gps: 'موقعیت دقیق GPS',
                 leak: 'سنسور نشتی آب',
@@ -1799,6 +1775,7 @@
                 fixedIntervalLabel: 'زمان ثابت هر ارسال',
                 nextSendLabel: 'تا ارسال بعدی',
                 missionEnded: 'ماموریت پایان یافته',
+                missionRunning: 'در حال انجام', missionBoxTitle: 'وضعیت ماموریت', nextSendShort: 'ارسال بعدی', tempInBox: 'دما و رطوبت داخل', tempOutBox: 'دما و رطوبت بیرون', rhOut: 'رطوبت بیرون:', rssiLabel: 'قدرت سیگنال', menuSupport: '۵. پشتیبانی', supportTitle: 'پشتیبانی', supportIntro: 'برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.', supportNone: 'راه‌های تماس هنوز ثبت نشده است.',
                 daysUnit: 'روز',
                 menuHistory: '۳. اطلاعات پیشین بویه',
                 historyLockedMsg: 'این بخش فقط در حالت آنلاین در دسترس است',
@@ -1866,11 +1843,11 @@
             },
             en: {
                 dir: 'ltr',
-                appTitle: 'RAYKA Fleet & Buoy Control',
+                appTitle: 'SAYRA Fleet & Buoy Control',
                 menuTitle: 'Navigation Menu',
                 menuRecent: '1. Dashboard & Telemetry',
                 menuFleet: '2. My Buoys (Fleet)',
-                menuSettings: '3. System Settings',
+                menuSettings: '4. System Settings',
                 bat: 'Battery Charge (INA219)',
                 gps: 'Exact GPS Position',
                 leak: 'Water Leak Sensor',
@@ -1924,6 +1901,7 @@
                 fixedIntervalLabel: 'Fixed Interval / Send',
                 nextSendLabel: 'Next Send In',
                 missionEnded: 'Mission ended',
+                missionRunning: 'In progress', missionBoxTitle: 'Mission status', nextSendShort: 'Next send', tempInBox: 'Inside temp & humidity', tempOutBox: 'Outside temp & humidity', rhOut: 'Outside humidity:', rssiLabel: 'Signal strength', menuSupport: '5. Support', supportTitle: 'Support', supportIntro: 'To report a problem or get help, contact us using one of the options below.', supportNone: 'No contact details have been added yet.',
                 daysUnit: 'd',
                 menuHistory: '3. Buoy History',
                 historyLockedMsg: 'This section is only available in Online mode',
@@ -1991,11 +1969,11 @@
             },
             ar: {
                 dir: 'rtl',
-                appTitle: 'نظام إدارة عوامات رايكا',
+                appTitle: 'نظام إدارة عوامات سايرا',
                 menuTitle: 'قائمة التنقل',
                 menuRecent: '١. لوحة التحكم والقياس',
                 menuFleet: '٢. عواماتي (الأسطول)',
-                menuSettings: '٣. إعدادات النظام',
+                menuSettings: '٤. إعدادات النظام',
                 bat: 'شحن البطارية (INA219)',
                 gps: 'موقع GPS الدقيق',
                 leak: 'مستشعر تسرب المياه',
@@ -2049,6 +2027,7 @@
                 fixedIntervalLabel: 'الفترة الثابتة لكل إرسال',
                 nextSendLabel: 'الإرسال التالي خلال',
                 missionEnded: 'انتهت المهمة',
+                missionRunning: 'قيد التنفيذ', missionBoxTitle: 'حالة المهمة', nextSendShort: 'الإرسال التالي', tempInBox: 'الحرارة والرطوبة الداخلية', tempOutBox: 'الحرارة والرطوبة الخارجية', rhOut: 'الرطوبة الخارجية:', rssiLabel: 'قوة الإشارة', menuSupport: '٥. الدعم', supportTitle: 'الدعم', supportIntro: 'للإبلاغ عن مشكلة أو طلب المساعدة، تواصل معنا بإحدى الطرق التالية.', supportNone: 'لم تتم إضافة بيانات التواصل بعد.',
                 daysUnit: 'يوم',
                 menuHistory: '٣. بيانات العوامة السابقة',
                 historyLockedMsg: 'هذا القسم متاح فقط في وضع الاتصال بالإنترنت',
@@ -2442,6 +2421,8 @@
                 }
             };
 
+            const rssiEl = document.getElementById('val-rssi');
+            if (rssiEl) rssiEl.innerText = fmt(b.rssi, ' dBm');
             setStatus('gsm', b.gsm);
             setStatus('gps', b.gps);
 
@@ -2619,6 +2600,22 @@
             document.getElementById('menu-link-fleet-parent').classList.toggle('submenu-expanded');
         }
 
+        // اطلاعات تماس پشتیبانی: فقط موارد پر‌شده نمایش داده می‌شود
+        const SUPPORT_CONTACTS = { phone: '', whatsapp: '', telegram: '', email: '' };
+        function renderSupport() {
+            const t = translations[currentLang()];
+            const defs = [
+                ['phone', 'fa-phone', v => 'tel:' + v], ['whatsapp', 'fa-brands fa-whatsapp', v => 'https://wa.me/' + v.replace(/\D/g, '')],
+                ['telegram', 'fa-brands fa-telegram', v => 'https://t.me/' + v.replace('@', '')], ['email', 'fa-envelope', v => 'mailto:' + v]
+            ];
+            const html = defs.filter(d => SUPPORT_CONTACTS[d[0]]).map(d => {
+                const v = SUPPORT_CONTACTS[d[0]];
+                const ic = d[1].includes('fa-brands') ? d[1] : 'fa-solid ' + d[1];
+                return `<a class="support-link" href="${d[2](v)}" target="_blank" rel="noopener"><i class="${ic} fa-lg text-primary"></i><span dir="ltr">${v}</span></a>`;
+            }).join('');
+            document.getElementById('support-links').innerHTML = html || `<p class="text-muted small mb-0">${t.supportNone}</p>`;
+        }
+
         function showSection(section) {
             // Revert any unsaved preview (theme/language/interval/connection mode) back to the
             // last committed state, and reset the pending buoy selection back to the actual active buoy
@@ -2639,6 +2636,8 @@
             document.getElementById('sec-buoy-detail').style.display = (section === 'buoy-detail') ? 'block' : 'none';
             document.getElementById('sec-history').style.display = (section === 'history') ? 'block' : 'none';
             document.getElementById('sec-settings').style.display = (section === 'settings') ? 'block' : 'none';
+            document.getElementById('sec-support').style.display = (section === 'support') ? 'block' : 'none';
+            if (section === 'support') renderSupport();
 
             document.querySelectorAll('.nav-link-custom').forEach(el => {
                 el.classList.toggle('active', el.dataset.section === section);
@@ -2968,8 +2967,7 @@
             document.getElementById('txt-map-title').innerText = t.mapTitle;
             document.getElementById('txt-map-hint').innerText = t.mapHint;
             document.getElementById('txt-quick-switch-label').innerText = t.quickSwitchLabel;
-            document.getElementById('txt-chart-title').innerText = t.chartTitle;
-            document.getElementById('txt-temp-title').innerText = t.tempTitle;
+            [['txt-chart-title', t.chartTitle], ['txt-temp-title', t.tempTitle]].forEach(([id, v]) => { const e = document.getElementById(id); if (e) e.innerText = v; });
             document.getElementById('txt-temp-in').innerText = t.tempIn;
             document.getElementById('txt-temp-out').innerText = t.tempOut;
             document.getElementById('txt-rh-in').innerText = t.rhIn;
@@ -3092,6 +3090,18 @@
             document.getElementById('val-fixed-interval').innerText = formatHMS(appState.smsIntervalSeconds);
             document.getElementById('val-next-send').innerText = stats.missionOver ? t.missionEnded : formatHMS(stats.secToNext);
             document.getElementById('val-mission-countdown').innerText = stats.missionOver ? t.missionEnded : formatCountdownWithDays(stats.secToMissionEnd, t.daysUnit);
+
+            // باکس وضعیت ماموریت در داشبورد
+            const loc = { fa: 'fa-IR', en: 'en-GB', ar: 'ar' }[currentLang()] || 'fa-IR';
+            const stEl = document.getElementById('val-mission-state');
+            if (stEl) {
+                stEl.innerText = stats.missionOver ? t.missionEnded : t.missionRunning;
+                stEl.className = 'mt-2 fs-5 fw-bold ' + (stats.missionOver ? 'text-secondary' : 'status-ok');
+                const nowD = new Date();
+                const nextAt = new Date(nowD.getTime() + stats.secToNext * 1000).toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('val-mission-next').innerText = stats.missionOver ? '—' : `${formatHMS(stats.secToNext)} (${nextAt})`;
+                document.getElementById('val-now-datetime').innerText = nowD.toLocaleDateString(loc) + ' - ' + nowD.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
+            }
         }
 
         // ===== SMS RECIPIENT PHONE NUMBERS (host only) =====
@@ -3292,8 +3302,8 @@
             setInterval(renderMissionBar, 1000);
 
             // نمودار ولتاژ لحظه‌ای: خالی شروع می‌شود و فقط با رسیدن تله‌متری واقعی پر می‌شود
-            const ctx = document.getElementById('telemetryChart').getContext('2d');
-            liveChartInstance = new Chart(ctx, {
+            const liveCanvas = document.getElementById('telemetryChart');
+            if (liveCanvas) liveChartInstance = new Chart(liveCanvas.getContext('2d'), {
                 type: 'line',
                 data: { labels: [], datasets: [{ label: 'Volts', data: [], borderColor: '#10b981', tension: 0.3 }] },
                 options: { responsive: true, plugins: { legend: { display: false } } }
