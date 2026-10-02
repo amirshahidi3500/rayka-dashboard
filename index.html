@@ -666,6 +666,115 @@
             .sx-box .btn { font-size: .5rem !important; padding: .12rem .24rem !important; }
             .rayka-power-btn { min-width: 34px; height: 30px; padding-inline: .45rem; }
         }
+
+
+        /* ===== RAYKA dashboard v3 layout refinements ===== */
+        .sx-five-col {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+
+        @media (min-width: 992px) {
+            .sx-five-col {
+                flex: 0 0 20%;
+                max-width: 20%;
+            }
+        }
+
+        /* Slightly larger readable text without changing card dimensions */
+        .sx-box .text-muted.small { font-size: .76rem !important; line-height: 1.15; }
+        .sx-box .sx-row { font-size: .74rem !important; line-height: 1.2; }
+        .sx-box .sx-sub { font-size: .68rem !important; }
+        .sx-box .metric-val { font-size: 1.08rem !important; }
+        .sx-box .status-block-value { font-size: .86rem !important; }
+        .sx-box .badge { font-size: .72rem !important; }
+        #val-mission-state { font-size: .98rem !important; line-height: 1.15; }
+
+        .map-visual-shell {
+            position: relative;
+        }
+
+        .map-fullscreen-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            z-index: 1000;
+            width: 32px;
+            height: 32px;
+            border: 1px solid rgba(148,163,184,.45);
+            border-radius: 8px;
+            background: rgba(15,23,42,.72);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .78rem;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+        }
+
+        .map-fullscreen-btn:hover {
+            background: rgba(2,132,199,.9);
+        }
+
+        .map-visual-shell:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            background: var(--bg-main);
+            padding: 0;
+        }
+
+        .map-visual-shell:fullscreen #gpsMap {
+            height: calc(100vh - 54px);
+            border-radius: 0;
+        }
+
+        .map-visual-shell:fullscreen .quick-switch-wrap {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            z-index: 1000;
+            margin: 0;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(15,23,42,.78);
+            backdrop-filter: blur(7px);
+        }
+
+        .map-visual-shell:fullscreen .map-fullscreen-btn {
+            top: 10px;
+            right: 10px;
+        }
+
+        @media (max-width: 575.98px) {
+            /* Mobile: keep the map noticeably shorter; desktop remains 560px. */
+            #gpsMap { height: 300px; }
+
+            .sx-five-col {
+                flex: 0 0 33.333333%;
+                max-width: 33.333333%;
+            }
+
+            .sx-box .text-muted.small { font-size: .62rem !important; }
+            .sx-box .sx-row { font-size: .61rem !important; }
+            .sx-box .sx-sub { font-size: .58rem !important; }
+            .sx-box .metric-val { font-size: .94rem !important; }
+            .sx-box .status-block-value { font-size: .78rem !important; }
+            .sx-box .badge { font-size: .62rem !important; }
+            #val-mission-state { font-size: .82rem !important; }
+
+            .map-fullscreen-btn {
+                width: 30px;
+                height: 30px;
+                top: 6px;
+                right: 6px;
+            }
+
+            .map-visual-shell:fullscreen #gpsMap {
+                height: 100vh;
+            }
+        }
 </style>
 </link></head>
 <body class="p-2 p-md-4">
@@ -855,7 +964,7 @@
 
 
 
-<div class="col-4 col-xl-2">
+<div class="col-4 sx-five-col">
 <div class="card p-3 sx-box">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
@@ -865,9 +974,9 @@
 </div>
 <div class="metric-val status-ok mt-2"><span id="val-bat">12.6</span>V <small class="fs-6 text-muted">(<span id="val-soc">92</span>%)</small></div>
 </div>
-</div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
+</div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gsm-status">متصل</div>
-<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gps-status">متصل</div>
 <div class="sx-row mt-2"><span class="sx-sub" id="txt-satellites-label">ماهواره‌های متصل</span><b id="val-satellites">9</b></div>
 <div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div></div>
@@ -879,6 +988,10 @@
 <h6 class="card-title mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i><span id="txt-map-title">نقشه زنده موقعیت بویه‌ها روی دریا</span></h6>
 <small class="text-muted" id="txt-map-hint">روی هر بویه روی نقشه کلیک کنید تا اطلاعاتش لود شود</small>
 </div>
+<div class="map-visual-shell" id="mapVisualShell">
+<button class="map-fullscreen-btn" id="mapFullscreenBtn" onclick="toggleMapFullscreen()" type="button" title="تمام‌صفحه کردن نقشه" aria-label="تمام‌صفحه کردن نقشه">
+<i class="fa-solid fa-expand"></i>
+</button>
 <div id="gpsMap"></div>
 <!-- MINIMAL QUICK BUOY SWITCHER -->
 <div class="quick-switch-wrap">
@@ -895,7 +1008,8 @@
 </div>
 </div>
 </div>
-</div><div class="row g-2 mb-4 sx-bottom-metrics"><div class="col-4 col-xl-2">
+</div>
+</div><div class="row g-2 mb-4 sx-bottom-metrics"><div class="col-4 sx-five-col">
 <div class="card p-3 sx-box">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
@@ -903,7 +1017,7 @@
 </div>
 <div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div>
 </div>
-</div><div class="col-4 col-xl-2">
+</div><div class="col-4 sx-five-col">
 <div class="card p-3 sx-box" id="leak-card">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
@@ -912,7 +1026,7 @@
 <div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div>
 <button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button>
 </div>
-</div><div class="col-4 col-xl-2">
+</div><div class="col-4 sx-five-col">
 <div class="card p-3 sx-box">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
@@ -928,11 +1042,11 @@
 </div>
 </div>
 </div>
-</div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
+</div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
-<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
+<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div>
-<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div><div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
+<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
 <div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
 <div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" id="val-mission-next" style="font-size:.78rem;font-variant-numeric:tabular-nums;">—</b></div>
 <div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div></div>
@@ -3243,6 +3357,32 @@
             pendingState.smsRecipients.splice(idx, 1);
             renderPhoneRows();
         }
+
+        // ===== MAP FULLSCREEN VIEW =====
+        function toggleMapFullscreen() {
+            const shell = document.getElementById('mapVisualShell');
+            if (!shell) return;
+            if (document.fullscreenElement === shell) {
+                document.exitFullscreen();
+            } else if (shell.requestFullscreen) {
+                shell.requestFullscreen();
+            }
+        }
+
+        function updateMapFullscreenButton() {
+            const shell = document.getElementById('mapVisualShell');
+            const btn = document.getElementById('mapFullscreenBtn');
+            if (!shell || !btn) return;
+            const isFull = document.fullscreenElement === shell;
+            btn.innerHTML = isFull
+                ? '<i class="fa-solid fa-compress"></i>'
+                : '<i class="fa-solid fa-expand"></i>';
+            btn.title = isFull ? 'خروج از حالت تمام‌صفحه' : 'تمام‌صفحه کردن نقشه';
+            btn.setAttribute('aria-label', btn.title);
+            if (map) setTimeout(() => map.invalidateSize(), 120);
+        }
+
+        document.addEventListener('fullscreenchange', updateMapFullscreenButton);
 
         // ===== ROBOT MASTER POWER SWITCH (host only - sends a command to the buoy) =====
         let pendingRobotPowerChoice = null;
