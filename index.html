@@ -19,11 +19,11 @@
 <!-- Leaflet CSS for Map -->
 <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet">
 <!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script></script>
 <!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script></script>
 <!-- Supabase JS client (auth + database + realtime) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script></script>
 <style>
         :root {
             --bg-main: #0f172a;
@@ -1420,7 +1420,7 @@ html[data-bs-theme="light"] .rayka-topbar{
 </div>
 </div>
 <!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script></script>
 <script>
         // FLEET DATA (بویه‌های کاربر)
         // مهم: دیگر هیچ داده سنسور فرضی/آزمایشی در اینجا ساخته نمی‌شود. هر بویه فقط با
@@ -3332,7 +3332,7 @@ html[data-bs-theme="light"] .rayka-topbar{
             document.documentElement.lang = lang;
             document.getElementById('langSelect').value = lang;
             const sidebarMenu = document.getElementById('sidebarMenu');
-            if (sidebarMenu) { sidebarMenu.classList.remove('offcanvas-start','offcanvas-end'); sidebarMenu.classList.add(t.dir === 'rtl' ? 'offcanvas-end' : 'offcanvas-start'); sidebarMenu.setAttribute('dir', t.dir); }
+            if (sidebarMenu) { sidebarMenu.classList.toggle('offcanvas-end', t.dir === 'rtl'); sidebarMenu.classList.toggle('offcanvas-start', t.dir === 'ltr'); }
 
             document.getElementById('txt-app-title').innerText = t.appTitle;
             document.getElementById('txt-menu-title').innerText = t.menuTitle;
@@ -3521,54 +3521,21 @@ html[data-bs-theme="light"] .rayka-topbar{
         }
 
         // ===== MAP FULLSCREEN VIEW =====
-        async function copyGpsCoordinates() {
-            const el = document.getElementById('val-gps-coords');
-            if (!el) return;
-            const value = (el.innerText || '').trim();
-            if (!value || value === '—') return;
-            try {
-                await navigator.clipboard.writeText(value);
-            } catch (err) {
-                const ta = document.createElement('textarea');
-                ta.value = value;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.focus();
-                ta.select();
-                try { document.execCommand('copy'); } catch (_) {}
-                ta.remove();
-            }
-            const btn = document.getElementById('gpsCopyBtn');
-            if (btn) {
-                btn.classList.add('copied');
-                setTimeout(() => btn.classList.remove('copied'), 900);
-            }
-        }
-
-        async function toggleMapFullscreen() {
+        function toggleMapFullscreen() {
             const shell = document.getElementById('mapVisualShell');
             if (!shell) return;
-            try {
-                const active = document.fullscreenElement || document.webkitFullscreenElement;
-                if (active === shell) {
-                    if (document.exitFullscreen) await document.exitFullscreen();
-                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-                } else {
-                    if (shell.requestFullscreen) await shell.requestFullscreen();
-                    else if (shell.webkitRequestFullscreen) shell.webkitRequestFullscreen();
-                }
-            } catch (err) {
-                console.warn('Map fullscreen unavailable:', err);
+            if (document.fullscreenElement === shell) {
+                document.exitFullscreen();
+            } else if (shell.requestFullscreen) {
+                shell.requestFullscreen();
             }
-            setTimeout(updateMapFullscreenButton, 120);
         }
 
         function updateMapFullscreenButton() {
             const shell = document.getElementById('mapVisualShell');
             const btn = document.getElementById('mapFullscreenBtn');
             if (!shell || !btn) return;
-            const isFull = (document.fullscreenElement || document.webkitFullscreenElement) === shell;
+            const isFull = document.fullscreenElement === shell;
             btn.innerHTML = isFull
                 ? '<i class="fa-solid fa-compress"></i>'
                 : '<i class="fa-solid fa-expand"></i>';
@@ -3577,7 +3544,7 @@ html[data-bs-theme="light"] .rayka-topbar{
             if (map) setTimeout(() => map.invalidateSize(), 120);
         }
 
-        document.addEventListener('fullscreenchange', updateMapFullscreenButton); document.addEventListener('webkitfullscreenchange', updateMapFullscreenButton);
+        document.addEventListener('fullscreenchange', updateMapFullscreenButton);
 
         function requestRobotPowerToggleFromSwitch(el) {
             if (el) el.checked = !!appState.robotPower;
