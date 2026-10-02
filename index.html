@@ -809,6 +809,151 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
  .sx-bottom-metrics{gap:.35rem}.sx-bottom-col .sx-box{height:104px;min-height:104px!important;padding:8px!important}
 }
 
+
+/* ===== RAYKA v5 visual refinements ===== */
+.rayka-topbar{
+  position:sticky;
+  top:8px;
+  z-index:2000;
+  margin-inline:-2px;
+  padding:8px 10px !important;
+  border:1px solid var(--border-color) !important;
+  border-radius:22px;
+  background:color-mix(in srgb, var(--card-bg) 88%, transparent);
+  box-shadow:0 8px 28px rgba(15,23,42,.18);
+  backdrop-filter:blur(14px) saturate(135%);
+  -webkit-backdrop-filter:blur(14px) saturate(135%);
+}
+html[data-bs-theme="light"] .rayka-topbar{
+  box-shadow:0 8px 28px rgba(15,23,42,.10);
+}
+.rayka-topbar .status-badge{min-width:62px;text-align:center}
+.rayka-topbar #btn-logout{border-radius:14px}
+.rayka-topbar > div:first-child{min-width:0}
+.rayka-topbar h4{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rayka-topbar .btn-outline-primary{border-radius:14px}
+
+/* Map fills the card horizontally while its title remains outside the map */
+.map-visual-shell{
+  position:relative;
+  margin:0 -12px -12px;
+}
+.map-visual-shell #gpsMap{
+  border-radius:0 0 11px 11px;
+}
+.map-fullscreen-btn{
+  z-index:1200 !important;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+}
+.quick-switch-wrap{
+  position:absolute !important;
+  left:12px !important;
+  bottom:12px !important;
+  z-index:1200 !important;
+  margin:0 !important;
+  padding:6px 8px;
+  border-radius:18px;
+  background:rgba(15,23,42,.72);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 6px 18px rgba(0,0,0,.22);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+}
+.quick-switch-label{font-size:.68rem;white-space:nowrap}
+.quick-switch-btn{font-size:.72rem !important;padding:5px 9px !important;border-radius:14px !important}
+
+/* GPS copy button */
+.sx-bottom-col:first-child .sx-box{position:relative}
+.gps-copy-btn{
+  position:absolute;
+  left:8px;
+  bottom:8px;
+  width:30px;
+  height:30px;
+  border:1px solid var(--border-color);
+  border-radius:9px;
+  background:var(--bg-main);
+  color:var(--subtext-color);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.gps-copy-btn:hover,.gps-copy-btn.copied{color:#0284c7;border-color:#0284c7}
+
+/* Control box: icon-only switches, larger and visually socket-like */
+.rayka-control-title{
+  margin-top:-2px;
+  margin-bottom:.7rem;
+  font-size:.88rem;
+  justify-content:flex-start;
+}
+.rayka-switch-row{
+  min-height:48px;
+  padding:.5rem .1rem;
+}
+.rayka-control-icon{
+  width:34px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:1.05rem;
+}
+.rayka-switch-row .form-check-input.rayka-socket-switch{
+  width:3.15em;
+  height:1.72em;
+  transform:none;
+  cursor:pointer;
+  margin:0;
+}
+.rayka-switch-row .form-check{
+  margin:0;
+}
+.rayka-switch-row>div:first-child{flex:0 0 auto}
+.rayka-switch-row>div:last-child{margin-inline-start:auto}
+
+/* Mission status should be compact but readable */
+#val-mission-state{
+  font-size:.82rem !important;
+  line-height:1.2 !important;
+}
+
+/* Fullscreen: keep quick switch floating inside the map */
+.map-visual-shell:fullscreen .quick-switch-wrap,
+.map-visual-shell:-webkit-full-screen .quick-switch-wrap{
+  left:12px !important;
+  right:auto !important;
+  bottom:12px !important;
+}
+.map-visual-shell:fullscreen .map-fullscreen-btn,
+.map-visual-shell:-webkit-full-screen .map-fullscreen-btn{
+  top:10px !important;
+  right:10px !important;
+}
+@media (max-width:575.98px){
+  .rayka-topbar{
+    top:4px;
+    border-radius:18px;
+    padding:6px 7px !important;
+  }
+  .rayka-topbar .status-badge{min-width:auto;font-size:.62rem;padding:5px 7px}
+  .rayka-topbar .role-badge{display:none}
+  .rayka-topbar h4{font-size:.9rem}
+  .rayka-topbar #txt-current-buoy-display{font-size:.6rem}
+  .map-visual-shell{margin:0 -8px -8px}
+  .map-visual-shell #gpsMap{border-radius:0 0 9px 9px}
+  .quick-switch-wrap{left:8px !important;bottom:8px !important;max-width:calc(100% - 16px)}
+  .quick-switch-label{display:none}
+  .quick-switch-btn{max-width:190px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gps-copy-btn{left:6px;bottom:6px}
+  .rayka-control-title{font-size:.78rem;margin-bottom:.45rem}
+  .rayka-switch-row{min-height:45px}
+  .rayka-control-icon{font-size:1.15rem}
+  .rayka-switch-row .form-check-input.rayka-socket-switch{width:3.25em;height:1.78em}
+}
+
 </style>
 </link></head>
 <body class="p-2 p-md-4">
@@ -900,7 +1045,7 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
 <!-- ===== MAIN APP SHELL (hidden until login) ===== -->
 <div id="app-shell" style="display:none;">
 <!-- TOP NAVBAR -->
-<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary flex-wrap gap-2">
+<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary flex-wrap gap-2 rayka-topbar">
 <div class="d-flex align-items-center gap-3">
 <button class="btn btn-outline-primary" data-bs-target="#sidebarMenu" data-bs-toggle="offcanvas" type="button">
 <i class="fa-solid fa-bars fa-lg"></i>
@@ -913,7 +1058,7 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
 <div class="d-flex align-items-center gap-2">
 <span class="badge status-badge" id="badge-gsm"><i class="fa-solid fa-signal me-1"></i>GSM</span>
 <span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
-<span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>ESP32</span>
+<span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>Core</span>
 <span class="role-badge" id="user-role-badge">-</span>
 <button class="btn btn-sm btn-outline-danger" id="btn-logout" onclick="logout()" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
 </div>
@@ -1022,15 +1167,15 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
     <div class="card p-3 sx-box rayka-control-box">
       <div class="rayka-control-title"><i class="fa-solid fa-sliders"></i><span>کنترل‌های بویه</span></div>
       <div class="rayka-switch-row">
-        <div><i class="fa-solid fa-plug-circle-bolt text-warning"></i><span>خاموش / روشن</span></div>
+        <div class="rayka-control-icon"><i class="fa-solid fa-plug-circle-bolt text-warning"></i></div>
         <div class="form-check form-switch"><input class="form-check-input rayka-socket-switch" id="powerControlSwitch" type="checkbox" checked onchange="requestRobotPowerToggleFromSwitch(this)"></div>
       </div>
       <div class="rayka-switch-row">
-        <div><i class="fa-solid fa-display text-primary"></i><span>نمایشگر</span></div>
+        <div class="rayka-control-icon"><i class="fa-solid fa-display text-primary"></i></div>
         <div class="form-check form-switch"><input class="form-check-input rayka-socket-switch" id="displayControlSwitch" type="checkbox" checked onchange="toggleDisplayControl(this.checked)"></div>
       </div>
       <div class="rayka-switch-row">
-        <div><i class="fa-solid fa-plug text-warning"></i><span id="txt-lbl-rs485">سوکت بدنه RS485-E</span></div>
+        <div class="rayka-control-icon"><i class="fa-solid fa-plug text-warning"></i><span id="txt-lbl-rs485" class="visually-hidden">سوکت بدنه RS485-E</span></div>
         <div class="d-flex align-items-center gap-2"><i class="fa-solid fa-lock lock-badge" id="rs485-lock-icon" style="display:none;"></i><div class="form-check form-switch"><input class="form-check-input rayka-socket-switch" id="rs485Toggle" checked onchange="toggleRs485(this.checked)" type="checkbox"></div></div>
       </div>
     </div>
@@ -1059,7 +1204,7 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
 </div>
 </div>
 <div class="row g-2 mb-4 sx-bottom-metrics">
-<div class="col-6 sx-bottom-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span><i class="fa-solid fa-location-dot text-primary"></i></div><div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div></div></div>
+<div class="col-6 sx-bottom-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span><i class="fa-solid fa-location-dot text-primary"></i></div><div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div><button type="button" class="gps-copy-btn" id="gpsCopyBtn" onclick="copyGpsCoordinates()" title="کپی مختصات GPS" aria-label="کپی مختصات GPS"><i class="fa-regular fa-copy"></i></button></div></div>
 <div class="col-6 sx-bottom-col"><div class="card p-3 sx-box" id="leak-card"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span><i class="fa-solid fa-droplet text-info" id="leak-icon"></i></div><div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div><button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button></div></div>
 <div class="col-6 sx-bottom-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div><div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div><div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div>
 <div class="col-6 sx-bottom-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div><div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div><div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div>
@@ -3187,7 +3332,7 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
             document.documentElement.lang = lang;
             document.getElementById('langSelect').value = lang;
             const sidebarMenu = document.getElementById('sidebarMenu');
-            if (sidebarMenu) { sidebarMenu.classList.toggle('offcanvas-end', t.dir === 'rtl'); sidebarMenu.classList.toggle('offcanvas-start', t.dir === 'ltr'); }
+            if (sidebarMenu) { sidebarMenu.classList.remove('offcanvas-start','offcanvas-end'); sidebarMenu.classList.add(t.dir === 'rtl' ? 'offcanvas-end' : 'offcanvas-start'); sidebarMenu.setAttribute('dir', t.dir); }
 
             document.getElementById('txt-app-title').innerText = t.appTitle;
             document.getElementById('txt-menu-title').innerText = t.menuTitle;
@@ -3376,21 +3521,54 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
         }
 
         // ===== MAP FULLSCREEN VIEW =====
-        function toggleMapFullscreen() {
+        async function copyGpsCoordinates() {
+            const el = document.getElementById('val-gps-coords');
+            if (!el) return;
+            const value = (el.innerText || '').trim();
+            if (!value || value === '—') return;
+            try {
+                await navigator.clipboard.writeText(value);
+            } catch (err) {
+                const ta = document.createElement('textarea');
+                ta.value = value;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try { document.execCommand('copy'); } catch (_) {}
+                ta.remove();
+            }
+            const btn = document.getElementById('gpsCopyBtn');
+            if (btn) {
+                btn.classList.add('copied');
+                setTimeout(() => btn.classList.remove('copied'), 900);
+            }
+        }
+
+        async function toggleMapFullscreen() {
             const shell = document.getElementById('mapVisualShell');
             if (!shell) return;
-            if (document.fullscreenElement === shell) {
-                document.exitFullscreen();
-            } else if (shell.requestFullscreen) {
-                shell.requestFullscreen();
+            try {
+                const active = document.fullscreenElement || document.webkitFullscreenElement;
+                if (active === shell) {
+                    if (document.exitFullscreen) await document.exitFullscreen();
+                    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                } else {
+                    if (shell.requestFullscreen) await shell.requestFullscreen();
+                    else if (shell.webkitRequestFullscreen) shell.webkitRequestFullscreen();
+                }
+            } catch (err) {
+                console.warn('Map fullscreen unavailable:', err);
             }
+            setTimeout(updateMapFullscreenButton, 120);
         }
 
         function updateMapFullscreenButton() {
             const shell = document.getElementById('mapVisualShell');
             const btn = document.getElementById('mapFullscreenBtn');
             if (!shell || !btn) return;
-            const isFull = document.fullscreenElement === shell;
+            const isFull = (document.fullscreenElement || document.webkitFullscreenElement) === shell;
             btn.innerHTML = isFull
                 ? '<i class="fa-solid fa-compress"></i>'
                 : '<i class="fa-solid fa-expand"></i>';
@@ -3399,7 +3577,7 @@ html[dir="ltr"] #sidebarMenu.offcanvas-end{right:auto;left:0}
             if (map) setTimeout(() => map.invalidateSize(), 120);
         }
 
-        document.addEventListener('fullscreenchange', updateMapFullscreenButton);
+        document.addEventListener('fullscreenchange', updateMapFullscreenButton); document.addEventListener('webkitfullscreenchange', updateMapFullscreenButton);
 
         function requestRobotPowerToggleFromSwitch(el) {
             if (el) el.checked = !!appState.robotPower;
