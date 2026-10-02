@@ -800,18 +800,23 @@
 .rayka-top-island .status-badge { font-size:.68rem; padding:5px 8px; }
 .rayka-top-island > div:last-child { flex-shrink:0; }
 
-html[dir="rtl"] .offcanvas.offcanvas-start{
+/* Hamburger menu: V3 behavior, with the opening side following RTL/LTR visually. */
+html[dir="rtl"] #sidebarMenu.offcanvas-start{
     left:auto !important;
     right:0 !important;
-    transform:translateX(100%);
+    transform:translateX(100%) !important;
+    border-left:0 !important;
+    border-right:1px solid var(--border-color);
 }
-html[dir="rtl"] .offcanvas.offcanvas-start.show{ transform:none; }
-html[dir="ltr"] .offcanvas.offcanvas-start{
+html[dir="rtl"] #sidebarMenu.offcanvas-start.show{ transform:translateX(0) !important; }
+html[dir="ltr"] #sidebarMenu.offcanvas-start{
     left:0 !important;
     right:auto !important;
-    transform:translateX(-100%);
+    transform:translateX(-100%) !important;
+    border-right:0 !important;
+    border-left:1px solid var(--border-color);
 }
-html[dir="ltr"] .offcanvas.offcanvas-start.show{ transform:none; }
+html[dir="ltr"] #sidebarMenu.offcanvas-start.show{ transform:translateX(0) !important; }
 .offcanvas { z-index: 1200 !important; }
 
 /* Top dashboard arrangement: 5 columns on desktop */
@@ -865,48 +870,58 @@ html[dir="ltr"] .offcanvas.offcanvas-start.show{ transform:none; }
     padding:14px !important;
 }
 .control-panel-title{
-    text-align:center;
-    font-weight:700;
-    font-size:.9rem;
+    text-align:right;
+    font-weight:800;
+    font-size:.92rem;
     line-height:1;
-    margin-top:-4px;
-    margin-bottom:2px;
+    margin:0 2px 2px;
+    padding:0 2px 9px;
+    border-bottom:1px solid var(--border-color);
     color:var(--text-color);
 }
+.control-panel-title::before{
+    content:'\f1de';
+    font-family:'Font Awesome 6 Free';
+    font-weight:900;
+    margin-inline-end:7px;
+    color:var(--subtext-color);
+}
 .control-switch-row{
-    min-height:48px;
+    min-height:54px;
     display:flex;
     align-items:center;
-    justify-content:center;
-    gap:14px;
-    border:1px solid var(--border-color);
-    border-radius:13px;
-    padding:6px 12px;
-    background:rgba(148,163,184,.055);
+    justify-content:space-between;
+    gap:12px;
+    border:0;
+    border-bottom:1px solid var(--border-color);
+    border-radius:0;
+    padding:6px 5px;
+    background:transparent;
 }
+.control-switch-row:last-child{ border-bottom:0; }
 .control-icon{
-    width:36px;
-    height:36px;
+    width:38px;
+    height:38px;
     display:flex;
     align-items:center;
     justify-content:center;
     border-radius:10px;
-    background:rgba(2,132,199,.10);
+    background:transparent;
     color:var(--accent);
-    font-size:1.05rem;
+    font-size:1.22rem;
     flex:0 0 auto;
 }
 .control-switch-right{
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:10px;
+    gap:7px;
 }
 .control-status{ display:none !important; }
 .control-form{ margin:0 !important; }
 .control-large.form-check-input{
-    width:2.9em !important;
-    height:1.55em !important;
+    width:3.15em !important;
+    height:1.7em !important;
     margin:0 !important;
     cursor:pointer;
 }
@@ -1037,16 +1052,21 @@ html[dir="ltr"] .offcanvas.offcanvas-start.show{ transform:none; }
     .control-panel-title{
         font-size:.82rem;
         margin-bottom:0;
+        padding-bottom:7px;
     }
     .control-switch-row{
-        min-height:53px;
+        min-height:52px;
         gap:7px;
-        padding:5px;
+        padding:5px 4px;
     }
     .control-icon{
-        width:32px;
-        height:32px;
-        font-size:.92rem;
+        width:34px;
+        height:34px;
+        font-size:1.05rem;
+    }
+    .control-large.form-check-input{
+        width:3em !important;
+        height:1.62em !important;
     }
     .rayka-power-btn{
         width:57px !important;
