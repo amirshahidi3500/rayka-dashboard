@@ -55,8 +55,8 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* Dashboard boxes: all the same size */
-        .sx-box { min-height: 150px; }
+        /* Dashboard boxes: compact responsive layout */
+        .sx-box { min-height: 122px; padding: 12px !important; }
         .sx-sub { font-size: 0.75rem; color: var(--subtext-color); }
         .sx-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; font-size: 0.85rem; padding: 2px 0; }
         .support-link { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid var(--border-color); border-radius: 10px; color: inherit; text-decoration: none; margin-bottom: 8px; }
@@ -517,7 +517,120 @@
             opacity: 0 !important;
             pointer-events: none !important;
         }
-    </style>
+    
+        /* ===== Visual-only refinement: responsive cards, depth, light-theme relief, page motion ===== */
+        [data-bs-theme="light"] {
+            --bg-main: #f6f8fb;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-color: #0f172a;
+            --subtext-color: #64748b;
+        }
+
+        .card,
+        .auth-card,
+        .modal-content {
+            border-color: var(--border-color);
+            box-shadow:
+                0 2px 5px rgba(15, 23, 42, 0.05),
+                0 8px 22px rgba(15, 23, 42, 0.07);
+            transition:
+                background-color 0.3s ease,
+                border-color 0.3s ease,
+                box-shadow 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .auth-card,
+        [data-bs-theme="dark"] .modal-content {
+            box-shadow:
+                0 2px 5px rgba(0, 0, 0, 0.16),
+                0 10px 26px rgba(0, 0, 0, 0.18);
+        }
+
+        .card:hover {
+            box-shadow:
+                0 4px 9px rgba(15, 23, 42, 0.07),
+                0 12px 28px rgba(15, 23, 42, 0.09);
+        }
+
+        [data-bs-theme="dark"] .card:hover {
+            box-shadow:
+                0 4px 9px rgba(0, 0, 0, 0.20),
+                0 14px 30px rgba(0, 0, 0, 0.22);
+        }
+
+        /* The compact dashboard cards remain readable on narrow phones. */
+        .sx-box {
+            overflow: hidden;
+        }
+
+        .sx-box .sx-row {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 575.98px) {
+            .sx-box {
+                min-height: 112px;
+                padding: 10px !important;
+            }
+
+            .sx-box .metric-val {
+                font-size: 1.15rem;
+            }
+
+            .sx-box .status-block-value {
+                font-size: 0.92rem !important;
+            }
+
+            .sx-box .sx-row {
+                font-size: 0.72rem;
+                gap: 4px;
+            }
+
+            .sx-box .badge {
+                font-size: 0.66rem;
+            }
+
+            .sx-box .form-check-input {
+                transform: scale(1.05) !important;
+            }
+        }
+
+        /* iPhone-like soft motion when changing dashboard sections.
+           Presentation only; no navigation/data logic is changed. */
+        #sec-recent-data,
+        #sec-fleet,
+        #sec-buoy-detail,
+        #sec-history,
+        #sec-settings,
+        #sec-support {
+            animation: sayraPageIn 0.34s cubic-bezier(0.22, 0.8, 0.24, 1) both;
+        }
+
+        @keyframes sayraPageIn {
+            from {
+                opacity: 0;
+                transform: translateY(7px) scale(0.992);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #sec-recent-data,
+            #sec-fleet,
+            #sec-buoy-detail,
+            #sec-history,
+            #sec-settings,
+            #sec-support {
+                animation: none;
+            }
+        }
+</style>
 </head>
 
 <body class="p-2 p-md-4">
@@ -701,7 +814,7 @@
 
             <!-- Metrics Cards -->
             <div class="row g-3 mb-4">
-                <div class="col-6 col-md-4 col-xl-3">
+                <div class="col-4 col-xl-2">
                     <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
@@ -713,14 +826,14 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
+                <div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gsm-status">متصل</div>
 <div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
+<div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gps-status">متصل</div>
 <div class="sx-row mt-2"><span class="sx-sub" id="txt-satellites-label">ماهواره‌های متصل</span><b id="val-satellites">9</b></div>
 <div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div>
-<div class="col-6 col-md-4 col-xl-3">
+<div class="col-4 col-xl-2">
                     <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
@@ -730,7 +843,7 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-4 col-xl-3">
+                <div class="col-4 col-xl-2">
                     <div class="card p-3 sx-box" id="leak-card">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
@@ -741,7 +854,7 @@
                     </div>
                 </div>
 
-                <div class="col-6 col-md-4 col-xl-3">
+                <div class="col-4 col-xl-2">
                     <div class="card p-3 sx-box">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
@@ -758,13 +871,13 @@
                         </div>
                     </div>
                 </div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
+<div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
 <div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
+<div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div>
 <div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div>
-<div class="col-6 col-md-4 col-xl-3"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
+<div class="col-4 col-xl-2"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
 <div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
 <div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" style="font-size:.78rem;font-variant-numeric:tabular-nums;" id="val-mission-next">—</b></div>
 <div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div>
