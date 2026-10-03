@@ -785,12 +785,32 @@ html[dir="rtl"] .me-1{margin-right:0!important;margin-left:.25rem!important}
 html[dir="rtl"] .me-2{margin-right:0!important;margin-left:.5rem!important}
 html[dir="rtl"] .ms-auto{margin-left:0!important;margin-right:auto!important}
 
-/* sticky island bar */
-.sx-island-wrap{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:1030;display:flex;justify-content:center;margin-bottom:10px;pointer-events:none}
-.sx-island{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:520px;padding:6px 8px;border-radius:999px;background:rgba(8,12,22,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(148,163,184,.22);box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.sx-island-btn{width:38px;height:38px;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
-.sx-island-badges{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+/* sticky frosted-glass bar (iOS style, follows the theme) */
+.sx-island-wrap{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:1030;margin-bottom:10px}
+.sx-island{display:flex;align-items:center;gap:8px;width:100%;padding:6px 8px;border-radius:14px;background:rgba(30,41,59,.55);-webkit-backdrop-filter:blur(22px) saturate(1.8);backdrop-filter:blur(22px) saturate(1.8);border:1px solid rgba(255,255,255,.14);box-shadow:0 6px 22px rgba(0,0,0,.22)}
+html[data-bs-theme="light"] .sx-island{background:rgba(255,255,255,.6);border-color:rgba(15,23,42,.08);box-shadow:0 6px 22px rgba(15,23,42,.10)}
+.sx-island-btn{width:36px;height:36px;border-radius:10px;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sx-island-badges{display:flex;align-items:center;gap:6px;flex-wrap:nowrap;min-width:0}
+.sx-island-end{display:flex;align-items:center;gap:8px;margin-inline-start:auto;min-width:0}
 .sx-island .status-badge{padding:6px 9px;font-size:.7rem;white-space:nowrap}
+.sx-island .role-badge{white-space:nowrap}
+/* iPhone-style battery: fill = charge %, color = same gradient as the map buoys */
+.sx-batt{position:relative;direction:ltr;flex-shrink:0;width:42px;height:22px;margin-right:4px;border-radius:7px;background:rgba(148,163,184,.32)}
+.sx-batt::after{content:"";position:absolute;right:-4px;top:50%;transform:translateY(-50%);width:3px;height:8px;border-radius:0 3px 3px 0;background:rgba(148,163,184,.6)}
+.sx-batt-fill{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:7px;background:#64748b;transition:width .4s ease,background-color .4s ease}
+.sx-batt-num{position:relative;z-index:1;display:block;text-align:center;font-weight:700;font-size:.78rem;line-height:22px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6);font-variant-numeric:tabular-nums}
+html[data-bs-theme="light"] .sx-batt-num{color:#0f172a;text-shadow:none}
+@media (max-width:575.98px){
+  .sx-island{gap:5px;padding:5px 6px}
+  .sx-island-end{gap:5px}
+  .sx-island-btn{width:32px;height:32px}
+  .sx-island-badges{gap:4px}
+  .sx-island .status-badge{padding:5px 6px;font-size:.62rem}
+  .sx-island .status-badge i{display:none}
+  .sx-island .role-badge{font-size:.62rem;padding:3px 7px}
+  .sx-batt{width:38px;height:20px}
+  .sx-batt-num{font-size:.72rem;line-height:20px}
+}
 
 /* top dashboard grid: desktop 5 cols (controls = 2 cols x 2 rows), mobile 3 cols */
 .sx-top-grid{display:grid;gap:.5rem;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:96px;grid-template-areas:"gsm gps ctl" "mis bat ctl";margin-bottom:.75rem}
@@ -831,20 +851,47 @@ html[dir="rtl"] .ms-auto{margin-left:0!important;margin-right:auto!important}
 /* map: edge-to-edge card + floating switcher + fullscreen (native or CSS fallback) */
 .sx-map-card{padding:4px!important}
 .sx-map-card #gpsMap{border-radius:9px}
-.map-visual-shell .quick-switch-wrap{position:absolute;left:10px;right:auto;bottom:10px;z-index:1000;margin:0;padding:5px 8px;border-radius:999px;background:rgba(8,12,22,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(148,163,184,.25)}
-.map-visual-shell .quick-switch-label{color:#cbd5e1}
-.map-visual-shell .quick-switch-btn{color:#fff;border-color:rgba(148,163,184,.4)}
+.map-visual-shell .quick-switch-wrap{position:absolute;left:10px;right:auto;bottom:10px;z-index:1000;margin:0;padding:4px;border-radius:12px;background:rgba(30,41,59,.5);-webkit-backdrop-filter:blur(16px) saturate(1.8);backdrop-filter:blur(16px) saturate(1.8);border:1px solid rgba(255,255,255,.16);box-shadow:0 4px 16px rgba(0,0,0,.2)}
+html[data-bs-theme="light"] .map-visual-shell .quick-switch-wrap{background:rgba(255,255,255,.55);border-color:rgba(15,23,42,.1)}
+.map-visual-shell .quick-switch-label{display:none}
+.map-visual-shell .quick-switch-btn{color:var(--text-color);border-color:transparent;background:transparent}
 body.map-full-open{overflow:hidden}
 .map-visual-shell.is-full{position:fixed;inset:0;z-index:3000;width:100%;height:100vh;height:100dvh;background:var(--bg-main);padding:0;border-radius:0}
 .map-visual-shell.is-full #gpsMap{height:100%!important;border-radius:0}
 .map-visual-shell.is-full .map-fullscreen-btn{top:calc(env(safe-area-inset-top,0px) + 10px);right:10px}
-.map-visual-shell.is-full .quick-switch-wrap{position:absolute;left:calc(env(safe-area-inset-left,0px) + 12px);right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);margin:0;padding:5px 8px;border-radius:999px;background:rgba(8,12,22,.82)}
+.map-visual-shell.is-full .quick-switch-wrap{position:absolute;left:calc(env(safe-area-inset-left,0px) + 12px);right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);margin:0}
+
+/* tap-to-activate ring (touch only) */
+.map-visual-shell.map-active #gpsMap{box-shadow:0 0 0 2px var(--accent)}
+/* buoy popup */
+.sx-popup .leaflet-popup-content-wrapper{background:var(--card-bg);color:var(--text-color);border-radius:12px;padding:0;border:1px solid var(--border-color);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.sx-popup .leaflet-popup-content{margin:0;width:auto!important;font-size:.7rem;line-height:1.25}
+.sx-popup .leaflet-popup-tip{background:var(--card-bg)}
+.sx-popup a.leaflet-popup-close-button{top:5px;right:6px;color:var(--subtext-color)}
+html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
+.sx-pop{padding:9px 10px 10px;min-width:232px}
+.sx-pop-head{display:flex;align-items:center;gap:6px;padding-inline-end:16px;font-size:.72rem;color:var(--text-color)}
+.sx-pop-head>i{color:var(--accent)}
+.sx-pop-copy{border:0;background:transparent;color:var(--subtext-color);padding:0 2px;font-size:.78rem;cursor:pointer}
+.sx-pop-copy:hover{color:var(--accent)}
+.sx-pop-title{display:flex;align-items:center;gap:7px;margin-top:7px}
+.sx-pop-dot{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.55rem;flex-shrink:0}
+.sx-pop-name{font-weight:700;font-size:.82rem;line-height:1.1}
+.sx-pop-id{font-size:.6rem;color:var(--subtext-color);direction:ltr;text-align:start}
+.sx-pop-more{margin-inline-start:auto;border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:8px;padding:3px 7px;font-size:.64rem;white-space:nowrap;cursor:pointer}
+.sx-pop-more:hover{background:var(--accent);color:#fff}
+.sx-pop-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.sx-pop-tile{background:rgba(148,163,184,.13);border-radius:9px;padding:6px 7px;min-width:0}
+.sx-pop-lbl{font-size:.58rem;color:var(--subtext-color);line-height:1.2}
+.sx-pop-val{display:flex;align-items:center;gap:5px;font-weight:700;font-size:.72rem;margin-top:3px}
+.sx-pop-val small{font-weight:500;color:var(--subtext-color);font-size:.62rem}
+.sx-pop-val+.sx-pop-val{margin-top:2px}
 </style>
 </link></head>
 <body class="p-2 p-md-4">
 <div id="auth-screen">
 <div class="auth-card">
-<h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه مدیریت بویه‌های سایرا</h4>
+<h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه سایرا</h4>
 <p class="text-muted text-center small mb-4" data-i18n="authSubtitle" id="txt-auth-subtitle">برای ورود، نقش خودتان را انتخاب کنید</p>
 <!-- Role selector -->
 <div class="d-flex gap-2 mb-4" id="role-selector">
@@ -929,7 +976,7 @@ body.map-full-open{overflow:hidden}
 </div>
 <!-- ===== MAIN APP SHELL (hidden until login) ===== -->
 <div id="app-shell" style="display:none;">
-<!-- TOP NAVBAR (sticky island) -->
+<!-- TOP NAVBAR (sticky glass bar) -->
 <div class="sx-island-wrap">
 <div class="sx-island" role="toolbar">
 <button class="btn btn-outline-primary sx-island-btn" data-bs-target="#sidebarMenu" data-bs-toggle="offcanvas" type="button" aria-label="Menu">
@@ -940,15 +987,16 @@ body.map-full-open{overflow:hidden}
 <span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
 <span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>Core</span>
 </div>
+<div class="sx-island-end">
+<span class="role-badge" id="user-role-badge">-</span>
+<span class="sx-batt" id="island-batt" title="—"><span class="sx-batt-fill" id="island-batt-fill"></span><span class="sx-batt-num" id="island-batt-num">—</span></span>
 <button class="btn btn-outline-danger sx-island-btn" id="btn-logout" onclick="logout()" title="خروج" type="button"><i class="fa-solid fa-right-from-bracket"></i></button>
 </div>
 </div>
-<div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-3 pb-2 border-bottom border-secondary">
-<div>
-<h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های سایرا</span></h4>
-<small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
 </div>
-<span class="role-badge" id="user-role-badge">-</span>
+<div class="mb-3 pb-2 border-bottom border-secondary">
+<h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه سایرا</span></h4>
+<small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
 </div>
 <!-- OFFCANVAS SIDEBAR MENU -->
 <div class="offcanvas offcanvas-start" id="sidebarMenu" tabindex="-1">
@@ -2001,7 +2049,7 @@ body.map-full-open{overflow:hidden}
         const translations = {
             fa: {
                 dir: 'rtl',
-                appTitle: 'سامانه مدیریت بویه‌های سایرا',
+                appTitle: 'سامانه سایرا',
                 menuTitle: 'منوی ناوبری',
                 menuRecent: '۱. داشبورد و تله‌متری',
                 menuFleet: '۲. بویه‌های من (ناوگان)',
@@ -2019,7 +2067,7 @@ body.map-full-open{overflow:hidden}
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر',
                 mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
@@ -2128,7 +2176,7 @@ body.map-full-open{overflow:hidden}
             },
             en: {
                 dir: 'ltr',
-                appTitle: 'SAYRA Fleet & Buoy Control',
+                appTitle: 'SAYRA System',
                 menuTitle: 'Navigation Menu',
                 menuRecent: '1. Dashboard & Telemetry',
                 menuFleet: '2. My Buoys (Fleet)',
@@ -2146,7 +2194,7 @@ body.map-full-open{overflow:hidden}
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data',
                 mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
@@ -2255,7 +2303,7 @@ body.map-full-open{overflow:hidden}
             },
             ar: {
                 dir: 'rtl',
-                appTitle: 'نظام إدارة عوامات سايرا',
+                appTitle: 'نظام سايرا',
                 menuTitle: 'قائمة التنقل',
                 menuRecent: '١. لوحة التحكم والقياس',
                 menuFleet: '٢. عواماتي (الأسطول)',
@@ -2273,7 +2321,7 @@ body.map-full-open{overflow:hidden}
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد',
                 mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
@@ -2436,7 +2484,10 @@ body.map-full-open{overflow:hidden}
 
         // ===== MAP =====
         function initMap() {
-            map = L.map('gpsMap').setView([27.8, 53.5], 6);
+            // Touch: the map ignores swipes (so the page scrolls) until you tap it once; wheel-zoom likewise needs a click
+            const coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            map = L.map('gpsMap', { dragging: !coarse, touchZoom: !coarse, scrollWheelZoom: false }).setView([27.8, 53.5], 6);
+            map.on('click', () => setMapInteractive(true));
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 18,
@@ -2460,9 +2511,11 @@ body.map-full-open{overflow:hidden}
                 iconAnchor: [15, 15]
             });
 
+            const popupWasOpen = !!(markers[b.id] && markers[b.id].isPopupOpen && markers[b.id].isPopupOpen());
             if (markers[b.id]) { map.removeLayer(markers[b.id]); }
             const marker = L.marker([b.lat, b.lon], { icon: buoyIcon }).addTo(map);
-            marker.bindPopup(`<b>${b.id} - ${b.name}</b><br>${b.locationName}<br>SOC: ${fmt(b.soc, '%')}`);
+            marker.bindPopup(() => buoyPopupHtml(b), { className: 'sx-popup', maxWidth: 280, minWidth: 232, autoPanPaddingTopLeft: [10, 20] });
+            if (popupWasOpen) marker.openPopup();
             marker.on('click', () => quickSelectBuoy(b.id));
 
             markers[b.id] = marker;
@@ -2828,6 +2881,7 @@ body.map-full-open{overflow:hidden}
             { const dsp = document.getElementById('displayToggle'); if (dsp) dsp.checked = b.display !== false; }
 
             updateBatteryIcon(b.soc);
+            updateIslandBattery(b);
             refreshBuoyDependentTexts();
 
             // Update Map Markers Visual
@@ -3426,6 +3480,103 @@ body.map-full-open{overflow:hidden}
             renderPhoneRows();
         }
 
+        // ===== MAP: tap-to-activate (touch) =====
+        let mapInteractive = false;
+        function setMapInteractive(on) {
+            if (!map) return;
+            mapInteractive = on;
+            const touch = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            if (on) { map.scrollWheelZoom.enable(); if (touch) { map.dragging.enable(); map.touchZoom.enable(); } }
+            else { map.scrollWheelZoom.disable(); if (touch) { map.dragging.disable(); map.touchZoom.disable(); } }
+            const shell = document.getElementById('mapVisualShell');
+            if (shell) shell.classList.toggle('map-active', on && touch);
+        }
+        // touching anywhere outside the map hands swipes back to the page
+        document.addEventListener('pointerdown', (e) => {
+            if (!mapInteractive) return;
+            const shell = document.getElementById('mapVisualShell');
+            if (shell && !shell.contains(e.target) && !shell.classList.contains('is-full')) setMapInteractive(false);
+        }, true);
+
+        // ===== MAP: buoy info popup =====
+        function escHtml(v) { return String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+        function agoText(iso) {
+            if (!iso) return '—';
+            const diff = Math.round((new Date(iso).getTime() - Date.now()) / 1000);
+            if (Number.isNaN(diff)) return '—';
+            const lang = currentLang();
+            let rtf; try { rtf = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' }); } catch (e) { return '—'; }
+            const abs = Math.abs(diff);
+            if (abs < 60) return rtf.format(0, 'second');
+            if (abs < 3600) return rtf.format(Math.round(diff / 60), 'minute');
+            if (abs < 86400) return rtf.format(Math.round(diff / 3600), 'hour');
+            return rtf.format(Math.round(diff / 86400), 'day');
+        }
+
+        function buoyPopupHtml(b) {
+            const t = translations[currentLang()];
+            const ago = agoText(b.lastUpdate);
+            const hasPos = b.lat !== null && b.lat !== undefined && b.lon !== null && b.lon !== undefined;
+            const pos = hasPos ? `${Math.abs(b.lat).toFixed(4)}° ${b.lat >= 0 ? 'N' : 'S'}, ${Math.abs(b.lon).toFixed(4)}° ${b.lon >= 0 ? 'E' : 'W'}` : '—';
+            const col = socToColor(b.soc);
+            const leak = b.leak === 'WET' ? `<span class="status-danger">${t.leakValWet}</span>` : (b.leak === 'DRY' ? `<span class="status-ok">${t.leakValDry}</span>` : '—');
+            const id = escHtml(b.id).replace(/'/g, '');
+            return `<div class="sx-pop">
+                <div class="sx-pop-head"><i class="fa-solid fa-location-dot"></i><span dir="ltr">${pos}</span><button class="sx-pop-copy" type="button" title="${escHtml(t.copyCoords)}" onclick="copyBuoyCoords('${id}', this)"><i class="fa-regular fa-copy"></i></button></div>
+                <div class="sx-pop-title">
+                    <span class="sx-pop-dot" style="background:${col}"><i class="fa-solid fa-anchor"></i></span>
+                    <div><div class="sx-pop-name">${escHtml(b.name)}</div><div class="sx-pop-id">${escHtml(b.id)}</div></div>
+                    <button class="sx-pop-more" type="button" onclick="openBuoyDetailFromMap('${id}')"><i class="fa-solid fa-chart-line me-1"></i>${t.popMore}</button>
+                </div>
+                <div class="sx-pop-grid">
+                    <div class="sx-pop-tile"><div class="sx-pop-lbl">${t.popBattery} • ${ago}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-battery-half" style="color:${col}"></i>${fmt(b.vbat, ' V')} <small>${fmt(b.soc, '%')}</small></div></div>
+                    <div class="sx-pop-tile"><div class="sx-pop-lbl">${t.popTemp} • ${ago}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-temperature-half text-danger"></i><small>${t.popTempIn}</small>${fmt(b.tempIn, '°')}<small>${t.popTempOut}</small>${fmt(b.tempOut, '°')}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-droplet text-info"></i>${fmt(b.rh, '%')}</div></div>
+                    <div class="sx-pop-tile"><div class="sx-pop-lbl">${t.popSignal} • ${ago}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-signal text-success"></i>${fmt(b.rssi, ' dBm')}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-satellite text-primary"></i>${fmt(b.satellites)} <small>${fmt(b.speedKmh, ' km/h')}</small></div></div>
+                    <div class="sx-pop-tile"><div class="sx-pop-lbl">${t.popLeak} • ${ago}</div>
+                        <div class="sx-pop-val"><i class="fa-solid fa-droplet text-info"></i>${leak}</div></div>
+                </div>
+            </div>`;
+        }
+
+        function copyBuoyCoords(id, el) {
+            const b = buoysFleet.find(x => x.id === id);
+            if (!b || b.lat === null || b.lat === undefined || b.lon === null || b.lon === undefined) return;
+            const txt = `${b.lat}, ${b.lon}`;
+            const done = () => { if (!el) return; el.innerHTML = '<i class="fa-solid fa-check text-success"></i>'; setTimeout(() => { el.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 1500); };
+            const fallback = () => {
+                const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) {}
+                document.body.removeChild(ta);
+            };
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done).catch(fallback); else fallback();
+        }
+
+        function openBuoyDetailFromMap(id) {
+            exitMapFull();
+            if (map) map.closePopup();
+            selectedDetailBuoyId = id;
+            showSection('buoy-detail');
+        }
+
+        // ===== ISLAND BATTERY (iPhone style) =====
+        function updateIslandBattery(b) {
+            const box = document.getElementById('island-batt');
+            if (!box) return;
+            const soc = b ? b.soc : null;
+            const ok = soc !== null && soc !== undefined && !Number.isNaN(soc);
+            document.getElementById('island-batt-fill').style.width = ok ? Math.max(0, Math.min(100, soc)) + '%' : '0%';
+            document.getElementById('island-batt-fill').style.background = socToColor(soc);
+            document.getElementById('island-batt-num').innerText = ok ? Math.round(soc) : '—';
+            box.title = ok ? `${(b.vbat !== null && b.vbat !== undefined) ? b.vbat + ' V · ' : ''}${Math.round(soc)}%` : '—';
+        }
+
         // ===== MAP FULLSCREEN VIEW =====
         // CSS overlay on every device (works on Android/PWA where the Fullscreen API on a div is unreliable);
         // on desktop the native Fullscreen API is added on top. The shell is moved to <body> while open
@@ -3444,6 +3595,7 @@ body.map-full-open{overflow:hidden}
             document.body.appendChild(shell);
             shell.classList.add('is-full');
             document.body.classList.add('map-full-open');
+            setMapInteractive(true);
             try { history.pushState({ mapFull: 1 }, ''); mapFullPushed = true; } catch (e) {}
             const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
             if (!touch && shell.requestFullscreen) { try { shell.requestFullscreen().catch(() => {}); } catch (e) {} }
@@ -3455,6 +3607,7 @@ body.map-full-open{overflow:hidden}
             if (!shell || !shell.classList.contains('is-full')) return;
             shell.classList.remove('is-full');
             document.body.classList.remove('map-full-open');
+            setMapInteractive(false);
             if (shell._ph && shell._ph.parentNode) { shell._ph.parentNode.insertBefore(shell, shell._ph); shell._ph.remove(); shell._ph = null; }
             if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) {} }
             if (mapFullPushed) { mapFullPushed = false; if (!fromPop) { try { history.back(); } catch (e) {} } }
@@ -3704,7 +3857,7 @@ body.map-full-open{overflow:hidden}
             renderPhoneRows();
 
             const initialBuoy = buoysFleet.find(x => x.id === appState.buoyId);
-            if (initialBuoy) updateBatteryIcon(initialBuoy.soc);
+            if (initialBuoy) { updateBatteryIcon(initialBuoy.soc); updateIslandBattery(initialBuoy); }
             refreshBuoyDependentTexts();
 
             renderMissionBar();
