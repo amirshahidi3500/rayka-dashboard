@@ -886,6 +886,63 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 .sx-pop-val{display:flex;align-items:center;gap:5px;font-weight:700;font-size:.72rem;margin-top:3px}
 .sx-pop-val small{font-weight:500;color:var(--subtext-color);font-size:.62rem}
 .sx-pop-val+.sx-pop-val{margin-top:2px}
+
+/* ===== SAYRA v6: comprehensive info page ===== */
+.sx-dfilter-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.sx-dfield{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sx-dfield label{font-size:.7rem;color:var(--subtext-color);margin:0}
+.sx-dbuoy{flex:1 1 220px}.sx-drange{flex:1 1 220px}.sx-dtime{flex:0 1 110px}
+.sx-drange-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:start;white-space:normal}
+.sx-drange-btn #detail-range-text{flex:1}
+#detail-live-btn i{margin-inline-end:6px}
+#detail-live-btn:not(.active){opacity:.85}
+.sx-dbanner{margin-top:10px;font-size:.78rem;padding:8px 10px;border-radius:10px;background:rgba(2,132,199,.12);color:var(--text-color);border:1px solid rgba(2,132,199,.35)}
+.sx-dbanner i{color:#38bdf8;margin-inline-end:6px}
+/* calendar */
+.sx-cal{margin-top:10px;padding:10px;border:1px solid var(--border-color);border-radius:12px;max-width:340px}
+.sx-cal-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
+.sx-cal-title{font-weight:700;font-size:.85rem}
+.sx-cal-nav{width:30px;height:30px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-color);display:inline-flex;align-items:center;justify-content:center}
+html[dir="rtl"] .sx-cal-nav i{transform:scaleX(-1)}
+.sx-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.sx-cal-wd{font-size:.65rem;color:var(--subtext-color);padding:3px 0}
+.sx-cal-day{border:0;background:transparent;color:var(--text-color);height:34px;border-radius:8px;font-size:.8rem;font-variant-numeric:tabular-nums}
+.sx-cal-day:hover:not(:disabled){background:rgba(2,132,199,.18)}
+.sx-cal-day:disabled{opacity:.3}
+.sx-cal-day.today{outline:1px solid var(--accent)}
+.sx-cal-day.in{background:rgba(2,132,199,.22);border-radius:0}
+.sx-cal-day.sel{background:#0284c7;color:#fff;font-weight:700;border-radius:8px}
+.sx-cal-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sx-cal-presets button{font-size:.7rem;padding:3px 9px;border-radius:999px;border:1px solid var(--border-color);background:transparent;color:var(--text-color)}
+.sx-cal-presets button:hover{border-color:var(--accent);color:var(--accent)}
+.sx-cal-hint{font-size:.68rem;color:var(--subtext-color);margin-top:6px}
+/* layout: map panel on the physical right, sticky */
+.sx-detail-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;direction:ltr;align-items:start}
+html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
+.sx-detail-side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);align-self:start}
+.sx-loc-panel{padding:12px}
+.sx-loc-head{display:flex;align-items:center;gap:8px;font-size:1rem}
+.sx-loc-head i{color:var(--accent)}
+.sx-loc-sub{font-size:.72rem;color:var(--subtext-color);margin-top:2px}
+.sx-loc-coords{display:flex;align-items:center;gap:8px;margin:6px 0 8px;font-weight:600;font-size:.9rem}
+.sx-loc-map{height:320px;border-radius:10px;overflow:hidden;background:#0b1220}
+@media (max-width:991.98px){
+  .sx-detail-layout{grid-template-columns:minmax(0,1fr)}
+  .sx-detail-side{position:static;order:-1}
+  .sx-loc-map{height:230px}
+}
+/* metric boxes (accordion) */
+.sx-acc{border:1px solid var(--border-color);background:var(--card-bg);border-radius:14px;margin-bottom:8px;overflow:hidden}
+.sx-acc-head{display:flex;align-items:center;gap:10px;width:100%;padding:12px 14px;border:0;background:transparent;color:var(--text-color);text-align:start}
+.sx-acc-ico{font-size:1.15rem;width:24px;text-align:center}
+.sx-acc-title{font-weight:600;font-size:.9rem}
+.sx-acc-val{margin-inline-start:auto;font-weight:700;font-size:.82rem;font-variant-numeric:tabular-nums;color:var(--text-color)}
+.sx-acc-chev{transition:transform .2s;color:var(--subtext-color)}
+.sx-acc.open .sx-acc-chev{transform:rotate(180deg)}
+.sx-acc-body{padding:0 12px 12px}
+.sx-acc-chartwrap{position:relative;height:220px}
+.sx-acc-empty{font-size:.78rem;color:var(--subtext-color);padding:10px 2px}
+@media (max-width:575.98px){.sx-acc-head{padding:10px 11px;gap:8px}.sx-acc-title{font-size:.82rem}.sx-acc-val{font-size:.74rem}.sx-acc-chartwrap{height:190px}}
 </style>
 </link></head>
 <body class="p-2 p-md-4">
@@ -1014,24 +1071,26 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 </a>
 <div class="nav-submenu" id="fleet-submenu">
 <a class="nav-link-sub" data-section="fleet" href="#" onclick="showSection('fleet'); return false;">
-<i class="fa-solid fa-list-ol me-2"></i><span id="txt-menu-fleet-count">تعداد بویه‌ها (افزودن / ویرایش / حذف)</span>
+<i class="fa-solid fa-list-ol me-2"></i><span data-i18n="menuFleetCount" id="txt-menu-fleet-count">تعداد بویه‌ها (افزودن / ویرایش / حذف)</span>
 </a>
 <a class="nav-link-sub" data-section="buoy-detail" href="#" onclick="showSection('buoy-detail'); return false;">
-<i class="fa-solid fa-circle-info me-2"></i><span id="txt-menu-fleet-detail">اطلاعات جامع هر بویه</span>
+<i class="fa-solid fa-circle-info me-2"></i><span data-i18n="menuFleetDetail" id="txt-menu-fleet-detail">اطلاعات جامع هر بویه</span>
 </a>
 </div>
-<a class="nav-link-custom" data-section="history" href="#" id="menu-link-history" onclick="goToHistorySection(); return false;">
-<i class="fa-solid fa-clock-rotate-left me-2"></i><span id="txt-menu-history">۳. اطلاعات پیشین بویه</span>
-<i class="fa-solid fa-lock ms-auto small text-muted" id="history-lock-icon" style="display:none;"></i>
+<a class="nav-link-custom has-submenu" href="#" id="menu-link-settings-parent" onclick="toggleSettingsSubmenu(); return false;">
+<i class="fa-solid fa-gear me-2"></i><span id="txt-menu-settings">۳. تنظیمات</span>
+<i class="fa-solid fa-chevron-down submenu-chevron"></i>
 </a>
-<div class="text-danger small mb-2 px-2" id="history-locked-notice" style="display:none;">
-<i class="fa-solid fa-triangle-exclamation me-1"></i><span id="txt-history-locked-msg">این بخش فقط در حالت آنلاین در دسترس است</span>
+<div class="nav-submenu" id="settings-submenu">
+<a class="nav-link-sub" data-section="settings" href="#" onclick="showSection('settings'); return false;">
+<i class="fa-solid fa-sliders me-2"></i><span data-i18n="menuSettingsSystem">تنظیمات سیستم</span>
+</a>
+<a class="nav-link-sub" data-section="buoy-settings" href="#" onclick="showSection('buoy-settings'); return false;">
+<i class="fa-solid fa-life-ring me-2"></i><span data-i18n="menuSettingsBuoys">تنظیمات بویه‌ها</span>
+</a>
 </div>
-<a class="nav-link-custom" data-section="settings" href="#" onclick="showSection('settings'); return false;">
-<i class="fa-solid fa-gear me-2"></i><span id="txt-menu-settings">۴. تنظیمات سیستم</span>
-</a>
 <a class="nav-link-custom" data-section="support" href="#" onclick="showSection('support'); return false;">
-<i class="fa-solid fa-headset me-2"></i><span data-i18n="menuSupport">۵. پشتیبانی</span>
+<i class="fa-solid fa-headset me-2"></i><span data-i18n="menuSupport">۴. پشتیبانی</span>
 </a>
 </div>
 </div>
@@ -1188,9 +1247,16 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 </div>
 <!-- SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) -->
 <div id="sec-buoy-detail" style="display: none;">
-<div class="card p-3 mb-3">
-<h6 class="mb-2"><i class="fa-solid fa-anchor me-2 text-primary"></i>انتخاب بویه</h6>
-<div class="d-flex gap-2 overflow-auto pb-1" id="buoy-detail-tabs"></div>
+<div class="card p-3 mb-3 sx-dfilter">
+<div class="sx-dfilter-row">
+<div class="sx-dfield sx-dbuoy"><label for="detailBuoySelect" data-i18n="dSelectBuoy">انتخاب بویه</label><select class="form-select form-select-sm" id="detailBuoySelect" onchange="selectBuoyDetailTab(this.value)"></select></div>
+<div class="sx-dfield sx-drange"><label data-i18n="dCalendar">تقویم</label><button class="btn btn-sm btn-outline-primary sx-drange-btn" id="detail-range-btn" onclick="toggleDetailCalendar()" type="button"><i class="fa-regular fa-calendar"></i><span id="detail-range-text">—</span><i class="fa-solid fa-chevron-down small"></i></button></div>
+<div class="sx-dfield sx-dtime"><label for="detailTimeFrom" data-i18n="dTimeFrom">از ساعت</label><input class="form-control form-control-sm" id="detailTimeFrom" onchange="onDetailTimeChange()" type="time" value="00:00"/></div>
+<div class="sx-dfield sx-dtime"><label for="detailTimeTo" data-i18n="dTimeTo">تا ساعت</label><input class="form-control form-control-sm" id="detailTimeTo" onchange="onDetailTimeChange()" type="time" value="23:59"/></div>
+<div class="sx-dfield"><button class="btn btn-sm btn-outline-success active" id="detail-live-btn" onclick="resetDetailToLive()" type="button"><i class="fa-solid fa-satellite-dish"></i><span data-i18n="dLive">آخرین اطلاعات</span></button></div>
+</div>
+<div class="sx-cal" id="detail-cal" hidden></div>
+<div class="sx-dbanner" id="detail-banner" hidden></div>
 </div>
 <!-- MISSION TIMER BAR -->
 <div class="card p-3 mb-3">
@@ -1225,16 +1291,20 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 </div>
 </div>
 </div>
-<div id="buoy-detail-content"><!-- Populated by JS --></div>
+<div class="sx-detail-layout">
+<div class="sx-detail-main">
+<div class="card p-3 mb-3" id="detail-header"></div>
+<div id="detail-boxes"></div>
+<p class="text-muted small mt-2 mb-0" id="detail-note"></p>
 </div>
-<!-- SECTION: HISTORICAL BUOY DATA (only meaningful in Online mode) -->
-<div id="sec-history" style="display: none;">
-<div class="card p-4 mx-auto" style="max-width: 800px;">
-<h4 class="fw-bold mb-2 border-bottom border-secondary pb-2"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i><span id="txt-history-heading">اطلاعات پیشین بویه</span></h4>
-<p class="text-muted small mb-3" id="txt-history-desc">روند شارژ باتری و دما در ۷ روز اخیر برای بویه فعال.</p>
-<p class="history-note mb-3"><i class="fa-solid fa-server me-1"></i><span id="txt-history-buoy-label">بویه:</span> <b id="val-history-buoy-name">-</b></p>
-<canvas height="140" id="historyChart"></canvas>
-<p class="history-note mt-3 mb-0" id="txt-history-note"><i class="fa-solid fa-circle-info me-1"></i>این بخش پس از اتصال به سرور آنلاین، آرشیو کامل داده‌های هر بویه را نمایش خواهد داد.</p>
+<aside class="sx-detail-side">
+<div class="card sx-loc-panel">
+<div class="sx-loc-head"><i class="fa-solid fa-location-dot"></i><b data-i18n="dLocTitle">موقعیت جغرافیایی بویه</b></div>
+<div class="sx-loc-sub" id="detail-loc-time">—</div>
+<div class="sx-loc-coords"><span dir="ltr" id="detail-loc-coords">—</span><button aria-label="copy" class="sx-copy-btn" onclick="copyDetailCoords(this)" type="button"><i class="fa-regular fa-copy"></i></button></div>
+<div class="sx-loc-map" id="detailMap"></div>
+</div>
+</aside>
 </div>
 </div>
 <!-- SECTION 3: SYSTEM SETTINGS -->
@@ -1279,6 +1349,29 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 <option value="ar">العربية (عربی)</option>
 </select>
 </div>
+<p class="text-muted small mb-4 mt-3"><i class="fa-solid fa-circle-info me-1"></i><span data-i18n="settingsHint">تغییرات فقط پیش‌نمایش هستند؛ برای ثبت نهایی باید دکمه ذخیره را بزنید.</span></p>
+<button class="btn btn-primary w-100 mt-2" data-i18n="btnSaveSys" onclick="saveSettings('system')">ذخیره تنظیمات</button>
+<div class="save-feedback" id="settings-save-feedback-sys"><i class="fa-solid fa-circle-check me-1"></i><span data-i18n="settingsSavedMsg">تنظیمات ذخیره شد</span></div>
+<!-- Referral code (host only) -->
+<div class="mt-4 pt-3 border-top border-secondary" id="referral-code-block" style="display:none;">
+<label class="form-label fw-bold" data-i18n="referralLabel" id="txt-referral-label">کد معرف شما برای دعوت مهمان:</label>
+<div class="referral-code-box" id="val-referral-code">-</div>
+</div>
+<!-- Cloud sync status (Supabase) -->
+<div class="mt-4 pt-3 border-top border-secondary" id="cloud-sync-block">
+<label class="form-label fw-bold" data-i18n="cloudsyncLabel" id="txt-cloudsync-label">وضعیت اتصال به سرور ابری:</label>
+<div class="d-flex align-items-center gap-2">
+<i class="fa-solid fa-circle-check text-success" id="cloud-sync-icon"></i>
+<span id="val-cloud-sync-status">-</span>
+</div>
+<p class="locked-note mt-1 mb-0" data-i18n="cloudsyncNote" id="txt-cloudsync-note">داده‌ها هنگام اتصال به اینترنت خودکار با سرور همگام می‌شوند و برای مشاهده آفلاین روی همین دستگاه کش می‌شوند.</p>
+</div>
+</div>
+</div>
+<!-- SECTION 3b: BUOY SETTINGS -->
+<div id="sec-buoy-settings" style="display: none;">
+<div class="card p-4 mx-auto" style="max-width: 650px;">
+<h4 class="fw-bold mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-life-ring me-2 text-warning"></i><span data-i18n="menuSettingsBuoys">تنظیمات بویه‌ها</span></h4>
 <!-- Custom Send Interval (Hours / Minutes / Seconds) -->
 <div class="mb-2">
 <label class="form-label fw-bold" id="txt-interval-label">بازه ارسال پیامک دوره‌ای به ساحل (دلخواه):</label>
@@ -1305,25 +1398,9 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 <button class="btn btn-sm btn-outline-primary mt-1" id="btn-add-phone" onclick="addPhoneRow()"><i class="fa-solid fa-plus me-1"></i><span data-i18n="addPhoneBtn" id="txt-add-phone-btn">افزودن شماره</span></button>
 <p class="locked-note mt-2 mb-0" id="txt-phones-locked-note" style="display:none;"><i class="fa-solid fa-lock me-1"></i><span data-i18n="phonesLockedText" id="txt-phones-locked-text">این بخش فقط برای میزبان قابل تغییر است</span></p>
 </div>
-<!-- Robot master power switch (host only - sends command to the buoy) -->
-
 <p class="text-muted small mb-4 mt-3" id="txt-settings-hint"><i class="fa-solid fa-circle-info me-1"></i>تغییرات فقط پیش‌نمایش هستن؛ برای ثبت نهایی باید دکمه ذخیره رو بزنید.</p>
-<button class="btn btn-primary w-100 mt-2" id="txt-btn-save" onclick="saveSettings()">ذخیره تنظیمات در ESP32</button>
+<button class="btn btn-primary w-100 mt-2" id="txt-btn-save" onclick="saveSettings('buoys')">ذخیره تنظیمات در ESP32</button>
 <div class="save-feedback" id="settings-save-feedback"><i class="fa-solid fa-circle-check me-1"></i><span id="txt-settings-saved-msg">تنظیمات ذخیره شد</span></div>
-<!-- Referral code (host only) -->
-<div class="mt-4 pt-3 border-top border-secondary" id="referral-code-block" style="display:none;">
-<label class="form-label fw-bold" data-i18n="referralLabel" id="txt-referral-label">کد معرف شما برای دعوت مهمان:</label>
-<div class="referral-code-box" id="val-referral-code">-</div>
-</div>
-<!-- Cloud sync status (Supabase) -->
-<div class="mt-4 pt-3 border-top border-secondary" id="cloud-sync-block">
-<label class="form-label fw-bold" data-i18n="cloudsyncLabel" id="txt-cloudsync-label">وضعیت اتصال به سرور ابری:</label>
-<div class="d-flex align-items-center gap-2">
-<i class="fa-solid fa-circle-check text-success" id="cloud-sync-icon"></i>
-<span id="val-cloud-sync-status">-</span>
-</div>
-<p class="locked-note mt-1 mb-0" data-i18n="cloudsyncNote" id="txt-cloudsync-note">داده‌ها هنگام اتصال به اینترنت خودکار با سرور همگام می‌شوند و برای مشاهده آفلاین روی همین دستگاه کش می‌شوند.</p>
-</div>
 </div>
 </div>
 <!-- SECTION: SUPPORT -->
@@ -1588,6 +1665,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 applyBuoy(b.id);
                 pushLiveChartPoint(b);
             }
+            if (typeof onDetailTelemetry === 'function') onDetailTelemetry(b.id);
             renderFleetLists();
             renderQuickSwitcher();
         }
@@ -2053,7 +2131,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 menuTitle: 'منوی ناوبری',
                 menuRecent: '۱. داشبورد و تله‌متری',
                 menuFleet: '۲. بویه‌های من (ناوگان)',
-                menuSettings: '۴. تنظیمات سیستم',
+                menuSettings: '۳. تنظیمات',
                 bat: 'شارژ باتری (INA219)',
                 gps: 'موقعیت دقیق GPS',
                 leak: 'سنسور نشتی آب',
@@ -2067,7 +2145,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره تنظیمات', dSelectBuoy: 'انتخاب بویه', dCalendar: 'تقویم', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'یک روز را انتخاب کنید؛ برای بازه، روز دوم را هم بزنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
                 mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
@@ -2108,7 +2186,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 fixedIntervalLabel: 'زمان ثابت هر ارسال',
                 nextSendLabel: 'تا ارسال بعدی',
                 missionEnded: 'ماموریت پایان یافته',
-                missionRunning: 'در حال انجام', missionBoxTitle: 'وضعیت ماموریت', nextSendShort: 'ارسال بعدی', tempInBox: 'دما و رطوبت داخل', tempOutBox: 'دما و رطوبت بیرون', rhOut: 'رطوبت بیرون:', rssiLabel: 'قدرت سیگنال', menuSupport: '۵. پشتیبانی', supportTitle: 'پشتیبانی', supportIntro: 'برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.', supportNone: 'راه‌های تماس هنوز ثبت نشده است.',
+                missionRunning: 'در حال انجام', missionBoxTitle: 'وضعیت ماموریت', nextSendShort: 'ارسال بعدی', tempInBox: 'دما و رطوبت داخل', tempOutBox: 'دما و رطوبت بیرون', rhOut: 'رطوبت بیرون:', rssiLabel: 'قدرت سیگنال', menuSupport: '۴. پشتیبانی', supportTitle: 'پشتیبانی', supportIntro: 'برای گزارش مشکل یا دریافت راهنما از یکی از راه‌های زیر با ما در تماس باشید.', supportNone: 'راه‌های تماس هنوز ثبت نشده است.',
                 daysUnit: 'روز',
                 menuHistory: '۳. اطلاعات پیشین بویه',
                 historyLockedMsg: 'این بخش فقط در حالت آنلاین در دسترس است',
@@ -2180,7 +2258,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 menuTitle: 'Navigation Menu',
                 menuRecent: '1. Dashboard & Telemetry',
                 menuFleet: '2. My Buoys (Fleet)',
-                menuSettings: '4. System Settings',
+                menuSettings: '3. Settings',
                 bat: 'Battery Charge (INA219)',
                 gps: 'Exact GPS Position',
                 leak: 'Water Leak Sensor',
@@ -2194,7 +2272,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save settings', dSelectBuoy: 'Select buoy', dCalendar: 'Calendar', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'Pick a day; pick a second day for a range.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
                 mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
@@ -2235,7 +2313,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 fixedIntervalLabel: 'Fixed Interval / Send',
                 nextSendLabel: 'Next Send In',
                 missionEnded: 'Mission ended',
-                missionRunning: 'In progress', missionBoxTitle: 'Mission status', nextSendShort: 'Next send', tempInBox: 'Inside temp & humidity', tempOutBox: 'Outside temp & humidity', rhOut: 'Outside humidity:', rssiLabel: 'Signal strength', menuSupport: '5. Support', supportTitle: 'Support', supportIntro: 'To report a problem or get help, contact us using one of the options below.', supportNone: 'No contact details have been added yet.',
+                missionRunning: 'In progress', missionBoxTitle: 'Mission status', nextSendShort: 'Next send', tempInBox: 'Inside temp & humidity', tempOutBox: 'Outside temp & humidity', rhOut: 'Outside humidity:', rssiLabel: 'Signal strength', menuSupport: '4. Support', supportTitle: 'Support', supportIntro: 'To report a problem or get help, contact us using one of the options below.', supportNone: 'No contact details have been added yet.',
                 daysUnit: 'd',
                 menuHistory: '3. Buoy History',
                 historyLockedMsg: 'This section is only available in Online mode',
@@ -2307,7 +2385,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 menuTitle: 'قائمة التنقل',
                 menuRecent: '١. لوحة التحكم والقياس',
                 menuFleet: '٢. عواماتي (الأسطول)',
-                menuSettings: '٤. إعدادات النظام',
+                menuSettings: '٣. الإعدادات',
                 bat: 'شحن البطارية (INA219)',
                 gps: 'موقع GPS الدقيق',
                 leak: 'مستشعر تسرب المياه',
@@ -2321,7 +2399,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ الإعدادات', dSelectBuoy: 'اختيار العوامة', dCalendar: 'التقويم', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'اختر يومًا؛ ولاختيار فترة اختر يومًا ثانيًا.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
                 mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
@@ -2362,7 +2440,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 fixedIntervalLabel: 'الفترة الثابتة لكل إرسال',
                 nextSendLabel: 'الإرسال التالي خلال',
                 missionEnded: 'انتهت المهمة',
-                missionRunning: 'قيد التنفيذ', missionBoxTitle: 'حالة المهمة', nextSendShort: 'الإرسال التالي', tempInBox: 'الحرارة والرطوبة الداخلية', tempOutBox: 'الحرارة والرطوبة الخارجية', rhOut: 'الرطوبة الخارجية:', rssiLabel: 'قوة الإشارة', menuSupport: '٥. الدعم', supportTitle: 'الدعم', supportIntro: 'للإبلاغ عن مشكلة أو طلب المساعدة، تواصل معنا بإحدى الطرق التالية.', supportNone: 'لم تتم إضافة بيانات التواصل بعد.',
+                missionRunning: 'قيد التنفيذ', missionBoxTitle: 'حالة المهمة', nextSendShort: 'الإرسال التالي', tempInBox: 'الحرارة والرطوبة الداخلية', tempOutBox: 'الحرارة والرطوبة الخارجية', rhOut: 'الرطوبة الخارجية:', rssiLabel: 'قوة الإشارة', menuSupport: '٤. الدعم', supportTitle: 'الدعم', supportIntro: 'للإبلاغ عن مشكلة أو طلب المساعدة، تواصل معنا بإحدى الطرق التالية.', supportNone: 'لم تتم إضافة بيانات التواصل بعد.',
                 daysUnit: 'يوم',
                 menuHistory: '٣. بيانات العوامة السابقة',
                 historyLockedMsg: 'هذا القسم متاح فقط في وضع الاتصال بالإنترنت',
@@ -2937,6 +3015,11 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
         }
 
         // ===== SECTIONS =====
+        function toggleSettingsSubmenu() {
+            document.getElementById('settings-submenu').classList.toggle('open');
+            document.getElementById('menu-link-settings-parent').classList.toggle('submenu-expanded');
+        }
+
         function toggleFleetSubmenu() {
             document.getElementById('fleet-submenu').classList.toggle('open');
             document.getElementById('menu-link-fleet-parent').classList.toggle('submenu-expanded');
@@ -2971,12 +3054,12 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             updateCloudSyncStatus();
             hideSaveFeedback('settings-save-feedback');
             hideSaveFeedback('fleet-save-feedback');
-            hideHistoryLockedNotice();
+            hideSaveFeedback('settings-save-feedback-sys');
 
             document.getElementById('sec-recent-data').style.display = (section === 'recent-data') ? 'block' : 'none';
             document.getElementById('sec-fleet').style.display = (section === 'fleet') ? 'block' : 'none';
             document.getElementById('sec-buoy-detail').style.display = (section === 'buoy-detail') ? 'block' : 'none';
-            document.getElementById('sec-history').style.display = (section === 'history') ? 'block' : 'none';
+            document.getElementById('sec-buoy-settings').style.display = (section === 'buoy-settings') ? 'block' : 'none';
             document.getElementById('sec-settings').style.display = (section === 'settings') ? 'block' : 'none';
             document.getElementById('sec-support').style.display = (section === 'support') ? 'block' : 'none';
             if (section === 'support') renderSupport();
@@ -2996,9 +3079,17 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
                 fleetParent.classList.remove('active');
             }
 
+            const setParent = document.getElementById('menu-link-settings-parent');
+            const setSubmenu = document.getElementById('settings-submenu');
+            if (section === 'settings' || section === 'buoy-settings') {
+                setParent.classList.add('active', 'submenu-expanded');
+                setSubmenu.classList.add('open');
+            } else {
+                setParent.classList.remove('active');
+            }
+
             if (section === 'fleet') renderFleetLists();
             if (section === 'buoy-detail') renderBuoyDetailSection();
-            if (section === 'history') renderHistoryChart();
 
             const sidebarEl = document.getElementById('sidebarMenu');
             const sidebar = bootstrap.Offcanvas.getInstance(sidebarEl) || bootstrap.Offcanvas.getOrCreateInstance(sidebarEl);
@@ -3014,28 +3105,6 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             }
         }
 
-        // History menu is only reachable in Online mode - Offline shows a brief notice instead
-        function goToHistorySection() {
-            if (appState.connectionMode !== 'online') {
-                showHistoryLockedNotice();
-                const sidebarEl = document.getElementById('sidebarMenu');
-                const sidebar = bootstrap.Offcanvas.getInstance(sidebarEl) || bootstrap.Offcanvas.getOrCreateInstance(sidebarEl);
-                if (sidebar) sidebar.hide();
-                return;
-            }
-            showSection('history');
-        }
-
-        function showHistoryLockedNotice() {
-            const el = document.getElementById('history-locked-notice');
-            el.style.display = 'block';
-            setTimeout(() => { el.style.display = 'none'; }, 3000);
-        }
-
-        function hideHistoryLockedNotice() {
-            document.getElementById('history-locked-notice').style.display = 'none';
-        }
-
         // ===== CONNECTION MODE (Online / Offline) =====
         function previewConnectionMode(mode) {
             pendingState.connectionMode = mode;
@@ -3048,225 +3117,426 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             document.getElementById('offline-banner').classList.toggle('show', mode === 'offline');
         }
 
-        // Enable/disable the "Historical Buoy Data" menu item based on the COMMITTED connection mode
-        function updateHistoryMenuState() {
-            const link = document.getElementById('menu-link-history');
-            const lockIcon = document.getElementById('history-lock-icon');
-            const isOnline = appState.connectionMode === 'online';
-            link.classList.toggle('disabled-link', !isOnline);
-            lockIcon.style.display = isOnline ? 'none' : 'inline-block';
+        // ===== SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) =====
+        // Calendar + time window apply ONLY to this page. Live buoy data (dashboard) is never touched.
+        let selectedDetailBuoyId = null;
+        const detailView = { mode: 'live', start: null, end: null, picking: false, anchor: new Date() };
+        let detailRows = [];
+        let detailSource = '';
+        let detailCharts = {};
+        const detailOpen = new Set();
+        let detailMap = null, detailMapLayer = null, detailMapActive = false;
+        let detailLoadToken = 0, detailRefreshTimer = null;
+
+        function dT() { return translations[currentLang()]; }
+        function curDetailBuoy() { return buoysFleet.find(b => b.id === selectedDetailBuoyId); }
+
+        // ---- calendar helpers (Persian calendar for fa, Gregorian for en/ar) ----
+        function calTag(latn) {
+            const l = currentLang();
+            const base = l === 'fa' ? 'fa-u-ca-persian' : (l === 'ar' ? 'ar-u-ca-gregory' : 'en-GB-u-ca-gregory');
+            return latn ? base + '-nu-latn' : base;
+        }
+        function calParts(d) {
+            const o = {};
+            new Intl.DateTimeFormat(calTag(true), { year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(d)
+                .forEach(p => { if (p.type !== 'literal') o[p.type] = parseInt(p.value, 10); });
+            return o;
+        }
+        function noonOf(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0); }
+        function dayKey(d) { return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate(); }
+        function calMonth(anchor) {
+            const same = (a, b) => { const x = calParts(a), y = calParts(b); return x.year === y.year && x.month === y.month; };
+            let first = noonOf(anchor);
+            for (let i = 0; i < 40 && same(new Date(first.getTime() - 864e5), first); i++) first = new Date(first.getTime() - 864e5);
+            const days = []; let d = first;
+            for (let i = 0; i < 40 && same(d, first); i++) { days.push(d); d = new Date(d.getTime() + 864e5); }
+            return { first, days, next: d, prev: new Date(first.getTime() - 864e5) };
+        }
+        function fmtDT(d, withTime) {
+            const o = { year: 'numeric', month: 'numeric', day: 'numeric' };
+            if (withTime) { o.hour = '2-digit'; o.minute = '2-digit'; }
+            return new Intl.DateTimeFormat(calTag(false), o).format(new Date(d));
+        }
+        function fmtAxis(d, withDate) {
+            const o = withDate ? { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' } : { hour: '2-digit', minute: '2-digit' };
+            return new Intl.DateTimeFormat(calTag(false), o).format(d);
+        }
+        function fmtCoords(lat, lon) {
+            if (lat === null || lat === undefined || lon === null || lon === undefined) return '—';
+            return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? 'E' : 'W'}`;
         }
 
-        // ===== HISTORICAL DATA CHART (داده واقعی ۷ روز اخیر از Supabase - این بخش فقط در حالت آنلاین در دسترس است) =====
-        // ===== SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) =====
-        let selectedDetailBuoyId = null;
-        let detailChartInstances = {}; // key: metric name -> Chart.js instance
+        function renderDetailCalendar() {
+            const t = dT(); const el = document.getElementById('detail-cal');
+            if (!el) return;
+            const m = calMonth(detailView.anchor);
+            const lang = currentLang();
+            const title = new Intl.DateTimeFormat(calTag(false), { month: 'long', year: 'numeric' }).format(m.first);
+            const weekStart = lang === 'en' ? 1 : 6;
+            const wdFmt = new Intl.DateTimeFormat(calTag(false), { weekday: lang === 'fa' ? 'narrow' : 'short' });
+            let html = `<div class="sx-cal-head"><button class="sx-cal-nav" type="button" onclick="navDetailCal(-1)"><i class="fa-solid fa-chevron-left"></i></button><span class="sx-cal-title">${title}</span><button class="sx-cal-nav" type="button" onclick="navDetailCal(1)"><i class="fa-solid fa-chevron-right"></i></button></div><div class="sx-cal-grid">`;
+            for (let i = 0; i < 7; i++) html += `<div class="sx-cal-wd">${wdFmt.format(new Date(2023, 0, 1 + ((weekStart + i) % 7), 12))}</div>`;
+            const lead = (m.first.getDay() - weekStart + 7) % 7;
+            for (let i = 0; i < lead; i++) html += '<div></div>';
+            const todayK = dayKey(new Date());
+            const sK = detailView.start ? dayKey(detailView.start) : null, eK = detailView.end ? dayKey(detailView.end) : null;
+            const dayFmt = new Intl.DateTimeFormat(calTag(false), { day: 'numeric' });
+            m.days.forEach(d => {
+                const k = dayKey(d);
+                let cls = 'sx-cal-day';
+                if (k === todayK) cls += ' today';
+                if (sK !== null && k >= sK && k <= eK) cls += (k === sK || k === eK) ? ' sel' : ' in';
+                html += `<button type="button" class="${cls}" ${k > todayK ? 'disabled' : ''} onclick="pickDetailDay(${d.getTime()})">${dayFmt.format(d)}</button>`;
+            });
+            html += `</div><div class="sx-cal-presets">
+                <button type="button" onclick="setDetailPreset('today')">${t.dToday}</button>
+                <button type="button" onclick="setDetailPreset('yesterday')">${t.dYesterday}</button>
+                <button type="button" onclick="setDetailPreset('7')">${t.d7}</button>
+                <button type="button" onclick="setDetailPreset('30')">${t.d30}</button></div>
+                <div class="sx-cal-hint">${t.dCalHint}</div>`;
+            el.innerHTML = html;
+        }
+        function navDetailCal(dir) {
+            const m = calMonth(detailView.anchor);
+            detailView.anchor = dir > 0 ? m.next : m.prev;
+            renderDetailCalendar();
+        }
+        function toggleDetailCalendar() {
+            const el = document.getElementById('detail-cal');
+            if (el.hasAttribute('hidden')) { renderDetailCalendar(); el.removeAttribute('hidden'); } else el.setAttribute('hidden', '');
+        }
+        function closeDetailCalendar() { const el = document.getElementById('detail-cal'); if (el) el.setAttribute('hidden', ''); }
 
+        function pickDetailDay(ts) {
+            const d = noonOf(new Date(ts));
+            if (!detailView.picking || !detailView.start) {
+                detailView.start = d; detailView.end = d; detailView.picking = true;
+                applyDetailWindow(false);
+            } else {
+                if (d < detailView.start) { detailView.end = detailView.start; detailView.start = d; } else detailView.end = d;
+                detailView.picking = false;
+                applyDetailWindow(true);
+            }
+        }
+        function setDetailPreset(kind) {
+            const today = noonOf(new Date());
+            const back = kind === 'yesterday' ? 1 : (kind === '7' ? 6 : (kind === '30' ? 29 : 0));
+            detailView.start = new Date(today.getTime() - back * 864e5);
+            detailView.end = kind === 'yesterday' ? detailView.start : today;
+            detailView.picking = false;
+            applyDetailWindow(true);
+        }
+        function onDetailTimeChange() {
+            if (detailView.mode === 'live' || !detailView.start) { detailView.start = detailView.end = noonOf(new Date()); }
+            applyDetailWindow(false);
+        }
+        function applyDetailWindow(closeCal) {
+            detailView.mode = 'range';
+            if (closeCal) closeDetailCalendar(); else if (!document.getElementById('detail-cal').hasAttribute('hidden')) renderDetailCalendar();
+            if (closeCal) renderDetailCalendar();
+            loadDetailData();
+        }
+        function resetDetailToLive() {
+            detailView.mode = 'live'; detailView.start = detailView.end = null; detailView.picking = false; detailView.anchor = new Date();
+            document.getElementById('detailTimeFrom').value = '00:00';
+            document.getElementById('detailTimeTo').value = '23:59';
+            closeDetailCalendar();
+            loadDetailData();
+        }
+        function detailWindow() {
+            if (detailView.mode === 'live') { const to = new Date(); return { from: new Date(to.getTime() - 7 * 864e5), to }; }
+            const [fh, fm] = (document.getElementById('detailTimeFrom').value || '00:00').split(':').map(Number);
+            const [th, tm] = (document.getElementById('detailTimeTo').value || '23:59').split(':').map(Number);
+            const s0 = detailView.start, e0 = detailView.end;
+            let from = new Date(s0.getFullYear(), s0.getMonth(), s0.getDate(), fh, fm, 0);
+            let to = new Date(e0.getFullYear(), e0.getMonth(), e0.getDate(), th, tm, 59);
+            if (to < from) { const x = from; from = to; to = x; }
+            return { from, to };
+        }
+        function updateDetailRangeText() {
+            const t = dT(); const el = document.getElementById('detail-range-text');
+            if (!el) return;
+            if (detailView.mode === 'live') { el.innerText = t.dRangeLive; }
+            else {
+                const tf = document.getElementById('detailTimeFrom').value, tt = document.getElementById('detailTimeTo').value;
+                const same = dayKey(detailView.start) === dayKey(detailView.end);
+                let txt = same ? fmtDT(detailView.start, false) : `${fmtDT(detailView.start, false)} → ${fmtDT(detailView.end, false)}`;
+                if (tf !== '00:00' || tt !== '23:59') txt += ` (${tf}–${tt})`;
+                el.innerText = txt;
+            }
+            document.getElementById('detail-live-btn').classList.toggle('active', detailView.mode === 'live');
+        }
+
+        // ---- data ----
+        async function fetchDetailRows(buoyId, from, to) {
+            const fromIso = from.toISOString(), toIso = to.toISOString();
+            let rows = null; detailSource = '';
+            if (sb && supabaseReady) {
+                try {
+                    rows = []; const PAGE = 1000;
+                    for (let p = 0; p < 10; p++) {
+                        const { data, error } = await sb.from(TELEMETRY_TABLE).select('*').eq('buoy_id', buoyId)
+                            .gte('device_ts', fromIso).lte('device_ts', toIso).order('device_ts', { ascending: true }).range(p * PAGE, (p + 1) * PAGE - 1);
+                        if (error) throw error;
+                        rows = rows.concat(data || []);
+                        if (!data || data.length < PAGE) break;
+                    }
+                    detailSource = 'server';
+                } catch (e) { rows = null; }
+            }
+            if (!rows || rows.length === 0) {
+                try {
+                    const cached = await getBuoyHistoryFromCache(buoyId, fromIso);
+                    const c = cached.filter(r => (r.device_ts || r.cached_at) <= toIso);
+                    if (c.length || !rows) { rows = c; detailSource = 'cache'; }
+                } catch (e) { if (!rows) rows = []; }
+            }
+            return rows.map(r => ({ ...r, _t: new Date(r.device_ts || r.created_at || r.cached_at) }))
+                .filter(r => !Number.isNaN(r._t.getTime())).sort((a, b) => a._t - b._t);
+        }
+
+        async function loadDetailData() {
+            const b = curDetailBuoy(); if (!b) return;
+            const token = ++detailLoadToken;
+            updateDetailRangeText();
+            const note = document.getElementById('detail-note');
+            if (note) note.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i>${dT().dLoading}`;
+            const w = detailWindow();
+            let rows = [];
+            try { rows = await fetchDetailRows(b.id, w.from, w.to); } catch (e) { console.warn('detail load', e); }
+            if (token !== detailLoadToken) return;
+            detailRows = rows;
+            renderDetailAll();
+        }
+
+        function onDetailTelemetry(buoyId) {
+            const sec = document.getElementById('sec-buoy-detail');
+            if (!sec || sec.style.display !== 'block' || detailView.mode !== 'live' || buoyId !== selectedDetailBuoyId) return;
+            clearTimeout(detailRefreshTimer);
+            detailRefreshTimer = setTimeout(loadDetailData, 1500);
+        }
+
+        function detailSnapshot() {
+            const b = curDetailBuoy(); if (!b) return { empty: true };
+            if (detailView.mode === 'live') {
+                return { live: true, time: b.lastUpdate, vbat: b.vbat, soc: b.soc, solar: b.solar, curr: b.curr, tempIn: b.tempIn, tempOut: b.tempOut, rh: b.rh, rssi: b.rssi, leak: b.leak, lat: b.lat, lon: b.lon, gpsFix: b.gpsFix, sats: b.satellites, speed: b.speedKmh };
+            }
+            const r = detailRows[detailRows.length - 1];
+            if (!r) return { live: false, empty: true };
+            return { live: false, time: r._t.toISOString(), vbat: r.battery_voltage, soc: estimateSocFromVoltage(r.battery_voltage), solar: r.solar_voltage, curr: r.current_ma, tempIn: null, tempOut: r.temp_ext, rh: r.hum_int, rssi: r.rssi, leak: r.leak === true ? 'WET' : (r.leak === false ? 'DRY' : null), lat: r.lat, lon: r.lon, gpsFix: r.gps_fix, sats: null, speed: null };
+        }
+
+        function haversineM(a, b) {
+            const R = 6371000, rad = x => x * Math.PI / 180;
+            const dLat = rad(b[0] - a[0]), dLon = rad(b[1] - a[1]);
+            const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLon / 2) ** 2;
+            return 2 * R * Math.asin(Math.sqrt(h));
+        }
+
+        function detailMetricDefs() {
+            const t = dT();
+            const leakTxt = s => s.leak === 'WET' ? `<span class="status-danger">${t.leakValWet}</span>` : (s.leak === 'DRY' ? `<span class="status-ok">${t.leakValDry}</span>` : '—');
+            return [
+                { id: 'bat', icon: 'fa-battery-three-quarters', color: '#10b981', title: t.dBat, val: s => `${fmt(s.vbat, ' V')} · ${fmt(s.soc, '%')}`,
+                  series: [{ label: t.dVolt, get: r => r.battery_voltage, color: '#10b981', axis: 'y' }, { label: t.dSoc, get: r => estimateSocFromVoltage(r.battery_voltage), color: '#84cc16', axis: 'y1', dash: true }] },
+                { id: 'solar', icon: 'fa-sun', color: '#f59e0b', title: t.dSolar, val: s => fmt(s.solar, ' V'), series: [{ label: t.dVolt, get: r => r.solar_voltage, color: '#f59e0b' }] },
+                { id: 'curr', icon: 'fa-bolt', color: '#06b6d4', title: t.dCurr, val: s => fmt(s.curr, ' mA'), series: [{ label: 'mA', get: r => r.current_ma, color: '#06b6d4' }] },
+                { id: 'gsm', icon: 'fa-signal', color: '#64748b', title: t.dGsm, val: s => fmt(s.rssi, ' dBm'), series: [{ label: 'RSSI (dBm)', get: r => r.rssi, color: '#64748b' }] },
+                { id: 'gps', icon: 'fa-satellite', color: '#3b82f6', title: t.dGps, val: s => `${fmt(s.gpsFix)}${(s.sats !== null && s.sats !== undefined) ? ' · ' + s.sats : ''}`, series: [{ label: t.dAlt, get: r => r.alt, color: '#3b82f6' }] },
+                { id: 'pos', icon: 'fa-location-dot', color: '#ef4444', title: t.dPos, val: s => fmtCoords(s.lat, s.lon).replace('° ', '°'),
+                  series: [{ label: t.dDrift, color: '#ef4444', get: (r, i, rows) => {
+                      const f = rows.find(x => x.lat !== null && x.lat !== undefined && x.lon !== null && x.lon !== undefined);
+                      if (!f || r.lat === null || r.lat === undefined || r.lon === null || r.lon === undefined) return null;
+                      return Math.round(haversineM([f.lat, f.lon], [r.lat, r.lon]));
+                  } }] },
+                { id: 'tin', icon: 'fa-temperature-half', color: '#8b5cf6', title: t.dTempIn, val: s => `${fmt(s.tempIn, '°')} · ${fmt(s.rh, '%')}`, series: [{ label: t.dHum, get: r => r.hum_int, color: '#8b5cf6' }] },
+                { id: 'tout', icon: 'fa-water', color: '#f97316', title: t.dTempOut, val: s => fmt(s.tempOut, ' °C'), series: [{ label: t.dTemp, get: r => r.temp_ext, color: '#f97316' }] },
+                { id: 'leak', icon: 'fa-droplet', color: '#0ea5e9', title: t.dLeak, val: leakTxt, series: [{ label: t.dLeakAxis, get: r => (r.leak === null || r.leak === undefined) ? null : (r.leak ? 1 : 0), color: '#0ea5e9', step: true }] }
+            ];
+        }
+
+        // ---- render ----
         function renderBuoyDetailSection() {
             if (!selectedDetailBuoyId || !buoysFleet.some(b => b.id === selectedDetailBuoyId)) {
                 selectedDetailBuoyId = appState.buoyId || (buoysFleet[0] && buoysFleet[0].id);
             }
+            detailView.mode = 'live'; detailView.start = detailView.end = null; detailView.picking = false; detailView.anchor = new Date();
+            document.getElementById('detailTimeFrom').value = '00:00';
+            document.getElementById('detailTimeTo').value = '23:59';
+            closeDetailCalendar();
             renderBuoyDetailTabs();
-            renderBuoyDetailContent();
+            detailRows = [];
+            renderDetailAll();
+            loadDetailData();
+            setTimeout(() => { ensureDetailMap(); updateDetailMap(); }, 150);
         }
 
+        // buoy chooser is a dropdown now
         function renderBuoyDetailTabs() {
-            const wrap = document.getElementById('buoy-detail-tabs');
-            wrap.innerHTML = '';
+            const sel = document.getElementById('detailBuoySelect');
+            sel.innerHTML = '';
             buoysFleet.forEach(b => {
-                const tab = document.createElement('button');
-                tab.className = 'buoy-detail-tab' + (b.id === selectedDetailBuoyId ? ' active' : '');
-                tab.innerHTML = `<i class="fa-solid fa-anchor me-1"></i>${b.id} — ${b.name}`;
-                tab.onclick = () => selectBuoyDetailTab(b.id);
-                wrap.appendChild(tab);
+                const o = document.createElement('option');
+                o.value = b.id; o.textContent = `${b.id} — ${b.name}`;
+                if (b.id === selectedDetailBuoyId) o.selected = true;
+                sel.appendChild(o);
             });
         }
-
         function selectBuoyDetailTab(buoyId) {
             selectedDetailBuoyId = buoyId;
-            renderBuoyDetailTabs();
-            renderBuoyDetailContent();
+            const sel = document.getElementById('detailBuoySelect'); if (sel) sel.value = buoyId;
+            detailRows = [];
+            renderDetailAll();
+            loadDetailData();
         }
 
-        function renderBuoyDetailContent() {
-            const b = buoysFleet.find(x => x.id === selectedDetailBuoyId);
-            const content = document.getElementById('buoy-detail-content');
-            if (!b) { content.innerHTML = '<p class="text-muted">هیچ بویه‌ای ثبت نشده است.</p>'; return; }
-
-            const lastUpdateText = b.lastUpdate ? new Date(b.lastUpdate).toLocaleString('fa-IR') : '—';
-
-            content.innerHTML = `
-                <div class="card p-3 mb-3">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <h5 class="fw-bold text-primary mb-1"><i class="fa-solid fa-anchor me-2"></i>${b.id} — ${b.name}</h5>
-                            <div class="text-muted small mb-2">محل استقرار: ${b.locationName || '—'}</div>
-                            <div class="text-muted small">پارت نامبر: <b>${b.partNumber || b.id.split('-').pop()}</b></div>
-                            <div class="text-muted small">آخرین به‌روزرسانی: <b>${lastUpdateText}</b></div>
-                            <div class="text-muted small">مختصات GPS: <b>${(b.lat !== null && b.lon !== null) ? `${b.lat} N, ${b.lon} E` : '—'}</b> (${fmt(b.gpsFix)})</div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="row g-2 text-center">
-                                <div class="col-4"><div class="small text-muted">GSM</div><span class="badge ${b.gsm === 'connected' ? 'bg-success' : 'bg-secondary'}">${b.gsm}</span></div>
-                                <div class="col-4"><div class="small text-muted">GPS</div><span class="badge ${b.gps === 'connected' ? 'bg-success' : 'bg-secondary'}">${b.gps}</span></div>
-                                <div class="col-4"><div class="small text-muted">ESP32</div><span class="badge ${b.esp32 === 'connected' ? 'bg-success' : 'bg-secondary'}">${b.esp32}</span></div>
-                            </div>
-                            <hr class="border-secondary">
-                            <div class="row g-2">
-                                <div class="col-6"><div class="small text-muted">ولتاژ باتری</div><b>${fmt(b.vbat, ' V')}</b></div>
-                                <div class="col-6"><div class="small text-muted">شارژ تخمینی</div><b>${fmt(b.soc, '%')}</b></div>
-                                <div class="col-6"><div class="small text-muted">ولتاژ خورشیدی</div><b>${fmt(b.solar, ' V')}</b></div>
-                                <div class="col-6"><div class="small text-muted">جریان</div><b>${fmt(b.curr, ' mA')}</b></div>
-                                <div class="col-6"><div class="small text-muted">دمای بیرون</div><b>${fmt(b.tempOut, ' °C')}</b></div>
-                                <div class="col-6"><div class="small text-muted">رطوبت داخل</div><b>${fmt(b.rh, '%')}</b></div>
-                                <div class="col-6"><div class="small text-muted">RSSI آنتن</div><b>${fmt(b.rssi, ' dBm')}</b></div>
-                                <div class="col-6"><div class="small text-muted">نشتی آب</div><b>${b.leak || '—'}</b></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row g-3" id="buoy-detail-charts-row">
-                    ${buoyDetailChartCardHtml('chart-battery_voltage', 'ولتاژ باتری (V)')}
-                    ${buoyDetailChartCardHtml('chart-solar_voltage', 'ولتاژ خورشیدی (V)')}
-                    ${buoyDetailChartCardHtml('chart-current_ma', 'جریان (mA)')}
-                    ${buoyDetailChartCardHtml('chart-temp_ext', 'دما (°C)')}
-                    ${buoyDetailChartCardHtml('chart-hum_int', 'رطوبت داخل (%)')}
-                    ${buoyDetailChartCardHtml('chart-rssi', 'قدرت آنتن RSSI (dBm)')}
-                </div>
-                <p class="text-muted small mt-2" id="buoy-detail-charts-note"><i class="fa-solid fa-circle-info me-1"></i>در حال بارگذاری تاریخچه...</p>
-            `;
-
-            loadBuoyDetailCharts(b.id);
+        function renderDetailAll() {
+            updateDetailRangeText();
+            renderDetailHeader();
+            renderDetailBoxes();
+            updateDetailBanner();
+            updateDetailMap();
         }
 
-        function buoyDetailChartCardHtml(canvasId, title) {
-            return `
-                <div class="col-md-6">
-                    <div class="card p-3">
-                        <h6 class="card-title mb-2">${title}</h6>
-                        <canvas id="${canvasId}" height="130"></canvas>
-                    </div>
-                </div>
-            `;
+        function renderDetailHeader() {
+            const t = dT(); const b = curDetailBuoy(); const el = document.getElementById('detail-header');
+            if (!el) return;
+            if (!b) { el.innerHTML = `<p class="text-muted mb-0">${t.dNoBuoys}</p>`; return; }
+            const s = detailSnapshot();
+            const timeTxt = s.time ? fmtDT(s.time, true) : '—';
+            el.innerHTML = `<h5 class="fw-bold text-primary mb-1"><i class="fa-solid fa-anchor me-2"></i>${escHtml(b.id)} — ${escHtml(b.name)}</h5>
+                <div class="text-muted small">${t.dPlace}: <b>${escHtml(b.locationName || '—')}</b></div>
+                <div class="text-muted small">${t.dPart}: <b>${escHtml(b.partNumber || b.id.split('-').pop())}</b></div>
+                <div class="text-muted small">${s.live ? t.dLastUpdate : t.dSampleTime}: <b>${timeTxt}</b></div>`;
         }
 
-        // خواندن ۷ روز اخیر (نقطه‌به‌نقطه، بدون میانگین‌گیری) برای بویه‌ی انتخاب‌شده و رسم هر پارامتر
-        // در نمودار جداگانه‌ی خودش. فقط در حالت آنلاین معنا دارد؛ در آفلاین فقط از داده‌ی لحظه‌ای فعلی استفاده می‌شود.
-        async function loadBuoyDetailCharts(buoyId) {
-            const noteEl = document.getElementById('buoy-detail-charts-note');
-            const metrics = [
-                { key: 'battery_voltage', canvas: 'chart-battery_voltage', color: '#10b981' },
-                { key: 'solar_voltage', canvas: 'chart-solar_voltage', color: '#f59e0b' },
-                { key: 'current_ma', canvas: 'chart-current_ma', color: '#06b6d4' },
-                { key: 'temp_ext', canvas: 'chart-temp_ext', color: '#ef4444' },
-                { key: 'hum_int', canvas: 'chart-hum_int', color: '#8b5cf6' },
-                { key: 'rssi', canvas: 'chart-rssi', color: '#64748b' },
-            ];
+        function updateDetailBanner() {
+            const t = dT(); const el = document.getElementById('detail-banner'); const note = document.getElementById('detail-note');
+            if (!el) return;
+            const src = detailSource === 'server' ? t.dSrcServer : (detailSource === 'cache' ? t.dSrcCache : '');
+            if (detailView.mode === 'live') el.setAttribute('hidden', '');
+            else { el.innerHTML = `<i class="fa-solid fa-filter"></i>${t.dFilteredBanner}`; el.removeAttribute('hidden'); }
+            if (note) note.innerHTML = detailRows.length
+                ? `<i class="fa-solid fa-circle-info me-1"></i>${detailRows.length} ${t.dRecords}${src ? ' — ' + src : ''}`
+                : `<i class="fa-solid fa-circle-info me-1"></i>${detailView.mode === 'live' ? t.dNoDataLive : t.dNoData}`;
+        }
 
-            // پاک کردن نمودارهای قبلی قبل از رسم دوباره
-            Object.values(detailChartInstances).forEach(ch => ch && ch.destroy());
-            detailChartInstances = {};
+        function renderDetailBoxes() {
+            const wrap = document.getElementById('detail-boxes'); if (!wrap) return;
+            const s = detailSnapshot();
+            const defs = detailMetricDefs();
+            Object.values(detailCharts).forEach(ch => ch && ch.destroy()); detailCharts = {};
+            wrap.innerHTML = defs.map(d => {
+                const open = detailOpen.has(d.id);
+                const val = s.empty ? '—' : d.val(s);
+                return `<div class="sx-acc ${open ? 'open' : ''}" data-m="${d.id}">
+                    <button class="sx-acc-head" id="acc-head-${d.id}" type="button" aria-expanded="${open}" onclick="toggleDetailBox('${d.id}')">
+                        <i class="fa-solid ${d.icon} sx-acc-ico" style="color:${d.color}"></i>
+                        <span class="sx-acc-title">${d.title}</span>
+                        <span class="sx-acc-val">${val}</span>
+                        <i class="fa-solid fa-chevron-down sx-acc-chev"></i>
+                    </button>
+                    <div class="sx-acc-body" id="acc-body-${d.id}" ${open ? '' : 'hidden'}></div>
+                </div>`;
+            }).join('');
+            defs.forEach(d => { if (detailOpen.has(d.id)) drawDetailChart(d); });
+        }
 
-            if (!sb || !supabaseReady) {
-                if (noteEl) noteEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i>این نمودارها فقط در حالت آنلاین (اتصال به سرور) نمایش داده می‌شوند.';
-                metrics.forEach(m => drawEmptyDetailChart(m));
-                return;
+        function toggleDetailBox(id) {
+            const body = document.getElementById('acc-body-' + id), head = document.getElementById('acc-head-' + id);
+            if (!body) return;
+            const opening = body.hasAttribute('hidden');
+            const def = detailMetricDefs().find(d => d.id === id);
+            if (opening) { body.removeAttribute('hidden'); detailOpen.add(id); drawDetailChart(def); }
+            else {
+                body.setAttribute('hidden', ''); detailOpen.delete(id);
+                if (detailCharts[id]) { detailCharts[id].destroy(); delete detailCharts[id]; }
             }
+            head.setAttribute('aria-expanded', String(opening));
+            head.parentElement.classList.toggle('open', opening);
+        }
 
-            const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-            const { data, error } = await sb.from(TELEMETRY_TABLE).select('*')
-                .eq('buoy_id', buoyId).gte('device_ts', since).order('device_ts', { ascending: true });
-
-            if (error || !data || data.length === 0) {
-                if (noteEl) noteEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i>هنوز داده‌ی واقعی‌ای برای این بویه در ۷ روز اخیر ثبت نشده است.';
-                metrics.forEach(m => drawEmptyDetailChart(m));
-                return;
-            }
-            if (noteEl) noteEl.innerHTML = `<i class="fa-solid fa-circle-info me-1"></i>${data.length} رکورد واقعی از سرور (۷ روز اخیر).`;
-
-            const labels = data.map(row => new Date(row.device_ts || row.created_at).toLocaleString('fa-IR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }));
-
-            metrics.forEach(m => {
-                const canvasEl = document.getElementById(m.canvas);
-                if (!canvasEl) return;
-                const values = data.map(row => row[m.key]);
-                detailChartInstances[m.key] = new Chart(canvasEl.getContext('2d'), {
-                    type: 'line',
-                    data: { labels, datasets: [{ data: values, borderColor: m.color, backgroundColor: m.color + '33', tension: 0.3, spanGaps: true }] },
-                    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { maxTicksLimit: 6 } } } }
-                });
+        function drawDetailChart(def) {
+            const body = document.getElementById('acc-body-' + def.id);
+            if (!body) return;
+            if (detailCharts[def.id]) { detailCharts[def.id].destroy(); delete detailCharts[def.id]; }
+            const rows = detailRows;
+            if (!rows.length) { body.innerHTML = `<div class="sx-acc-empty">${dT().dNoData}</div>`; return; }
+            body.innerHTML = '<div class="sx-acc-chartwrap"><canvas></canvas></div>';
+            const canvas = body.querySelector('canvas');
+            const spanDays = (rows[rows.length - 1]._t - rows[0]._t) / 864e5;
+            const labels = rows.map(r => fmtAxis(r._t, spanDays > 1.2));
+            const css = getComputedStyle(document.documentElement);
+            const tick = (css.getPropertyValue('--subtext-color') || '#94a3b8').trim();
+            const grid = 'rgba(148,163,184,.18)';
+            const datasets = def.series.map(sr => ({
+                label: sr.label, data: rows.map((r, i) => sr.get(r, i, rows)), borderColor: sr.color, backgroundColor: sr.color + '33',
+                tension: sr.step ? 0 : 0.3, stepped: !!sr.step, spanGaps: true, pointRadius: rows.length > 80 ? 0 : 2, borderWidth: 2,
+                borderDash: sr.dash ? [5, 4] : [], yAxisID: sr.axis || 'y'
+            }));
+            const scales = { x: { ticks: { color: tick, maxTicksLimit: 6, maxRotation: 0 }, grid: { color: grid } }, y: { ticks: { color: tick }, grid: { color: grid } } };
+            if (def.series.some(x => x.axis === 'y1')) scales.y1 = { position: 'right', ticks: { color: tick }, grid: { drawOnChartArea: false } };
+            detailCharts[def.id] = new Chart(canvas.getContext('2d'), {
+                type: 'line', data: { labels, datasets },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: def.series.length > 1, labels: { color: tick } } }, scales }
             });
         }
 
-        function drawEmptyDetailChart(m) {
-            const canvasEl = document.getElementById(m.canvas);
-            if (!canvasEl) return;
-            detailChartInstances[m.key] = new Chart(canvasEl.getContext('2d'), {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: m.color }] },
-                options: { responsive: true, plugins: { legend: { display: false } } }
-            });
+        // ---- sticky location panel ----
+        function ensureDetailMap() {
+            if (detailMap) return detailMap;
+            const el = document.getElementById('detailMap'); if (!el) return null;
+            const coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+            detailMap = L.map('detailMap', { dragging: !coarse, touchZoom: !coarse, scrollWheelZoom: false }).setView([27.8, 53.5], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(detailMap);
+            L.control.scale({ imperial: false }).addTo(detailMap);
+            detailMapLayer = L.layerGroup().addTo(detailMap);
+            // same tap-to-activate behaviour as the dashboard map (touch: swipe scrolls the page until the map is tapped)
+            const setActive = on => {
+                detailMapActive = on;
+                if (on) { detailMap.scrollWheelZoom.enable(); if (coarse) { detailMap.dragging.enable(); detailMap.touchZoom.enable(); } }
+                else { detailMap.scrollWheelZoom.disable(); if (coarse) { detailMap.dragging.disable(); detailMap.touchZoom.disable(); } }
+            };
+            detailMap.on('click', () => setActive(true));
+            document.addEventListener('pointerdown', e => { if (detailMapActive && !el.contains(e.target)) setActive(false); }, true);
+            return detailMap;
         }
 
-        let historyChartInstance = null;
-
-        async function renderHistoryChart() {
-            const b = buoysFleet.find(x => x.id === appState.buoyId);
-            if (!b) return;
-            document.getElementById('val-history-buoy-name').innerText = `${b.id} - ${b.name}`;
-
-            const noteEl = document.getElementById('txt-history-note');
-            const ctx = document.getElementById('historyChart').getContext('2d');
-            if (historyChartInstance) { historyChartInstance.destroy(); historyChartInstance = null; }
-
-            if (!sb || !supabaseReady) {
-                if (noteEl) noteEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i>اتصال به سرور برقرار نیست.';
-                return;
+        function updateDetailMap() {
+            const m = ensureDetailMap(); if (!m) return;
+            const t = dT(); const s = detailSnapshot();
+            detailMapLayer.clearLayers();
+            const pts = detailRows.filter(r => r.lat !== null && r.lat !== undefined && r.lon !== null && r.lon !== undefined).map(r => [r.lat, r.lon]);
+            if (pts.length > 1) L.polyline(pts, { color: '#0284c7', weight: 2, dashArray: '5,6', opacity: 0.85 }).addTo(detailMapLayer);
+            const has = s.lat !== null && s.lat !== undefined && s.lon !== null && s.lon !== undefined;
+            if (has) {
+                const col = socToColor(s.soc);
+                const icon = L.divIcon({ className: 'custom-buoy-icon active', html: `<div class="buoy-marker-circle" style="background:${col}; box-shadow:0 0 10px ${col};"><i class="fa-solid fa-anchor"></i></div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
+                L.marker([s.lat, s.lon], { icon }).addTo(detailMapLayer);
             }
+            document.getElementById('detail-loc-coords').innerText = has ? fmtCoords(s.lat, s.lon) : t.dLocNone;
+            document.getElementById('detail-loc-time').innerText = s.time ? `${s.live ? t.dLastUpdate : t.dSampleTime}: ${fmtDT(s.time, true)}` : '—';
+            setTimeout(() => {
+                m.invalidateSize();
+                if (pts.length > 1) { const bnd = L.latLngBounds(pts); if (has) bnd.extend([s.lat, s.lon]); m.fitBounds(bnd, { padding: [24, 24], maxZoom: 15 }); }
+                else if (has) m.setView([s.lat, s.lon], 12);
+            }, 60);
+        }
 
-            const since = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString();
-            const { data, error } = await sb.from(TELEMETRY_TABLE).select('*')
-                .eq('buoy_id', b.id).gte('device_ts', since).order('device_ts', { ascending: true });
-
-            if (error || !data || data.length === 0) {
-                if (noteEl) noteEl.innerHTML = '<i class="fa-solid fa-circle-info me-1"></i>هنوز هیچ داده واقعی‌ای برای این بویه در ۷ روز اخیر ثبت نشده است.';
-                return;
-            }
-            if (noteEl) noteEl.innerHTML = `<i class="fa-solid fa-circle-info me-1"></i>${data.length} رکورد واقعی از سرور دریافت شد.`;
-
-            // میانگین‌گیری روزانه از رکوردهای واقعی
-            const byDay = {};
-            data.forEach(row => {
-                const day = (row.device_ts || row.created_at || '').slice(0, 10);
-                if (!day) return;
-                if (!byDay[day]) byDay[day] = { bat: [], temp: [] };
-                if (row.battery_voltage !== null && row.battery_voltage !== undefined) byDay[day].bat.push(estimateSocFromVoltage(row.battery_voltage));
-                if (row.temp_ext !== null && row.temp_ext !== undefined) byDay[day].temp.push(row.temp_ext);
-            });
-            const dayKeys = Object.keys(byDay).sort();
-            const avg = arr => arr.length ? Math.round((arr.reduce((a, c) => a + c, 0) / arr.length) * 10) / 10 : null;
-            const days = dayKeys.map(d => { const dt = new Date(d); return `${pad(dt.getMonth() + 1)}/${pad(dt.getDate())}`; });
-            const batterySeries = dayKeys.map(d => avg(byDay[d].bat));
-            const tempSeries = dayKeys.map(d => avg(byDay[d].temp));
-
-            historyChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: days,
-                    datasets: [
-                        { label: 'Battery %', data: batterySeries, borderColor: '#10b981', tension: 0.3, yAxisID: 'y' },
-                        { label: 'Temp °C', data: tempSeries, borderColor: '#f97316', tension: 0.3, yAxisID: 'y1' }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: { position: 'left', min: 0, max: 100 },
-                        y1: { position: 'right', grid: { drawOnChartArea: false } }
-                    }
-                }
-            });
+        function copyDetailCoords(el) {
+            const s = detailSnapshot();
+            if (s.lat === null || s.lat === undefined || s.lon === null || s.lon === undefined) return;
+            const txt = `${s.lat}, ${s.lon}`;
+            const done = () => { el.innerHTML = '<i class="fa-solid fa-check text-success"></i>'; setTimeout(() => { el.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 1500); };
+            const fallback = () => {
+                const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) {}
+                document.body.removeChild(ta);
+            };
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done).catch(fallback); else fallback();
         }
 
         // ===== THEME =====
@@ -3297,8 +3567,6 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             document.getElementById('txt-menu-title').innerText = t.menuTitle;
             document.getElementById('txt-menu-recent').innerText = t.menuRecent;
             document.getElementById('txt-menu-fleet').innerText = t.menuFleet;
-            document.getElementById('txt-menu-history').innerText = t.menuHistory;
-            document.getElementById('txt-history-locked-msg').innerText = t.historyLockedMsg;
             document.getElementById('txt-menu-settings').innerText = t.menuSettings;
 
             document.getElementById('txt-lbl-bat').innerText = t.bat;
@@ -3343,11 +3611,6 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             document.getElementById('txt-gps-label').innerText = t.gpsLabel;
             document.getElementById('txt-satellites-label').innerText = t.satellitesLabel;
             document.getElementById('txt-speed-label').innerText = t.speedLabel;
-
-            document.getElementById('txt-history-heading').innerText = t.historyHeading;
-            document.getElementById('txt-history-desc').innerText = t.historyDesc;
-            document.getElementById('txt-history-buoy-label').innerText = t.historyBuoyLabel;
-            document.getElementById('txt-history-note').innerHTML = `<i class="fa-solid fa-circle-info me-1"></i>${t.historyNote}`;
 
             document.getElementById('txt-mission-title').innerHTML = `<i class="fa-solid fa-hourglass-half me-2 text-primary"></i>${t.missionTitle}`;
             document.getElementById('txt-mission-start-label').innerText = t.missionStartLabel;
@@ -3786,7 +4049,7 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 
 
         // ===== SAVE ACTIONS =====
-        function saveSettings() {
+        function saveSettings(scope) {
             const modeChanged = appState.connectionMode !== pendingState.connectionMode;
             const urlInput = document.getElementById('local-server-url');
             const newLocalUrl = urlInput ? urlInput.value.trim() : appState.localServerUrl;
@@ -3802,11 +4065,10 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             localStorage.setItem('rayka_local_server_url', newLocalUrl || '');
 
             renderMissionBar();
-            updateHistoryMenuState();
             applyConnectionModeState(appState.connectionMode);
             renderPhoneRows();
             if (modeChanged || urlChanged) startTelemetryPipeline();
-            flashSaveFeedback('settings-save-feedback');
+            flashSaveFeedback(scope === 'system' ? 'settings-save-feedback-sys' : 'settings-save-feedback');
         }
 
         function flashSaveFeedback(elId) {
@@ -3852,7 +4114,6 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
             renderQuickSwitcher();
             applyIntervalInputsFromSeconds(appState.smsIntervalSeconds);
             applyConnectionModeState(appState.connectionMode);
-            updateHistoryMenuState();
             updateTopRobotPowerButton();
             renderPhoneRows();
 
