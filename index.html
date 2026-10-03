@@ -775,6 +775,70 @@
                 height: 100vh;
             }
         }
+
+/* ===== SAYRA v4 ===== */
+/* menu opens from the reading-start side: right in RTL (fa/ar), left in LTR (en) */
+html[dir="rtl"] .offcanvas-start{left:auto;right:0;border-right:0;border-left:var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);transform:translateX(100%)}
+html[dir="rtl"] .offcanvas-header .btn-close{margin-right:0;margin-left:calc(-.5 * var(--bs-offcanvas-padding-x))}
+/* Bootstrap margin helpers mirrored for RTL */
+html[dir="rtl"] .me-1{margin-right:0!important;margin-left:.25rem!important}
+html[dir="rtl"] .me-2{margin-right:0!important;margin-left:.5rem!important}
+html[dir="rtl"] .ms-auto{margin-left:0!important;margin-right:auto!important}
+
+/* sticky island bar */
+.sx-island-wrap{position:sticky;top:calc(env(safe-area-inset-top,0px) + 6px);z-index:1030;display:flex;justify-content:center;margin-bottom:10px;pointer-events:none}
+.sx-island{pointer-events:auto;display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;max-width:520px;padding:6px 8px;border-radius:999px;background:rgba(8,12,22,.92);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(148,163,184,.22);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.sx-island-btn{width:38px;height:38px;border-radius:50%;padding:0;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.sx-island-badges{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.sx-island .status-badge{padding:6px 9px;font-size:.7rem;white-space:nowrap}
+
+/* top dashboard grid: desktop 5 cols (controls = 2 cols x 2 rows), mobile 3 cols */
+.sx-top-grid{display:grid;gap:.5rem;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:96px;grid-template-areas:"gsm gps ctl" "mis bat ctl";margin-bottom:.75rem}
+.sx-c-bat{grid-area:bat}.sx-c-gsm{grid-area:gsm}.sx-c-gps{grid-area:gps}.sx-c-mis{grid-area:mis}.sx-c-ctl{grid-area:ctl}
+@media (min-width:576px){.sx-top-grid{grid-auto-rows:108px}}
+@media (max-width:575.98px){.sx-top-grid{gap:.25rem}}
+@media (min-width:992px){
+  .sx-top-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-areas:"bat gsm gps ctl ctl" "mis mis mis ctl ctl"}
+  .sx-c-mis .sx-row{justify-content:flex-start;gap:12px}
+}
+.sx-cell{min-width:0}
+.sx-cell>.sx-box{height:100%;min-height:0!important}
+
+/* bottom grid: 4 cols desktop, 2x2 mobile */
+.sx-bottom-grid{display:grid;gap:.5rem;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:96px;margin-bottom:1rem}
+@media (min-width:576px){.sx-bottom-grid{grid-auto-rows:108px}}
+@media (min-width:992px){.sx-bottom-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:575.98px){.sx-bottom-grid{gap:.25rem}}
+.sx-copy-row{margin-top:auto;display:flex;justify-content:flex-start;direction:ltr}
+.sx-copy-btn{width:28px;height:24px;border-radius:7px;border:1px solid var(--border-color);background:transparent;color:var(--subtext-color);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;padding:0}
+.sx-copy-btn:hover,.sx-copy-btn:focus-visible{color:var(--accent);border-color:var(--accent)}
+
+/* control box: icons + big switches only */
+.sx-box.sx-ctl{display:flex;flex-direction:column;padding:8px 10px 6px!important}
+.sx-ctl-title{display:flex;align-items:center;gap:6px;font-size:.76rem;line-height:1;color:var(--subtext-color);margin:0 0 2px}
+.sx-ctl-title .lock-badge{margin-inline-start:auto}
+.sx-ctl-row{flex:1 1 0;display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0;cursor:pointer;border-top:1px solid rgba(148,163,184,.15)}
+.sx-ctl-ico{font-size:1.25rem;transition:opacity .2s}
+.sx-ctl-row:has(input:not(:checked)) .sx-ctl-ico{opacity:.45}
+.sx-box.sx-ctl .form-switch{padding:0;margin:0;min-height:0;display:flex}
+.sx-box.sx-ctl .form-check-input{float:none;margin:0;font-size:1.45rem;transform:none!important;cursor:pointer}
+@media (max-width:575.98px){
+  .sx-ctl-ico{font-size:1.05rem}
+  .sx-box.sx-ctl .form-check-input{font-size:1.3rem}
+  .sx-ctl-title{font-size:.64rem}
+}
+
+/* map: edge-to-edge card + floating switcher + fullscreen (native or CSS fallback) */
+.sx-map-card{padding:4px!important}
+.sx-map-card #gpsMap{border-radius:9px}
+.map-visual-shell .quick-switch-wrap{position:absolute;left:10px;right:auto;bottom:10px;z-index:1000;margin:0;padding:5px 8px;border-radius:999px;background:rgba(8,12,22,.82);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:1px solid rgba(148,163,184,.25)}
+.map-visual-shell .quick-switch-label{color:#cbd5e1}
+.map-visual-shell .quick-switch-btn{color:#fff;border-color:rgba(148,163,184,.4)}
+body.map-full-open{overflow:hidden}
+.map-visual-shell.is-full{position:fixed;inset:0;z-index:3000;width:100%;height:100vh;height:100dvh;background:var(--bg-main);padding:0;border-radius:0}
+.map-visual-shell.is-full #gpsMap{height:100%!important;border-radius:0}
+.map-visual-shell.is-full .map-fullscreen-btn{top:calc(env(safe-area-inset-top,0px) + 10px);right:10px}
+.map-visual-shell.is-full .quick-switch-wrap{position:absolute;left:calc(env(safe-area-inset-left,0px) + 12px);right:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);margin:0;padding:5px 8px;border-radius:999px;background:rgba(8,12,22,.82)}
 </style>
 </link></head>
 <body class="p-2 p-md-4">
@@ -865,24 +929,26 @@
 </div>
 <!-- ===== MAIN APP SHELL (hidden until login) ===== -->
 <div id="app-shell" style="display:none;">
-<!-- TOP NAVBAR -->
-<div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary flex-wrap gap-2">
-<div class="d-flex align-items-center gap-3">
-<button class="btn btn-outline-primary" data-bs-target="#sidebarMenu" data-bs-toggle="offcanvas" type="button">
-<i class="fa-solid fa-bars fa-lg"></i>
+<!-- TOP NAVBAR (sticky island) -->
+<div class="sx-island-wrap">
+<div class="sx-island" role="toolbar">
+<button class="btn btn-outline-primary sx-island-btn" data-bs-target="#sidebarMenu" data-bs-toggle="offcanvas" type="button" aria-label="Menu">
+<i class="fa-solid fa-bars"></i>
 </button>
+<div class="sx-island-badges">
+<span class="badge status-badge" id="badge-gsm"><i class="fa-solid fa-signal me-1"></i>GSM</span>
+<span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
+<span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>Core</span>
+</div>
+<button class="btn btn-outline-danger sx-island-btn" id="btn-logout" onclick="logout()" title="خروج" type="button"><i class="fa-solid fa-right-from-bracket"></i></button>
+</div>
+</div>
+<div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-3 pb-2 border-bottom border-secondary">
 <div>
 <h4 class="fw-bold mb-0 text-primary"><i class="fa-solid fa-anchor me-2"></i><span id="txt-app-title">سامانه مدیریت بویه‌های سایرا</span></h4>
 <small class="text-muted" id="txt-current-buoy-display">بویه فعال: RAYKA-01 (بوشهر)</small>
 </div>
-</div>
-<div class="d-flex align-items-center gap-2">
-<span class="badge status-badge" id="badge-gsm"><i class="fa-solid fa-signal me-1"></i>GSM</span>
-<span class="badge status-badge" id="badge-gps"><i class="fa-solid fa-location-crosshairs me-1"></i>GPS</span>
-<span class="badge status-badge" id="badge-esp32"><i class="fa-solid fa-microchip me-1"></i>ESP32</span>
 <span class="role-badge" id="user-role-badge">-</span>
-<button class="btn btn-sm btn-outline-warning rayka-power-btn" id="btn-top-robot-power" onclick="requestRobotPowerToggle()" title="روشن/خاموش کردن بویه" type="button"><i class="fa-solid fa-power-off"></i></button><button class="btn btn-sm btn-outline-danger" id="btn-logout" onclick="logout()" title="خروج"><i class="fa-solid fa-right-from-bracket"></i></button>
-</div>
 </div>
 <!-- OFFCANVAS SIDEBAR MENU -->
 <div class="offcanvas offcanvas-start" id="sidebarMenu" tabindex="-1">
@@ -954,18 +1020,8 @@
 <span id="txt-offline-banner"><b>حالت آفلاین فعال است:</b> داده‌ها مستقیماً از وای‌فای محلی دستگاه (ارسال‌شده توسط برنامه Tasker به شبکه خصوصی بویه‌ها) خوانده می‌شود، نه از سرور آنلاین.</span>
 </div>
 <!-- Metrics Cards -->
-<div class="row g-2 mb-3 sx-top-metrics">
-
-
-
-
-
-
-
-
-
-<div class="col-4 sx-five-col">
-<div class="card p-3 sx-box">
+<div class="sx-top-grid">
+<div class="sx-cell sx-c-bat"><div class="card p-3 sx-box">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-bat">شارژ باتری (INA219)</span>
 <span class="battery-icon-wrap">
@@ -973,19 +1029,43 @@
 </span>
 </div>
 <div class="metric-val status-ok mt-2"><span id="val-bat">12.6</span>V <small class="fs-6 text-muted">(<span id="val-soc">92</span>%)</small></div>
-</div>
-</div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
+</div></div>
+<div class="sx-cell sx-c-gsm"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gsm-label">وضعیت GSM</span><i class="fa-solid fa-signal fa-lg text-success" id="gsm-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gsm-status">متصل</div>
-<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="rssiLabel">قدرت سیگنال</span><b id="val-rssi">—</b></div></div></div>
+<div class="sx-cell sx-c-gps"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" id="txt-gps-label">وضعیت GPS</span><i class="fa-solid fa-satellite fa-lg text-success" id="gps-icon"></i></div>
 <div class="status-block-value mt-2 fs-5" id="val-gps-status">متصل</div>
 <div class="sx-row mt-2"><span class="sx-sub" id="txt-satellites-label">ماهواره‌های متصل</span><b id="val-satellites">9</b></div>
-<div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div></div>
+<div class="sx-row"><span class="sx-sub" id="txt-speed-label">سرعت بویه</span><b id="val-speed">0.4 km/h</b></div></div></div>
+<div class="sx-cell sx-c-mis"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
+<div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
+<div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" id="val-mission-next" style="font-size:.78rem;font-variant-numeric:tabular-nums;">—</b></div>
+<div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div>
+<div class="sx-cell sx-c-ctl"><div class="card sx-box sx-ctl">
+<div class="sx-ctl-title"><i class="fa-solid fa-sliders"></i><span data-i18n="controlTitle">کنترل بویه</span><i class="fa-solid fa-lock lock-badge" id="rs485-lock-icon" style="display:none;"></i></div>
+<label class="sx-ctl-row">
+<i class="fa-solid fa-power-off sx-ctl-ico text-warning"></i>
+<span class="visually-hidden" data-i18n="powerLabel">روشن/خاموش بویه</span>
+<span class="form-check form-switch"><input checked="" class="form-check-input" id="robotPowerSwitch" onclick="event.preventDefault(); requestRobotPowerToggle();" type="checkbox"/></span>
+</label>
+<label class="sx-ctl-row">
+<i class="fa-solid fa-plug sx-ctl-ico text-warning"></i>
+<span class="visually-hidden" id="txt-lbl-rs485">سوکت بدنه RS485-E</span><span class="visually-hidden" id="val-rs485-status">وصل</span>
+<span class="form-check form-switch"><input checked="" class="form-check-input" id="rs485Toggle" onchange="toggleRs485(this.checked)" type="checkbox"/></span>
+</label>
+<label class="sx-ctl-row">
+<i class="fa-solid fa-display sx-ctl-ico text-warning"></i>
+<span class="visually-hidden" data-i18n="displayLabel">نمایشگر</span>
+<span class="form-check form-switch"><input checked="" class="form-check-input" id="displayToggle" onchange="toggleDisplay(this.checked)" type="checkbox"/></span>
+</label>
+</div></div>
+</div>
 <!-- GPS MAP SECTION -->
 <div class="row mb-4">
 <div class="col-12">
-<div class="card p-3">
-<div class="d-flex justify-content-between align-items-center mb-2">
-<h6 class="card-title mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i><span id="txt-map-title">نقشه زنده موقعیت بویه‌ها روی دریا</span></h6>
+<div class="card sx-map-card">
+<div class="d-flex justify-content-between align-items-center gap-2 flex-wrap px-2 pt-1 pb-1">
+<h6 class="card-title mb-0"><i class="fa-solid fa-map-location-dot me-2 text-primary"></i><span id="txt-map-title">نقشه زنده</span></h6>
 <small class="text-muted" id="txt-map-hint">روی هر بویه روی نقشه کلیک کنید تا اطلاعاتش لود شود</small>
 </div>
 <div class="map-visual-shell" id="mapVisualShell">
@@ -996,7 +1076,7 @@
 <!-- MINIMAL QUICK BUOY SWITCHER -->
 <div class="quick-switch-wrap">
 <span class="quick-switch-label" id="txt-quick-switch-label">سوییچ سریع:</span>
-<div class="dropdown">
+<div class="dropdown dropup">
 <button aria-expanded="false" class="quick-switch-btn dropdown-toggle" data-bs-toggle="dropdown" id="quickSwitchBtn" type="button">
 <span class="mini-buoy-icon"><i class="fa-solid fa-anchor"></i></span>
 <span id="quickSwitchCurrentName">بویه ۱ (بوشهر)</span>
@@ -1009,47 +1089,30 @@
 </div>
 </div>
 </div>
-</div><div class="row g-2 mb-4 sx-bottom-metrics"><div class="col-4 sx-five-col">
-<div class="card p-3 sx-box">
+</div>
+<div class="sx-bottom-grid">
+<div class="sx-cell "><div class="card p-3 sx-box">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-gps">موقعیت دقیق GPS</span>
 <i class="fa-solid fa-location-dot text-primary"></i>
 </div>
 <div class="metric-val text-primary mt-2 fs-6" id="val-gps-coords">28.9712 N, 50.8361 E</div>
-</div>
-</div><div class="col-4 sx-five-col">
-<div class="card p-3 sx-box" id="leak-card">
+<div class="sx-copy-row"><button aria-label="کپی مختصات" class="sx-copy-btn" id="btn-copy-coords" onclick="copyCoords()" title="کپی مختصات" type="button"><i class="fa-regular fa-copy"></i></button></div></div></div>
+<div class="sx-cell "><div class="card p-3 sx-box" id="leak-card">
 <div class="d-flex justify-content-between align-items-center">
 <span class="text-muted small" id="txt-lbl-leak">سنسور نشتی آب</span>
 <i class="fa-solid fa-droplet text-info" id="leak-icon"></i>
 </div>
 <div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div>
 <button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button>
-</div>
-</div><div class="col-4 sx-five-col">
-<div class="card p-3 sx-box">
-<div class="d-flex justify-content-between align-items-center">
-<span class="text-muted small" id="txt-lbl-rs485">سوکت بدنه RS485-E</span>
-<i class="fa-solid fa-plug text-warning"></i>
-</div>
-<div class="d-flex align-items-center justify-content-between mt-2">
-<span class="fw-bold" id="val-rs485-status">وصل</span>
-<div class="d-flex align-items-center gap-2">
-<i class="fa-solid fa-lock lock-badge" id="rs485-lock-icon" style="display:none;"></i>
-<div class="form-check form-switch">
-<input checked="" class="form-check-input" id="rs485Toggle" onchange="toggleRs485(this.checked)" style="transform: scale(1.3);" type="checkbox"/>
-</div>
-</div>
-</div>
-</div>
-</div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
+</div></div>
+<div class="sx-cell "><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
-<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
+<div class="sx-row mt-2"><span id="txt-rh-in">رطوبت داخل محفظه:</span><span class="badge bg-warning text-dark"><span id="val-rh">42</span>%</span></div></div></div>
+<div class="sx-cell "><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempOutBox">دما و رطوبت بیرون</span><i class="fa-solid fa-water text-info"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-out">دمای بیرون (دریا):</span><span class="badge bg-info"><span id="val-temp-out">31.2</span> °C</span></div>
-<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div><div class="col-4 sx-five-col"><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="missionBoxTitle">وضعیت ماموریت</span><i class="fa-solid fa-hourglass-half text-primary"></i></div>
-<div class="mt-2 fs-5 fw-bold" id="val-mission-state">—</div>
-<div class="sx-row mt-2"><span class="sx-sub" data-i18n="nextSendShort">ارسال بعدی</span><b class="text-warning" id="val-mission-next" style="font-size:.78rem;font-variant-numeric:tabular-nums;">—</b></div>
-<div class="sx-sub mt-1" id="val-now-datetime" style="font-variant-numeric:tabular-nums;">—</div></div></div></div>
+<div class="sx-row mt-2"><span data-i18n="rhOut">رطوبت بیرون:</span><span class="badge bg-secondary"><span id="val-rh-out">—</span></span></div></div></div>
+</div>
 </div>
 <!-- SECTION 2: FLEET MANAGEMENT (بویه‌های من) -->
 <div id="sec-fleet" style="display: none;">
@@ -1956,7 +2019,8 @@
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                mapTitle: 'نقشه زنده موقعیت بویه‌ها روی دریا',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد',
+                mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
                 chartTitle: 'روند ولتاژ و جریان لحظه‌ای',
@@ -2082,7 +2146,8 @@
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                mapTitle: 'Live GPS Marine Buoy Map',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied',
+                mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
                 chartTitle: 'Voltage & Current Telemetry',
@@ -2208,7 +2273,8 @@
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                mapTitle: 'خريطة GPS المباشرة للعوامات',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ',
+                mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
                 chartTitle: 'مخطط الجهد والتيار اللحظي',
@@ -2759,6 +2825,7 @@
             document.getElementById('val-temp-out').innerText = fmt(b.tempOut);
             document.getElementById('val-rh').innerText = fmt(b.rh);
             document.getElementById('rs485Toggle').checked = !!b.rs485;
+            { const dsp = document.getElementById('displayToggle'); if (dsp) dsp.checked = b.display !== false; }
 
             updateBatteryIcon(b.soc);
             refreshBuoyDependentTexts();
@@ -3188,6 +3255,7 @@
             document.getElementById('txt-map-title').innerText = t.mapTitle;
             document.getElementById('txt-map-hint').innerText = t.mapHint;
             document.getElementById('txt-quick-switch-label').innerText = t.quickSwitchLabel;
+            { const cb = document.getElementById('btn-copy-coords'); if (cb && t.copyCoords) { cb.title = t.copyCoords; cb.setAttribute('aria-label', t.copyCoords); } }
             [['txt-chart-title', t.chartTitle], ['txt-temp-title', t.tempTitle]].forEach(([id, v]) => { const e = document.getElementById(id); if (e) e.innerText = v; });
             document.getElementById('txt-temp-in').innerText = t.tempIn;
             document.getElementById('txt-temp-out').innerText = t.tempOut;
@@ -3359,30 +3427,59 @@
         }
 
         // ===== MAP FULLSCREEN VIEW =====
+        // CSS overlay on every device (works on Android/PWA where the Fullscreen API on a div is unreliable);
+        // on desktop the native Fullscreen API is added on top. The shell is moved to <body> while open
+        // so no animated/transformed parent can break position:fixed.
+        let mapFullPushed = false;
         function toggleMapFullscreen() {
             const shell = document.getElementById('mapVisualShell');
             if (!shell) return;
-            if (document.fullscreenElement === shell) {
-                document.exitFullscreen();
-            } else if (shell.requestFullscreen) {
-                shell.requestFullscreen();
-            }
+            if (shell.classList.contains('is-full')) exitMapFull(); else enterMapFull();
+        }
+
+        function enterMapFull() {
+            const shell = document.getElementById('mapVisualShell');
+            if (!shell) return;
+            if (!shell._ph) { shell._ph = document.createComment('map-shell'); shell.parentNode.insertBefore(shell._ph, shell); }
+            document.body.appendChild(shell);
+            shell.classList.add('is-full');
+            document.body.classList.add('map-full-open');
+            try { history.pushState({ mapFull: 1 }, ''); mapFullPushed = true; } catch (e) {}
+            const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+            if (!touch && shell.requestFullscreen) { try { shell.requestFullscreen().catch(() => {}); } catch (e) {} }
+            updateMapFullscreenButton();
+        }
+
+        function exitMapFull(fromPop) {
+            const shell = document.getElementById('mapVisualShell');
+            if (!shell || !shell.classList.contains('is-full')) return;
+            shell.classList.remove('is-full');
+            document.body.classList.remove('map-full-open');
+            if (shell._ph && shell._ph.parentNode) { shell._ph.parentNode.insertBefore(shell, shell._ph); shell._ph.remove(); shell._ph = null; }
+            if (document.fullscreenElement) { try { document.exitFullscreen().catch(() => {}); } catch (e) {} }
+            if (mapFullPushed) { mapFullPushed = false; if (!fromPop) { try { history.back(); } catch (e) {} } }
+            updateMapFullscreenButton();
         }
 
         function updateMapFullscreenButton() {
             const shell = document.getElementById('mapVisualShell');
             const btn = document.getElementById('mapFullscreenBtn');
             if (!shell || !btn) return;
-            const isFull = document.fullscreenElement === shell;
+            const isFull = shell.classList.contains('is-full');
             btn.innerHTML = isFull
                 ? '<i class="fa-solid fa-compress"></i>'
                 : '<i class="fa-solid fa-expand"></i>';
             btn.title = isFull ? 'خروج از حالت تمام‌صفحه' : 'تمام‌صفحه کردن نقشه';
             btn.setAttribute('aria-label', btn.title);
-            if (map) setTimeout(() => map.invalidateSize(), 120);
+            if (map) { setTimeout(() => map.invalidateSize(), 120); setTimeout(() => map.invalidateSize(), 400); }
         }
 
-        document.addEventListener('fullscreenchange', updateMapFullscreenButton);
+        document.addEventListener('fullscreenchange', () => {
+            const shell = document.getElementById('mapVisualShell');
+            if (!document.fullscreenElement && shell && shell.classList.contains('is-full')) exitMapFull();
+        });
+        window.addEventListener('popstate', () => exitMapFull(true));
+        document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') exitMapFull(); });
 
         // ===== ROBOT MASTER POWER SWITCH (host only - sends a command to the buoy) =====
         let pendingRobotPowerChoice = null;
@@ -3409,11 +3506,8 @@
         }
 
         function updateTopRobotPowerButton() {
-            const btn = document.getElementById('btn-top-robot-power');
-            if (!btn) return;
-            btn.classList.toggle('btn-outline-success', !!appState.robotPower);
-            btn.classList.toggle('btn-outline-warning', !appState.robotPower);
-            btn.setAttribute('aria-label', appState.robotPower ? 'خاموش کردن بویه' : 'روشن کردن بویه');
+            const sw = document.getElementById('robotPowerSwitch');
+            if (sw) sw.checked = !!appState.robotPower;
         }
 
         function previewRobotPower(checked) {
@@ -3431,6 +3525,40 @@
             b.rs485 = checked;
             const t = translations[currentLang()];
             document.getElementById('val-rs485-status').innerText = checked ? t.rs485On : t.rs485Off;
+        }
+
+        // ===== DISPLAY SWITCH (host only) =====
+        function toggleDisplay(checked) {
+            if (!currentUser || currentUser.role !== 'host') {
+                document.getElementById('displayToggle').checked = !checked; // revert
+                return;
+            }
+            const b = buoysFleet.find(x => x.id === appState.buoyId);
+            if (b) b.display = checked;
+        }
+
+        // ===== COPY COORDINATES =====
+        function copyCoords() {
+            const b = buoysFleet.find(x => x.id === appState.buoyId);
+            if (!b || b.lat === null || b.lat === undefined || b.lon === null || b.lon === undefined) return;
+            const txt = `${b.lat}, ${b.lon}`;
+            const btn = document.getElementById('btn-copy-coords');
+            const done = () => {
+                if (!btn) return;
+                const t = translations[currentLang()];
+                btn.innerHTML = '<i class="fa-solid fa-check text-success"></i>';
+                btn.title = t.copied;
+                setTimeout(() => { btn.innerHTML = '<i class="fa-regular fa-copy"></i>'; btn.title = t.copyCoords; }, 1600);
+            };
+            const fallback = () => {
+                const ta = document.createElement('textarea');
+                ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) {}
+                document.body.removeChild(ta);
+            };
+            if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done).catch(fallback);
+            else fallback();
         }
 
         // ===== AUTH SYSTEM =====
@@ -3484,8 +3612,10 @@
             document.getElementById('btn-add-phone').disabled = !isHost;
 
             // Settings: robot power switch locked for guest
-            const topPowerBtn = document.getElementById('btn-top-robot-power');
-            if (topPowerBtn) topPowerBtn.disabled = !isHost;
+            const powerSw = document.getElementById('robotPowerSwitch');
+            if (powerSw) powerSw.disabled = !isHost;
+            const displaySw = document.getElementById('displayToggle');
+            if (displaySw) displaySw.disabled = !isHost;
             updateTopRobotPowerButton();
 
             // Dashboard: RS485 socket switch locked for guest
