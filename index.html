@@ -893,29 +893,39 @@ html[dir="rtl"] .sx-popup a.leaflet-popup-close-button{right:auto;left:6px}
 .sx-dfield label{font-size:.7rem;color:var(--subtext-color);margin:0}
 .sx-dbuoy{flex:1 1 220px}.sx-drange{flex:1 1 220px}.sx-dtime{flex:0 1 110px}
 .sx-drange-btn{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;text-align:start;white-space:normal}
-.sx-drange-btn #detail-range-text{flex:1}
 #detail-live-btn i{margin-inline-end:6px}
 #detail-live-btn:not(.active){opacity:.85}
 .sx-dbanner{margin-top:10px;font-size:.78rem;padding:8px 10px;border-radius:10px;background:rgba(2,132,199,.12);color:var(--text-color);border:1px solid rgba(2,132,199,.35)}
 .sx-dbanner i{color:#38bdf8;margin-inline-end:6px}
-/* calendar */
-.sx-cal{margin-top:10px;padding:10px;border:1px solid var(--border-color);border-radius:12px;max-width:340px}
-.sx-cal-head{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:6px}
-.sx-cal-title{font-weight:700;font-size:.85rem}
+/* date range boxes: start = left, end = right */
+.sx-daterange{display:flex;direction:ltr;align-items:stretch;gap:6px;background:rgba(148,163,184,.12);padding:4px;border-radius:10px}
+.sx-dbox{flex:1 1 0;min-width:98px;border:1px solid var(--border-color);background:var(--card-bg);color:var(--text-color);border-radius:6px;padding:6px 8px;font-size:.78rem;text-align:center;font-variant-numeric:tabular-nums;white-space:nowrap}
+.sx-dbox.active{border-color:#0284c7;box-shadow:0 0 0 1px #0284c7}
+.sx-dlive{width:36px;border:1px solid #0284c7;background:transparent;color:#0284c7;border-radius:6px;display:inline-flex;align-items:center;justify-content:center}
+.sx-dlive.active{background:#0284c7;color:#fff}
+/* two-month calendar popover */
+.sx-cal{margin-top:10px;padding:12px;border:1px solid var(--border-color);border-radius:12px;background:var(--card-bg);width:fit-content;max-width:100%}
+.sx-cal2{direction:ltr}
+.sx-cal-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.sx-cal-pick{font-size:.78rem;color:var(--subtext-color)}
 .sx-cal-nav{width:30px;height:30px;border-radius:8px;border:1px solid var(--border-color);background:transparent;color:var(--text-color);display:inline-flex;align-items:center;justify-content:center}
-html[dir="rtl"] .sx-cal-nav i{transform:scaleX(-1)}
-.sx-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.sx-cal-months{display:flex;gap:20px;align-items:flex-start}
+.sx-cal-m{width:238px}
+html[dir="rtl"] .sx-cal-m{direction:rtl}
+.sx-cal-mtitle{font-weight:700;font-size:.82rem;text-align:center;margin-bottom:6px}
+.sx-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
 .sx-cal-wd{font-size:.65rem;color:var(--subtext-color);padding:3px 0}
-.sx-cal-day{border:0;background:transparent;color:var(--text-color);height:34px;border-radius:8px;font-size:.8rem;font-variant-numeric:tabular-nums}
-.sx-cal-day:hover:not(:disabled){background:rgba(2,132,199,.18)}
+.sx-cal-day{border:0;background:transparent;color:var(--text-color);height:32px;border-radius:8px;font-size:.8rem;font-variant-numeric:tabular-nums}
+.sx-cal-day:hover:not(:disabled){background:rgba(2,132,199,.22)}
 .sx-cal-day:disabled{opacity:.3}
 .sx-cal-day.today{outline:1px solid var(--accent)}
-.sx-cal-day.in{background:rgba(2,132,199,.22);border-radius:0}
-.sx-cal-day.sel{background:#0284c7;color:#fff;font-weight:700;border-radius:8px}
-.sx-cal-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.sx-cal-day.in{background:rgba(2,132,199,.25);border-radius:0}
+.sx-cal-day.sel{background:#0284c7;color:#fff;font-weight:700}
+.sx-cal-presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;direction:ltr}
 .sx-cal-presets button{font-size:.7rem;padding:3px 9px;border-radius:999px;border:1px solid var(--border-color);background:transparent;color:var(--text-color)}
 .sx-cal-presets button:hover{border-color:var(--accent);color:var(--accent)}
 .sx-cal-hint{font-size:.68rem;color:var(--subtext-color);margin-top:6px}
+@media (max-width:640px){.sx-cal{width:100%}.sx-cal-m{width:100%}.sx-cal-m+.sx-cal-m{display:none}.sx-dbox{min-width:0}}
 /* layout: map panel on the physical right, sticky */
 .sx-detail-layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;direction:ltr;align-items:start}
 html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
@@ -926,6 +936,11 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 .sx-loc-sub{font-size:.72rem;color:var(--subtext-color);margin-top:2px}
 .sx-loc-coords{display:flex;align-items:center;gap:8px;margin:6px 0 8px;font-weight:600;font-size:.9rem}
 .sx-loc-map{height:320px;border-radius:10px;overflow:hidden;background:#0b1220}
+.sx-loc-sub{display:flex;align-items:center;gap:8px}
+.sx-loc-clear{border:0;background:rgba(148,163,184,.2);color:var(--text-color);width:20px;height:20px;border-radius:50%;font-size:.6rem;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.sx-loc-clear[hidden]{display:none}
+.sx-loc-note{font-size:.7rem;color:var(--subtext-color);margin-top:6px}
+.sx-loc-map .leaflet-control-scale-line{background:rgba(255,255,255,.88);color:#0f172a;border:2px solid #334155;border-top:none;font-weight:600;font-size:.7rem;padding:2px 6px}
 @media (max-width:991.98px){
   .sx-detail-layout{grid-template-columns:minmax(0,1fr)}
   .sx-detail-side{position:static;order:-1}
@@ -1250,10 +1265,9 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 <div class="card p-3 mb-3 sx-dfilter">
 <div class="sx-dfilter-row">
 <div class="sx-dfield sx-dbuoy"><label for="detailBuoySelect" data-i18n="dSelectBuoy">انتخاب بویه</label><select class="form-select form-select-sm" id="detailBuoySelect" onchange="selectBuoyDetailTab(this.value)"></select></div>
-<div class="sx-dfield sx-drange"><label data-i18n="dCalendar">تقویم</label><button class="btn btn-sm btn-outline-primary sx-drange-btn" id="detail-range-btn" onclick="toggleDetailCalendar()" type="button"><i class="fa-regular fa-calendar"></i><span id="detail-range-text">—</span><i class="fa-solid fa-chevron-down small"></i></button></div>
+<div class="sx-dfield sx-drange"><label data-i18n="dCalendar">بازه تاریخ</label><div class="sx-daterange"><button class="sx-dbox" id="detail-start-btn" onclick="openDetailCalendar('start')" type="button">—</button><button class="sx-dbox" id="detail-end-btn" onclick="openDetailCalendar('end')" type="button">—</button><button class="sx-dlive active" id="detail-live-btn" onclick="resetDetailToLive()" type="button"><i class="fa-solid fa-forward-step"></i></button></div></div>
 <div class="sx-dfield sx-dtime"><label for="detailTimeFrom" data-i18n="dTimeFrom">از ساعت</label><input class="form-control form-control-sm" id="detailTimeFrom" onchange="onDetailTimeChange()" type="time" value="00:00"/></div>
 <div class="sx-dfield sx-dtime"><label for="detailTimeTo" data-i18n="dTimeTo">تا ساعت</label><input class="form-control form-control-sm" id="detailTimeTo" onchange="onDetailTimeChange()" type="time" value="23:59"/></div>
-<div class="sx-dfield"><button class="btn btn-sm btn-outline-success active" id="detail-live-btn" onclick="resetDetailToLive()" type="button"><i class="fa-solid fa-satellite-dish"></i><span data-i18n="dLive">آخرین اطلاعات</span></button></div>
 </div>
 <div class="sx-cal" id="detail-cal" hidden></div>
 <div class="sx-dbanner" id="detail-banner" hidden></div>
@@ -1300,9 +1314,10 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 <aside class="sx-detail-side">
 <div class="card sx-loc-panel">
 <div class="sx-loc-head"><i class="fa-solid fa-location-dot"></i><b data-i18n="dLocTitle">موقعیت جغرافیایی بویه</b></div>
-<div class="sx-loc-sub" id="detail-loc-time">—</div>
+<div class="sx-loc-sub"><span id="detail-loc-time">—</span><button class="sx-loc-clear" id="detail-sel-clear" onclick="setDetailSel(null,false)" type="button" hidden><i class="fa-solid fa-xmark"></i></button></div>
 <div class="sx-loc-coords"><span dir="ltr" id="detail-loc-coords">—</span><button aria-label="copy" class="sx-copy-btn" onclick="copyDetailCoords(this)" type="button"><i class="fa-regular fa-copy"></i></button></div>
 <div class="sx-loc-map" id="detailMap"></div>
+<div class="sx-loc-note" id="detail-loc-note"></div>
 </div>
 </aside>
 </div>
@@ -2145,7 +2160,7 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره تنظیمات', dSelectBuoy: 'انتخاب بویه', dCalendar: 'تقویم', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'یک روز را انتخاب کنید؛ برای بازه، روز دوم را هم بزنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره تنظیمات', dStart: 'تاریخ شروع', dEnd: 'تاریخ پایان', dPickStart: 'روز شروع را انتخاب کنید', dPickEnd: 'روز پایان را انتخاب کنید', dSelSample: 'نمونه انتخاب‌شده', dPositions: 'موقعیت ثبت‌شده', dRadius: 'شعاع حرکت', dClearSel: 'بازگشت به آخرین نمونه', dSelectBuoy: 'انتخاب بویه', dCalendar: 'بازه تاریخ', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'برای یک روز، همان روز را دو بار انتخاب کنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
                 mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
@@ -2272,7 +2287,7 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save settings', dSelectBuoy: 'Select buoy', dCalendar: 'Calendar', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'Pick a day; pick a second day for a range.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save settings', dStart: 'Start date', dEnd: 'End date', dPickStart: 'Pick the start day', dPickEnd: 'Pick the end day', dSelSample: 'Selected sample', dPositions: 'positions', dRadius: 'Drift radius', dClearSel: 'Back to latest sample', dSelectBuoy: 'Select buoy', dCalendar: 'Date range', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'For a single day, pick the same day twice.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
                 mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
@@ -2399,7 +2414,7 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ الإعدادات', dSelectBuoy: 'اختيار العوامة', dCalendar: 'التقويم', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'اختر يومًا؛ ولاختيار فترة اختر يومًا ثانيًا.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ الإعدادات', dStart: 'تاريخ البداية', dEnd: 'تاريخ النهاية', dPickStart: 'اختر يوم البداية', dPickEnd: 'اختر يوم النهاية', dSelSample: 'العينة المحددة', dPositions: 'موقع مسجل', dRadius: 'نصف قطر الحركة', dClearSel: 'العودة لآخر عينة', dSelectBuoy: 'اختيار العوامة', dCalendar: 'الفترة', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'ليوم واحد، اختر اليوم نفسه مرتين.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
                 mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
@@ -3118,18 +3133,19 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
         }
 
         // ===== SECTION 2b: COMPREHENSIVE PER-BUOY INFO (اطلاعات جامع هر بویه) =====
-        // Calendar + time window apply ONLY to this page. Live buoy data (dashboard) is never touched.
+        // Calendar / time window / selected sample apply ONLY to this page. Live buoy data (dashboard) is never touched.
         let selectedDetailBuoyId = null;
-        const detailView = { mode: 'live', start: null, end: null, picking: false, anchor: new Date() };
-        let detailRows = [];
-        let detailSource = '';
+        const detailView = { mode: 'live', start: null, end: null, picking: null, anchor: new Date() };
+        let detailRows = [], detailSource = '', detailLoaded = false;
         let detailCharts = {};
         const detailOpen = new Set();
-        let detailMap = null, detailMapLayer = null, detailMapActive = false;
+        let detailMap = null, detailPtsLayer = null, detailSelLayer = null, detailMapActive = false, detailMapKey = '';
+        let detailSel = null, detailSelT = null, detailSelSticky = false, detailCursorRaf = 0;
         let detailLoadToken = 0, detailRefreshTimer = null;
 
         function dT() { return translations[currentLang()]; }
         function curDetailBuoy() { return buoysFleet.find(b => b.id === selectedDetailBuoyId); }
+        const okNum = v => typeof v === 'number' && Number.isFinite(v);
 
         // ---- calendar helpers (Persian calendar for fa, Gregorian for en/ar) ----
         function calTag(latn) {
@@ -3163,86 +3179,118 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             return new Intl.DateTimeFormat(calTag(false), o).format(d);
         }
         function fmtCoords(lat, lon) {
-            if (lat === null || lat === undefined || lon === null || lon === undefined) return '—';
+            if (!okNum(lat) || !okNum(lon)) return '—';
             return `${Math.abs(lat).toFixed(4)}° ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(4)}° ${lon >= 0 ? 'E' : 'W'}`;
         }
+        function fmtMeters(m) { return m < 1000 ? `${Math.round(m)} m` : `${(m / 1000).toFixed(2)} km`; }
 
+        function defaultDetailRange() {
+            const today = noonOf(new Date());
+            detailView.start = new Date(today.getTime() - 6 * 864e5);
+            detailView.end = today;
+            detailView.anchor = detailView.start;
+            detailView.picking = null;
+        }
+
+        // ---- two-month calendar (start month left, end month right) ----
         function renderDetailCalendar() {
             const t = dT(); const el = document.getElementById('detail-cal');
             if (!el) return;
-            const m = calMonth(detailView.anchor);
             const lang = currentLang();
-            const title = new Intl.DateTimeFormat(calTag(false), { month: 'long', year: 'numeric' }).format(m.first);
             const weekStart = lang === 'en' ? 1 : 6;
             const wdFmt = new Intl.DateTimeFormat(calTag(false), { weekday: lang === 'fa' ? 'narrow' : 'short' });
-            let html = `<div class="sx-cal-head"><button class="sx-cal-nav" type="button" onclick="navDetailCal(-1)"><i class="fa-solid fa-chevron-left"></i></button><span class="sx-cal-title">${title}</span><button class="sx-cal-nav" type="button" onclick="navDetailCal(1)"><i class="fa-solid fa-chevron-right"></i></button></div><div class="sx-cal-grid">`;
-            for (let i = 0; i < 7; i++) html += `<div class="sx-cal-wd">${wdFmt.format(new Date(2023, 0, 1 + ((weekStart + i) % 7), 12))}</div>`;
-            const lead = (m.first.getDay() - weekStart + 7) % 7;
-            for (let i = 0; i < lead; i++) html += '<div></div>';
-            const todayK = dayKey(new Date());
-            const sK = detailView.start ? dayKey(detailView.start) : null, eK = detailView.end ? dayKey(detailView.end) : null;
             const dayFmt = new Intl.DateTimeFormat(calTag(false), { day: 'numeric' });
-            m.days.forEach(d => {
-                const k = dayKey(d);
-                let cls = 'sx-cal-day';
-                if (k === todayK) cls += ' today';
-                if (sK !== null && k >= sK && k <= eK) cls += (k === sK || k === eK) ? ' sel' : ' in';
-                html += `<button type="button" class="${cls}" ${k > todayK ? 'disabled' : ''} onclick="pickDetailDay(${d.getTime()})">${dayFmt.format(d)}</button>`;
-            });
-            html += `</div><div class="sx-cal-presets">
-                <button type="button" onclick="setDetailPreset('today')">${t.dToday}</button>
-                <button type="button" onclick="setDetailPreset('yesterday')">${t.dYesterday}</button>
-                <button type="button" onclick="setDetailPreset('7')">${t.d7}</button>
-                <button type="button" onclick="setDetailPreset('30')">${t.d30}</button></div>
-                <div class="sx-cal-hint">${t.dCalHint}</div>`;
-            el.innerHTML = html;
+            const monthFmt = new Intl.DateTimeFormat(calTag(false), { month: 'long', year: 'numeric' });
+            const todayK = dayKey(new Date());
+            const sK = dayKey(detailView.start), eK = dayKey(detailView.end);
+            const monthHtml = m => {
+                let h = `<div class="sx-cal-m"><div class="sx-cal-mtitle">${monthFmt.format(m.first)}</div><div class="sx-cal-grid">`;
+                for (let i = 0; i < 7; i++) h += `<div class="sx-cal-wd">${wdFmt.format(new Date(2023, 0, 1 + ((weekStart + i) % 7), 12))}</div>`;
+                for (let i = 0; i < (m.first.getDay() - weekStart + 7) % 7; i++) h += '<div></div>';
+                m.days.forEach(d => {
+                    const k = dayKey(d); let cls = 'sx-cal-day';
+                    if (k === todayK) cls += ' today';
+                    if (k >= sK && k <= eK) cls += (k === sK || k === eK) ? ' sel' : ' in';
+                    h += `<button type="button" class="${cls}" ${k > todayK ? 'disabled' : ''} onclick="pickDetailDay(${d.getTime()})">${dayFmt.format(d)}</button>`;
+                });
+                return h + '</div></div>';
+            };
+            const left = calMonth(detailView.anchor), right = calMonth(left.next);
+            el.innerHTML = `<div class="sx-cal2">
+                <div class="sx-cal-top"><button class="sx-cal-nav" type="button" onclick="navDetailCal(-1)"><i class="fa-solid fa-chevron-left"></i></button>
+                <span class="sx-cal-pick">${detailView.picking === 'end' ? t.dPickEnd : t.dPickStart}</span>
+                <button class="sx-cal-nav" type="button" onclick="navDetailCal(1)"><i class="fa-solid fa-chevron-right"></i></button></div>
+                <div class="sx-cal-months">${monthHtml(left)}${monthHtml(right)}</div>
+                <div class="sx-cal-presets">
+                    <button type="button" onclick="setDetailPreset('today')">${t.dToday}</button>
+                    <button type="button" onclick="setDetailPreset('yesterday')">${t.dYesterday}</button>
+                    <button type="button" onclick="setDetailPreset('7')">${t.d7}</button>
+                    <button type="button" onclick="setDetailPreset('30')">${t.d30}</button></div>
+                <div class="sx-cal-hint">${t.dCalHint}</div></div>`;
         }
         function navDetailCal(dir) {
             const m = calMonth(detailView.anchor);
             detailView.anchor = dir > 0 ? m.next : m.prev;
             renderDetailCalendar();
         }
-        function toggleDetailCalendar() {
+        function openDetailCalendar(which) {
             const el = document.getElementById('detail-cal');
-            if (el.hasAttribute('hidden')) { renderDetailCalendar(); el.removeAttribute('hidden'); } else el.setAttribute('hidden', '');
+            if (!el.hasAttribute('hidden') && detailView.picking === which) { closeDetailCalendar(); return; }
+            detailView.picking = which;
+            detailView.anchor = which === 'end' && dayKey(detailView.end) >= dayKey(calMonth(detailView.start).next)
+                ? calMonth(detailView.end).prev : detailView.start;
+            renderDetailCalendar();
+            el.removeAttribute('hidden');
+            updateDetailRangeText();
         }
-        function closeDetailCalendar() { const el = document.getElementById('detail-cal'); if (el) el.setAttribute('hidden', ''); }
+        function closeDetailCalendar() {
+            const el = document.getElementById('detail-cal');
+            if (el) el.setAttribute('hidden', '');
+            detailView.picking = null;
+            updateDetailRangeText();
+        }
+        document.addEventListener('pointerdown', e => {
+            const cal = document.getElementById('detail-cal');
+            if (!cal || cal.hasAttribute('hidden')) return;
+            if (cal.contains(e.target) || (e.target.closest && e.target.closest('.sx-daterange'))) return;
+            closeDetailCalendar();
+        }, true);
 
+        // tap a day: the first tap fills the active box (start), then the end box becomes active
         function pickDetailDay(ts) {
             const d = noonOf(new Date(ts));
-            if (!detailView.picking || !detailView.start) {
-                detailView.start = d; detailView.end = d; detailView.picking = true;
-                applyDetailWindow(false);
-            } else {
+            detailView.mode = 'range';
+            if (detailView.picking === 'end') {
                 if (d < detailView.start) { detailView.end = detailView.start; detailView.start = d; } else detailView.end = d;
-                detailView.picking = false;
-                applyDetailWindow(true);
+                closeDetailCalendar();
+            } else {
+                detailView.start = d;
+                if (detailView.end < d) detailView.end = d;
+                detailView.picking = 'end';
+                renderDetailCalendar();
+                updateDetailRangeText();
             }
+            loadDetailData(false);
         }
         function setDetailPreset(kind) {
             const today = noonOf(new Date());
             const back = kind === 'yesterday' ? 1 : (kind === '7' ? 6 : (kind === '30' ? 29 : 0));
             detailView.start = new Date(today.getTime() - back * 864e5);
             detailView.end = kind === 'yesterday' ? detailView.start : today;
-            detailView.picking = false;
-            applyDetailWindow(true);
+            detailView.mode = 'range';
+            closeDetailCalendar();
+            loadDetailData(false);
         }
         function onDetailTimeChange() {
-            if (detailView.mode === 'live' || !detailView.start) { detailView.start = detailView.end = noonOf(new Date()); }
-            applyDetailWindow(false);
-        }
-        function applyDetailWindow(closeCal) {
-            detailView.mode = 'range';
-            if (closeCal) closeDetailCalendar(); else if (!document.getElementById('detail-cal').hasAttribute('hidden')) renderDetailCalendar();
-            if (closeCal) renderDetailCalendar();
-            loadDetailData();
+            if (detailView.mode === 'live') { detailView.start = detailView.end = noonOf(new Date()); detailView.mode = 'range'; }
+            loadDetailData(false);
         }
         function resetDetailToLive() {
-            detailView.mode = 'live'; detailView.start = detailView.end = null; detailView.picking = false; detailView.anchor = new Date();
+            detailView.mode = 'live'; defaultDetailRange();
             document.getElementById('detailTimeFrom').value = '00:00';
             document.getElementById('detailTimeTo').value = '23:59';
             closeDetailCalendar();
-            loadDetailData();
+            loadDetailData(false);
         }
         function detailWindow() {
             if (detailView.mode === 'live') { const to = new Date(); return { from: new Date(to.getTime() - 7 * 864e5), to }; }
@@ -3255,17 +3303,16 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             return { from, to };
         }
         function updateDetailRangeText() {
-            const t = dT(); const el = document.getElementById('detail-range-text');
-            if (!el) return;
-            if (detailView.mode === 'live') { el.innerText = t.dRangeLive; }
-            else {
-                const tf = document.getElementById('detailTimeFrom').value, tt = document.getElementById('detailTimeTo').value;
-                const same = dayKey(detailView.start) === dayKey(detailView.end);
-                let txt = same ? fmtDT(detailView.start, false) : `${fmtDT(detailView.start, false)} → ${fmtDT(detailView.end, false)}`;
-                if (tf !== '00:00' || tt !== '23:59') txt += ` (${tf}–${tt})`;
-                el.innerText = txt;
-            }
-            document.getElementById('detail-live-btn').classList.toggle('active', detailView.mode === 'live');
+            const t = dT();
+            const sb = document.getElementById('detail-start-btn'), eb = document.getElementById('detail-end-btn');
+            if (!sb || !detailView.start) return;
+            sb.innerText = fmtDT(detailView.start, false); eb.innerText = fmtDT(detailView.end, false);
+            sb.title = t.dStart; eb.title = t.dEnd;
+            const open = !document.getElementById('detail-cal').hasAttribute('hidden');
+            sb.classList.toggle('active', open && detailView.picking === 'start');
+            eb.classList.toggle('active', open && detailView.picking === 'end');
+            const lv = document.getElementById('detail-live-btn');
+            lv.classList.toggle('active', detailView.mode === 'live'); lv.title = t.dLive; lv.setAttribute('aria-label', t.dLive);
         }
 
         // ---- data ----
@@ -3296,17 +3343,22 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
                 .filter(r => !Number.isNaN(r._t.getTime())).sort((a, b) => a._t - b._t);
         }
 
-        async function loadDetailData() {
+        async function loadDetailData(keepSel) {
             const b = curDetailBuoy(); if (!b) return;
             const token = ++detailLoadToken;
+            if (!keepSel) { detailSel = null; detailSelT = null; detailSelSticky = false; detailLoaded = false; }
             updateDetailRangeText();
             const note = document.getElementById('detail-note');
-            if (note) note.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i>${dT().dLoading}`;
+            if (note && !keepSel) note.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i>${dT().dLoading}`;
             const w = detailWindow();
             let rows = [];
             try { rows = await fetchDetailRows(b.id, w.from, w.to); } catch (e) { console.warn('detail load', e); }
             if (token !== detailLoadToken) return;
-            detailRows = rows;
+            detailRows = rows; detailLoaded = true;
+            if (detailSelSticky && detailSelT !== null) {
+                const idx = rows.findIndex(r => +r._t === detailSelT);
+                if (idx >= 0) detailSel = idx; else { detailSel = null; detailSelT = null; detailSelSticky = false; }
+            } else detailSel = null;
             renderDetailAll();
         }
 
@@ -3314,17 +3366,39 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             const sec = document.getElementById('sec-buoy-detail');
             if (!sec || sec.style.display !== 'block' || detailView.mode !== 'live' || buoyId !== selectedDetailBuoyId) return;
             clearTimeout(detailRefreshTimer);
-            detailRefreshTimer = setTimeout(loadDetailData, 1500);
+            detailRefreshTimer = setTimeout(() => loadDetailData(true), 1500);
+        }
+
+        // ---- selected sample ("cursor"): driven by tapping a map marker or hovering/tapping a chart ----
+        function detailSelIndex() { return (detailSel !== null && detailRows[detailSel]) ? detailSel : null; }
+        function setDetailSel(idx, sticky) {
+            detailSel = idx;
+            detailSelT = (idx !== null && detailRows[idx]) ? +detailRows[idx]._t : null;
+            detailSelSticky = !!sticky && idx !== null;
+            if (detailCursorRaf) return;
+            detailCursorRaf = requestAnimationFrame(() => { detailCursorRaf = 0; updateDetailCursor(); });
+        }
+        function detailPick(idx) { if (detailSelSticky && detailSel === idx) setDetailSel(null, false); else setDetailSel(idx, true); }
+        function updateDetailCursor() {
+            renderDetailHeader();
+            const s = detailSnapshot();
+            detailMetricDefs().forEach(d => {
+                const v = document.querySelector('#acc-head-' + d.id + ' .sx-acc-val');
+                if (v) v.innerHTML = s.empty ? '—' : d.val(s);
+            });
+            updateDetailMapSelection();
+            Object.values(detailCharts).forEach(c => c && c.draw());
         }
 
         function detailSnapshot() {
             const b = curDetailBuoy(); if (!b) return { empty: true };
-            if (detailView.mode === 'live') {
-                return { live: true, time: b.lastUpdate, vbat: b.vbat, soc: b.soc, solar: b.solar, curr: b.curr, tempIn: b.tempIn, tempOut: b.tempOut, rh: b.rh, rssi: b.rssi, leak: b.leak, lat: b.lat, lon: b.lon, gpsFix: b.gpsFix, sats: b.satellites, speed: b.speedKmh };
+            const si = detailSelIndex();
+            const r = si !== null ? detailRows[si] : (detailView.mode === 'live' ? null : detailRows[detailRows.length - 1]);
+            if (!r) {
+                if (detailView.mode === 'live') return { live: true, time: b.lastUpdate, vbat: b.vbat, soc: b.soc, solar: b.solar, curr: b.curr, tempIn: b.tempIn, tempOut: b.tempOut, rh: b.rh, rssi: b.rssi, leak: b.leak, lat: b.lat, lon: b.lon, gpsFix: b.gpsFix, sats: b.satellites, speed: b.speedKmh };
+                return { live: false, empty: true };
             }
-            const r = detailRows[detailRows.length - 1];
-            if (!r) return { live: false, empty: true };
-            return { live: false, time: r._t.toISOString(), vbat: r.battery_voltage, soc: estimateSocFromVoltage(r.battery_voltage), solar: r.solar_voltage, curr: r.current_ma, tempIn: null, tempOut: r.temp_ext, rh: r.hum_int, rssi: r.rssi, leak: r.leak === true ? 'WET' : (r.leak === false ? 'DRY' : null), lat: r.lat, lon: r.lon, gpsFix: r.gps_fix, sats: null, speed: null };
+            return { live: false, sel: si !== null, time: r._t.toISOString(), vbat: r.battery_voltage, soc: estimateSocFromVoltage(r.battery_voltage), solar: r.solar_voltage, curr: r.current_ma, tempIn: null, tempOut: r.temp_ext, rh: r.hum_int, rssi: r.rssi, leak: r.leak === true ? 'WET' : (r.leak === false ? 'DRY' : null), lat: r.lat, lon: r.lon, gpsFix: r.gps_fix, sats: null, speed: null };
         }
 
         function haversineM(a, b) {
@@ -3346,8 +3420,8 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
                 { id: 'gps', icon: 'fa-satellite', color: '#3b82f6', title: t.dGps, val: s => `${fmt(s.gpsFix)}${(s.sats !== null && s.sats !== undefined) ? ' · ' + s.sats : ''}`, series: [{ label: t.dAlt, get: r => r.alt, color: '#3b82f6' }] },
                 { id: 'pos', icon: 'fa-location-dot', color: '#ef4444', title: t.dPos, val: s => fmtCoords(s.lat, s.lon).replace('° ', '°'),
                   series: [{ label: t.dDrift, color: '#ef4444', get: (r, i, rows) => {
-                      const f = rows.find(x => x.lat !== null && x.lat !== undefined && x.lon !== null && x.lon !== undefined);
-                      if (!f || r.lat === null || r.lat === undefined || r.lon === null || r.lon === undefined) return null;
+                      const f = rows.find(x => okNum(x.lat) && okNum(x.lon));
+                      if (!f || !okNum(r.lat) || !okNum(r.lon)) return null;
                       return Math.round(haversineM([f.lat, f.lon], [r.lat, r.lon]));
                   } }] },
                 { id: 'tin', icon: 'fa-temperature-half', color: '#8b5cf6', title: t.dTempIn, val: s => `${fmt(s.tempIn, '°')} · ${fmt(s.rh, '%')}`, series: [{ label: t.dHum, get: r => r.hum_int, color: '#8b5cf6' }] },
@@ -3361,18 +3435,17 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             if (!selectedDetailBuoyId || !buoysFleet.some(b => b.id === selectedDetailBuoyId)) {
                 selectedDetailBuoyId = appState.buoyId || (buoysFleet[0] && buoysFleet[0].id);
             }
-            detailView.mode = 'live'; detailView.start = detailView.end = null; detailView.picking = false; detailView.anchor = new Date();
+            detailView.mode = 'live'; defaultDetailRange();
             document.getElementById('detailTimeFrom').value = '00:00';
             document.getElementById('detailTimeTo').value = '23:59';
             closeDetailCalendar();
             renderBuoyDetailTabs();
-            detailRows = [];
+            detailRows = []; detailLoaded = false; detailSel = null; detailSelT = null; detailSelSticky = false;
             renderDetailAll();
-            loadDetailData();
-            setTimeout(() => { ensureDetailMap(); updateDetailMap(); }, 150);
+            loadDetailData(false);
         }
 
-        // buoy chooser is a dropdown now
+        // buoy chooser is a dropdown
         function renderBuoyDetailTabs() {
             const sel = document.getElementById('detailBuoySelect');
             sel.innerHTML = '';
@@ -3387,8 +3460,8 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             selectedDetailBuoyId = buoyId;
             const sel = document.getElementById('detailBuoySelect'); if (sel) sel.value = buoyId;
             detailRows = [];
+            loadDetailData(false);
             renderDetailAll();
-            loadDetailData();
         }
 
         function renderDetailAll() {
@@ -3405,10 +3478,11 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             if (!b) { el.innerHTML = `<p class="text-muted mb-0">${t.dNoBuoys}</p>`; return; }
             const s = detailSnapshot();
             const timeTxt = s.time ? fmtDT(s.time, true) : '—';
+            const lbl = s.sel ? t.dSelSample : (s.live ? t.dLastUpdate : t.dSampleTime);
             el.innerHTML = `<h5 class="fw-bold text-primary mb-1"><i class="fa-solid fa-anchor me-2"></i>${escHtml(b.id)} — ${escHtml(b.name)}</h5>
                 <div class="text-muted small">${t.dPlace}: <b>${escHtml(b.locationName || '—')}</b></div>
                 <div class="text-muted small">${t.dPart}: <b>${escHtml(b.partNumber || b.id.split('-').pop())}</b></div>
-                <div class="text-muted small">${s.live ? t.dLastUpdate : t.dSampleTime}: <b>${timeTxt}</b></div>`;
+                <div class="text-muted small">${lbl}: <b>${timeTxt}</b></div>`;
         }
 
         function updateDetailBanner() {
@@ -3419,7 +3493,7 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             else { el.innerHTML = `<i class="fa-solid fa-filter"></i>${t.dFilteredBanner}`; el.removeAttribute('hidden'); }
             if (note) note.innerHTML = detailRows.length
                 ? `<i class="fa-solid fa-circle-info me-1"></i>${detailRows.length} ${t.dRecords}${src ? ' — ' + src : ''}`
-                : `<i class="fa-solid fa-circle-info me-1"></i>${detailView.mode === 'live' ? t.dNoDataLive : t.dNoData}`;
+                : `<i class="fa-solid fa-circle-info me-1"></i>${detailLoaded ? (detailView.mode === 'live' ? t.dNoDataLive : t.dNoData) : t.dLoading}`;
         }
 
         function renderDetailBoxes() {
@@ -3457,6 +3531,19 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             head.parentElement.classList.toggle('open', opening);
         }
 
+        // vertical red line on every open chart at the selected sample
+        const detailCursorPlugin = {
+            id: 'detailCursor',
+            afterDatasetsDraw(chart) {
+                const i = detailSelIndex(); if (i === null) return;
+                const x = chart.scales.x.getPixelForValue(i), a = chart.chartArea;
+                if (!(x >= a.left - 1 && x <= a.right + 1)) return;
+                const c = chart.ctx; c.save();
+                c.strokeStyle = 'rgba(239,68,68,.9)'; c.lineWidth = 1.5; c.setLineDash([4, 3]);
+                c.beginPath(); c.moveTo(x, a.top); c.lineTo(x, a.bottom); c.stroke(); c.restore();
+            }
+        };
+
         function drawDetailChart(def) {
             const body = document.getElementById('acc-body-' + def.id);
             if (!body) return;
@@ -3477,23 +3564,29 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
             }));
             const scales = { x: { ticks: { color: tick, maxTicksLimit: 6, maxRotation: 0 }, grid: { color: grid } }, y: { ticks: { color: tick }, grid: { color: grid } } };
             if (def.series.some(x => x.axis === 'y1')) scales.y1 = { position: 'right', ticks: { color: tick }, grid: { drawOnChartArea: false } };
+            const isTouch = e => !!(e && e.native && ((e.native.type || '').startsWith('touch') || e.native.pointerType === 'touch'));
             detailCharts[def.id] = new Chart(canvas.getContext('2d'), {
-                type: 'line', data: { labels, datasets },
-                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-                    plugins: { legend: { display: def.series.length > 1, labels: { color: tick } } }, scales }
+                type: 'line', data: { labels, datasets }, plugins: [detailCursorPlugin],
+                options: {
+                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { display: def.series.length > 1, labels: { color: tick } } }, scales,
+                    onHover: (e, els) => { if (!els || !els.length) return; const touch = isTouch(e); if (detailSelSticky && !touch) return; if (detailSel !== els[0].index) setDetailSel(els[0].index, touch); },
+                    onClick: (e, els) => { if (els && els.length) detailPick(els[0].index); }
+                }
             });
+            canvas.addEventListener('mouseleave', () => { if (!detailSelSticky && detailSel !== null) setDetailSel(null, false); });
         }
 
-        // ---- sticky location panel ----
+        // ---- per-buoy location map: every position in the window, anchor circle, scale in metres ----
         function ensureDetailMap() {
             if (detailMap) return detailMap;
             const el = document.getElementById('detailMap'); if (!el) return null;
             const coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
-            detailMap = L.map('detailMap', { dragging: !coarse, touchZoom: !coarse, scrollWheelZoom: false }).setView([27.8, 53.5], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(detailMap);
-            L.control.scale({ imperial: false }).addTo(detailMap);
-            detailMapLayer = L.layerGroup().addTo(detailMap);
-            // same tap-to-activate behaviour as the dashboard map (touch: swipe scrolls the page until the map is tapped)
+            detailMap = L.map('detailMap', { preferCanvas: true, maxZoom: 19, dragging: !coarse, touchZoom: !coarse, scrollWheelZoom: false }).setView([27.8, 53.5], 5);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(detailMap);
+            L.control.scale({ imperial: false, metric: true, maxWidth: 110, position: 'bottomleft' }).addTo(detailMap);
+            detailPtsLayer = L.layerGroup().addTo(detailMap);
+            detailSelLayer = L.layerGroup().addTo(detailMap);
             const setActive = on => {
                 detailMapActive = on;
                 if (on) { detailMap.scrollWheelZoom.enable(); if (coarse) { detailMap.dragging.enable(); detailMap.touchZoom.enable(); } }
@@ -3506,28 +3599,64 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 
         function updateDetailMap() {
             const m = ensureDetailMap(); if (!m) return;
-            const t = dT(); const s = detailSnapshot();
-            detailMapLayer.clearLayers();
-            const pts = detailRows.filter(r => r.lat !== null && r.lat !== undefined && r.lon !== null && r.lon !== undefined).map(r => [r.lat, r.lon]);
-            if (pts.length > 1) L.polyline(pts, { color: '#0284c7', weight: 2, dashArray: '5,6', opacity: 0.85 }).addTo(detailMapLayer);
-            const has = s.lat !== null && s.lat !== undefined && s.lon !== null && s.lon !== undefined;
-            if (has) {
-                const col = socToColor(s.soc);
-                const icon = L.divIcon({ className: 'custom-buoy-icon active', html: `<div class="buoy-marker-circle" style="background:${col}; box-shadow:0 0 10px ${col};"><i class="fa-solid fa-anchor"></i></div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
-                L.marker([s.lat, s.lon], { icon }).addTo(detailMapLayer);
+            const t = dT();
+            detailPtsLayer.clearLayers();
+            const pts = [];
+            detailRows.forEach((r, i) => { if (okNum(r.lat) && okNum(r.lon)) pts.push({ i, ll: [r.lat, r.lon] }); });
+            const MAX = 2500, step = pts.length > MAX ? Math.ceil(pts.length / MAX) : 1;
+            const shown = step === 1 ? pts : pts.filter((p, k) => k % step === 0 || k === pts.length - 1);
+
+            // mooring circle: the buoy is tied to an anchor, so it drifts inside a circle
+            let center = null, radius = 0, rr = 0;
+            if (pts.length > 1) {
+                center = [pts.reduce((a, p) => a + p.ll[0], 0) / pts.length, pts.reduce((a, p) => a + p.ll[1], 0) / pts.length];
+                radius = pts.reduce((mx, p) => Math.max(mx, haversineM(center, p.ll)), 0);
+                rr = Math.max(radius * 1.08, 8);
+                L.circle(center, { radius: rr, color: '#0284c7', weight: 2, dashArray: '6,6', fillColor: '#0284c7', fillOpacity: 0.1, interactive: false }).addTo(detailPtsLayer);
             }
-            document.getElementById('detail-loc-coords').innerText = has ? fmtCoords(s.lat, s.lon) : t.dLocNone;
-            document.getElementById('detail-loc-time').innerText = s.time ? `${s.live ? t.dLastUpdate : t.dSampleTime}: ${fmtDT(s.time, true)}` : '—';
+            if (shown.length > 1) L.polyline(shown.map(p => p.ll), { color: '#0284c7', weight: 1.5, dashArray: '4,5', opacity: 0.8, interactive: false }).addTo(detailPtsLayer);
+            shown.forEach(p => L.circleMarker(p.ll, { radius: 4, color: '#a16207', weight: 1, fillColor: '#facc15', fillOpacity: 0.9 }).on('click', () => detailPick(p.i)).addTo(detailPtsLayer));
+
+            const s = detailSnapshot();
+            const has = okNum(s.lat) && okNum(s.lon);
+            const key = [selectedDetailBuoyId, detailView.mode, +detailView.start, +detailView.end, document.getElementById('detailTimeFrom').value, document.getElementById('detailTimeTo').value, detailLoaded ? 1 : 0].join('|');
+            const doFit = key !== detailMapKey && (pts.length > 0 || has);
+            if (doFit) detailMapKey = key;
             setTimeout(() => {
                 m.invalidateSize();
-                if (pts.length > 1) { const bnd = L.latLngBounds(pts); if (has) bnd.extend([s.lat, s.lon]); m.fitBounds(bnd, { padding: [24, 24], maxZoom: 15 }); }
-                else if (has) m.setView([s.lat, s.lon], 12);
+                if (!doFit) return;
+                if (center) {
+                    const dLat = rr / 111320, dLon = rr / (111320 * Math.max(0.2, Math.cos(center[0] * Math.PI / 180)));
+                    m.fitBounds([[center[0] - dLat, center[1] - dLon], [center[0] + dLat, center[1] + dLon]], { padding: [16, 16], maxZoom: 18 });
+                } else if (pts.length === 1) m.setView(pts[0].ll, 16);
+                else if (has) m.setView([s.lat, s.lon], 14);
             }, 60);
+
+            const noteEl = document.getElementById('detail-loc-note');
+            if (noteEl) noteEl.innerText = pts.length ? `${pts.length} ${t.dPositions}${center ? ` · ${t.dRadius} ≈ ${fmtMeters(radius)}` : ''}` : '';
+            updateDetailMapSelection();
+        }
+
+        function updateDetailMapSelection() {
+            if (!detailMap) return;
+            const t = dT(); const s = detailSnapshot();
+            detailSelLayer.clearLayers();
+            const has = okNum(s.lat) && okNum(s.lon);
+            if (has) {
+                const col = socToColor(s.soc);
+                const icon = L.divIcon({ className: 'custom-buoy-icon active', html: `<div class="buoy-marker-circle" style="background:${col}; box-shadow:0 0 0 3px #0b1220, 0 0 10px ${col};"><i class="fa-solid fa-anchor"></i></div>`, iconSize: [30, 30], iconAnchor: [15, 15] });
+                L.marker([s.lat, s.lon], { icon, interactive: false, zIndexOffset: 1000 }).addTo(detailSelLayer);
+                if (s.sel && !detailMap.getBounds().contains([s.lat, s.lon])) detailMap.panTo([s.lat, s.lon]);
+            }
+            document.getElementById('detail-loc-coords').innerText = has ? fmtCoords(s.lat, s.lon) : t.dLocNone;
+            document.getElementById('detail-loc-time').innerText = s.time ? fmtDT(s.time, true) : '—';
+            const clr = document.getElementById('detail-sel-clear');
+            if (clr) { clr.hidden = detailSelIndex() === null; clr.title = t.dClearSel; }
         }
 
         function copyDetailCoords(el) {
             const s = detailSnapshot();
-            if (s.lat === null || s.lat === undefined || s.lon === null || s.lon === undefined) return;
+            if (!okNum(s.lat) || !okNum(s.lon)) return;
             const txt = `${s.lat}, ${s.lon}`;
             const done = () => { el.innerHTML = '<i class="fa-solid fa-check text-success"></i>'; setTimeout(() => { el.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 1500); };
             const fallback = () => {
