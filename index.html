@@ -793,7 +793,6 @@ body{margin:0;font-family:'Vazirmatn','Segoe UI',Tahoma,sans-serif;background:#0
 
 /* ===== SAYRA v4 ===== */
 /* menu opens from the reading-start side: right in RTL (fa/ar), left in LTR (en) */
-html[dir="rtl"] .offcanvas-start{left:auto;right:0;border-right:0;border-left:var(--bs-offcanvas-border-width) solid var(--bs-offcanvas-border-color);transform:translateX(100%)}
 html[dir="rtl"] .offcanvas-header .btn-close{margin-right:0;margin-left:calc(-.5 * var(--bs-offcanvas-padding-x))}
 /* Bootstrap margin helpers mirrored for RTL */
 html[dir="rtl"] .me-1{margin-right:0!important;margin-left:.25rem!important}
@@ -1094,6 +1093,25 @@ html[data-bs-theme="light"] .sx-stars{opacity:0}
 }
 @media (prefers-reduced-motion:reduce){.sx-wave,.sx-buoy-wrap,.sx-buoy,.sx-lamp,.sx-bub,.sx-stars{animation:none!important}}
 .sx-loading-lite{opacity:.55;transition:opacity .2s ease;pointer-events:none}
+
+/* ===== SAYRA v10: floating frosted-glass side menu ===== */
+.offcanvas.offcanvas-start{
+  --bs-offcanvas-width:min(80vw,340px);
+  top:calc(env(safe-area-inset-top,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+  left:10px;right:auto;width:var(--bs-offcanvas-width);height:auto;
+  border:1px solid rgba(255,255,255,.16);border-radius:22px;overflow:hidden;
+  background:rgba(30,41,59,.55);
+  -webkit-backdrop-filter:blur(22px) saturate(1.8);backdrop-filter:blur(22px) saturate(1.8);
+  box-shadow:0 18px 50px rgba(0,0,0,.38);
+  transform:translateX(calc(-100% - 24px));
+}
+html[dir="rtl"] .offcanvas.offcanvas-start{left:auto;right:10px;transform:translateX(calc(100% + 24px))}
+html .offcanvas.offcanvas-start.show:not(.hiding),html .offcanvas.offcanvas-start.showing{transform:none!important}
+html[data-bs-theme="light"] .offcanvas.offcanvas-start{background:rgba(255,255,255,.62);border-color:rgba(255,255,255,.75);box-shadow:0 18px 50px rgba(15,23,42,.22)}
+.offcanvas.offcanvas-start .offcanvas-header,.offcanvas.offcanvas-start .offcanvas-body{background:transparent}
+.offcanvas.offcanvas-start .offcanvas-header{border-bottom:1px solid rgba(148,163,184,.22)}
+.offcanvas-backdrop.show{opacity:.42;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 </style>
 </link></head>
 <body class="p-2 p-md-4 sx-login-open">
