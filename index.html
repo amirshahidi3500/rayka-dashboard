@@ -13,6 +13,19 @@
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <link href="icon-192.png" rel="apple-touch-icon"/>
 <!-- Bootstrap 5 CSS -->
+<style id="sx-fallback">
+/* Lowest-priority fallback: keeps the login usable if the CDN stylesheets fail to load.
+   It sits BEFORE the CDN links, so Bootstrap and the app styles override it when they load. */
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;font-family:'Vazirmatn','Segoe UI',Tahoma,sans-serif;background:#0f172a;color:#e2e8f0}
+.d-flex{display:flex}.d-block{display:block}.justify-content-center{justify-content:center}.justify-content-between{justify-content:space-between}.align-items-center{align-items:center}
+.gap-2{gap:.5rem}.w-100{width:100%}.text-center{text-align:center}.fw-bold{font-weight:700}.small{font-size:.875em}.fs-4{font-size:1.5rem}.p-0{padding:0}
+.mb-0{margin-bottom:0}.mb-1{margin-bottom:.25rem}.mb-2{margin-bottom:.5rem}.mb-3{margin-bottom:1rem}.mb-4{margin-bottom:1.5rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:1rem}
+.me-1{margin-inline-end:.25rem}.me-2{margin-inline-end:.5rem}.text-primary{color:#38bdf8}.text-muted{color:#94a3b8}
+.form-control{display:block;width:100%;padding:.55rem .85rem;font:inherit;color:#e2e8f0;background:#1e293b;border:1px solid #334155;border-radius:.5rem}
+.btn{display:inline-block;padding:.55rem 1rem;border:1px solid transparent;border-radius:.5rem;font:inherit;cursor:pointer;text-align:center;color:#fff}
+.btn-primary{background:#0284c7}.btn-success{background:#16a34a}.btn-warning{background:#f59e0b;color:#111}.btn-outline-info{background:transparent;color:#38bdf8;border-color:#38bdf8}.btn-link{background:none;color:#38bdf8;padding:0}
+</style>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <!-- FontAwesome Icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
@@ -1046,10 +1059,65 @@ a.sx-sup-v:hover{color:var(--accent)}
 .buoy-item-card{transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s ease}
 .buoy-item-card:hover{transform:translateY(-3px)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ===== SAYRA v9: login scene ===== */
+body.sx-login-open{overflow:hidden;padding:0!important}
+#auth-screen{position:fixed;inset:0;z-index:2000;min-height:0;height:100%;overflow-y:auto;overflow-x:hidden;display:flex;align-items:center;justify-content:center;padding:20px;-webkit-overflow-scrolling:touch}
+#auth-screen .auth-card{position:relative;z-index:3;margin:auto;max-width:430px;width:100%;background:rgba(15,23,42,.62);-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border:1px solid rgba(255,255,255,.18);box-shadow:0 18px 50px rgba(0,20,50,.45)}
+html[data-bs-theme="light"] #auth-screen .auth-card{background:rgba(255,255,255,.62);border-color:rgba(255,255,255,.7);box-shadow:0 18px 50px rgba(2,60,110,.28)}
+.sx-sea{position:fixed;inset:0;z-index:1;overflow:hidden;pointer-events:none;background:linear-gradient(180deg,#0b1d3a 0%,#123a63 45%,#1c6a9a 70%,#2a8fbd 100%)}
+html[data-bs-theme="light"] .sx-sea{background:linear-gradient(180deg,#7dd3fc 0%,#bae6fd 45%,#7cc4e6 72%,#3a9bd0 100%)}
+.sx-sky,.sx-sun,.sx-stars{position:absolute;inset:0}
+.sx-sun{inset:auto;top:9%;right:14%;width:90px;height:90px;border-radius:50%;background:radial-gradient(circle,#fff7c2 0%,#fde68a 45%,rgba(253,230,138,0) 72%);opacity:.0;filter:blur(1px)}
+html[data-bs-theme="light"] .sx-sun{opacity:.95}
+.sx-stars{opacity:.9;background-image:radial-gradient(2px 2px at 12% 18%,#fff,transparent),radial-gradient(1.5px 1.5px at 30% 8%,#fff,transparent),radial-gradient(2px 2px at 55% 22%,#fff,transparent),radial-gradient(1.5px 1.5px at 72% 10%,#fff,transparent),radial-gradient(2px 2px at 88% 26%,#fff,transparent),radial-gradient(1.5px 1.5px at 20% 34%,#fff,transparent),radial-gradient(1.5px 1.5px at 64% 38%,#fff,transparent);animation:sxTwinkle 4s ease-in-out infinite alternate}
+html[data-bs-theme="light"] .sx-stars{opacity:0}
+@keyframes sxTwinkle{from{opacity:.35}to{opacity:.95}}
+.sx-wave{position:absolute;left:0;bottom:0;width:200%;will-change:transform}
+.sx-wave-1{height:35vh;z-index:1;animation:sxWave 24s linear infinite}
+.sx-wave-2{height:23vh;z-index:3;animation:sxWave 16s linear infinite reverse}
+.sx-wave-3{height:11vh;z-index:4;animation:sxWave 11s linear infinite}
+@keyframes sxWave{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
+.sx-buoy-wrap{--bw:min(120px,24vw);position:absolute;left:80%;bottom:calc(17vh - var(--bw) * .534);width:var(--bw);margin-left:calc(var(--bw) / -2);z-index:2;filter:drop-shadow(0 10px 14px rgba(0,20,50,.35));transform-origin:50% 88%;animation:sxBob 5s ease-in-out infinite}
+.sx-buoy{transform-origin:60px 150px;animation:sxTilt 6.5s ease-in-out infinite}
+@keyframes sxBob{0%,100%{transform:translateY(0) rotate(-1.5deg)}50%{transform:translateY(-12px) rotate(1.5deg)}}
+@keyframes sxTilt{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.sx-lamp{animation:sxLamp 2.4s ease-in-out infinite;filter:drop-shadow(0 0 8px #fde047)}
+@keyframes sxLamp{0%,100%{opacity:.35}50%{opacity:1}}
+.sx-bub{position:absolute;bottom:-20px;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.28);border:1px solid rgba(255,255,255,.4);animation:sxRise 9s linear infinite}
+.sx-bub.b1{left:12%;animation-duration:10s}.sx-bub.b2{left:34%;width:7px;height:7px;animation-duration:8s;animation-delay:2s}.sx-bub.b3{left:68%;width:12px;height:12px;animation-duration:12s;animation-delay:1s}.sx-bub.b4{left:86%;width:8px;height:8px;animation-duration:9s;animation-delay:4s}
+@keyframes sxRise{0%{transform:translateY(0);opacity:0}15%{opacity:.8}100%{transform:translateY(-62vh);opacity:0}}
+@media (max-width:575.98px){
+  .sx-sun{width:64px;height:64px}
+  .sx-wave-1{height:27vh}.sx-wave-2{height:17vh}.sx-wave-3{height:8vh}
+  .sx-buoy-wrap{--bw:min(96px,24vw);left:78%;bottom:calc(12.3vh - var(--bw) * .534)}
+}
+@media (prefers-reduced-motion:reduce){.sx-wave,.sx-buoy-wrap,.sx-buoy,.sx-lamp,.sx-bub,.sx-stars{animation:none!important}}
+.sx-loading-lite{opacity:.55;transition:opacity .2s ease;pointer-events:none}
 </style>
 </link></head>
-<body class="p-2 p-md-4">
+<body class="p-2 p-md-4 sx-login-open">
 <div id="auth-screen">
+<div aria-hidden="true" class="sx-sea" id="sx-sea">
+<div class="sx-sky"></div>
+<div class="sx-sun"></div>
+<div class="sx-stars"></div>
+<svg class="sx-buoy-wrap" viewBox="0 0 120 190" xmlns="http://www.w3.org/2000/svg">
+<g class="sx-buoy">
+<rect x="57" y="10" width="6" height="44" rx="3" fill="#cbd5e1"/>
+<circle class="sx-lamp" cx="60" cy="9" r="6" fill="#fde047"/>
+<path d="M36 70 Q60 40 84 70 L90 112 Q60 126 30 112 Z" fill="#f97316"/>
+<path d="M33 92 Q60 102 87 92 L90 112 Q60 126 30 112 Z" fill="#fff" opacity=".92"/>
+<path d="M42 66 Q60 52 78 66" stroke="#fff" stroke-width="3" fill="none" opacity=".55" stroke-linecap="round"/>
+<rect x="24" y="112" width="72" height="14" rx="7" fill="#0ea5e9"/>
+<rect x="52" y="126" width="16" height="30" rx="5" fill="#334155"/>
+</g>
+</svg>
+<svg class="sx-wave sx-wave-1" preserveAspectRatio="none" viewBox="0 0 2400 400" xmlns="http://www.w3.org/2000/svg"><path d="M0 100 Q150 40 300 100 T600 100 T900 100 T1200 100 T1500 100 T1800 100 T2100 100 T2400 100 V400 H0Z" fill="rgba(56,189,248,.35)"/></svg>
+<svg class="sx-wave sx-wave-2" preserveAspectRatio="none" viewBox="0 0 2400 400" xmlns="http://www.w3.org/2000/svg"><path d="M0 110 Q200 50 400 110 T800 110 T1200 110 T1600 110 T2000 110 T2400 110 V400 H0Z" fill="rgba(14,116,184,.55)"/></svg>
+<svg class="sx-wave sx-wave-3" preserveAspectRatio="none" viewBox="0 0 2400 400" xmlns="http://www.w3.org/2000/svg"><path d="M0 120 Q120 70 240 120 T480 120 T720 120 T960 120 T1200 120 T1440 120 T1680 120 T1920 120 T2160 120 T2400 120 V400 H0Z" fill="rgba(3,60,110,.8)"/></svg>
+<span class="sx-bub b1"></span><span class="sx-bub b2"></span><span class="sx-bub b3"></span><span class="sx-bub b4"></span>
+</div>
 <div class="auth-card">
 <h4 class="fw-bold text-center mb-1 text-primary"><i class="fa-solid fa-anchor me-2"></i>سامانه سایرا</h4>
 <p class="text-muted text-center small mb-4" data-i18n="authSubtitle" id="txt-auth-subtitle">برای ورود، نقش خودتان را انتخاب کنید</p>
@@ -2270,7 +2338,7 @@ a.sx-sup-v:hover{color:var(--accent)}
             if (sb) sb.auth.signOut();
             currentUser = null;
             document.getElementById('app-shell').style.display = 'none';
-            document.getElementById('auth-screen').style.display = 'flex';
+            document.getElementById('auth-screen').style.display = 'flex'; document.body.classList.add('sx-login-open');
             hideAuthError();
         }
         async function loadFleetFromServer() {
@@ -2738,6 +2806,7 @@ a.sx-sup-v:hover{color:var(--accent)}
 
         // ===== MAP =====
         function initMap() {
+            if (typeof L === 'undefined') { console.warn('Leaflet not loaded'); return; }
             // Touch: the map ignores swipes (so the page scrolls) until you tap it once; wheel-zoom likewise needs a click
             const coarse = !!(window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
             map = L.map('gpsMap', { dragging: !coarse, touchZoom: !coarse, scrollWheelZoom: false }).setView([27.8, 53.5], 6);
@@ -3254,7 +3323,7 @@ a.sx-sup-v:hover{color:var(--accent)}
         const detailOpen = new Set();
         let detailMap = null, detailPtsLayer = null, detailSelLayer = null, detailMapActive = false, detailMapKey = '';
         let detailSel = null, detailSelT = null, detailSelSticky = false, detailCursorRaf = 0;
-        let detailLoadToken = 0, detailRefreshTimer = null;
+        let detailLoadToken = 0, detailRefreshTimer = null, detailFullCount = 0, detailStats = { count: 0, center: null, radius: 0, first: null };
 
         function dT() { return translations[currentLang()]; }
         function curDetailBuoy() { return buoysFleet.find(b => b.id === selectedDetailBuoyId); }
@@ -3382,6 +3451,7 @@ a.sx-sup-v:hover{color:var(--accent)}
                 detailView.picking = 'end';
                 renderDetailCalendar();
                 updateDetailRangeText();
+                return; // wait for the end day: ONE load instead of two
             }
             loadDetailData(false);
         }
@@ -3394,9 +3464,12 @@ a.sx-sup-v:hover{color:var(--accent)}
             closeDetailCalendar();
             loadDetailData(false);
         }
+        let detailTimeTimer = null;
         function onDetailTimeChange() {
             if (detailView.mode === 'live') { detailView.start = detailView.end = noonOf(new Date()); detailView.mode = 'range'; }
-            loadDetailData(false);
+            updateDetailRangeText();
+            clearTimeout(detailTimeTimer);
+            detailTimeTimer = setTimeout(() => loadDetailData(false), 450);
         }
         function resetDetailToLive() {
             detailView.mode = 'live'; defaultDetailRange();
@@ -3429,18 +3502,32 @@ a.sx-sup-v:hover{color:var(--accent)}
         }
 
         // ---- data ----
+        const DETAIL_COLS = 'device_ts,lat,lon,battery_voltage,solar_voltage,current_ma,temp_ext,hum_int,leak,gps_fix,rssi';
+        const detailCache = new Map();
         async function fetchDetailRows(buoyId, from, to) {
             const fromIso = from.toISOString(), toIso = to.toISOString();
+            const ck = `${buoyId}|${fromIso.slice(0, 16)}|${toIso.slice(0, 16)}`;
+            const hit = detailCache.get(ck);
+            if (hit && Date.now() - hit.t < 60000) { detailSource = hit.src; return hit.rows; }
             let rows = null; detailSource = '';
             if (sb && supabaseReady) {
                 try {
-                    rows = []; const PAGE = 1000;
-                    for (let p = 0; p < 10; p++) {
-                        const { data, error } = await sb.from(TELEMETRY_TABLE).select('*').eq('buoy_id', buoyId)
+                    const PAGE = 1000;
+                    const page = async (p, cols) => {
+                        const { data, error } = await sb.from(TELEMETRY_TABLE).select(cols).eq('buoy_id', buoyId)
                             .gte('device_ts', fromIso).lte('device_ts', toIso).order('device_ts', { ascending: true }).range(p * PAGE, (p + 1) * PAGE - 1);
                         if (error) throw error;
-                        rows = rows.concat(data || []);
-                        if (!data || data.length < PAGE) break;
+                        return data || [];
+                    };
+                    let cols = DETAIL_COLS, first;
+                    try { first = await page(0, cols); } catch (e) { cols = '*'; first = await page(0, cols); }
+                    rows = first;
+                    let p = 1;
+                    while (first.length === PAGE && p < 12) {          // next pages are requested 4 at a time, in parallel
+                        const batch = await Promise.all([0, 1, 2, 3].map(k => page(p + k, cols).catch(() => [])));
+                        let done = false;
+                        batch.forEach(d => { rows = rows.concat(d); if (d.length < PAGE) done = true; });
+                        p += 4; if (done) break;
                     }
                     detailSource = 'server';
                 } catch (e) { rows = null; }
@@ -3452,8 +3539,30 @@ a.sx-sup-v:hover{color:var(--accent)}
                     if (c.length || !rows) { rows = c; detailSource = 'cache'; }
                 } catch (e) { if (!rows) rows = []; }
             }
-            return rows.map(r => ({ ...r, _t: new Date(r.device_ts || r.created_at || r.cached_at) }))
-                .filter(r => !Number.isNaN(r._t.getTime())).sort((a, b) => a._t - b._t);
+            rows = rows.map(r => { r._t = new Date(r.device_ts || r.created_at || r.cached_at); return r; })
+                .filter(r => !Number.isNaN(r._t.getTime())).sort((x, y) => x._t - y._t);
+            detailCache.set(ck, { t: Date.now(), rows, src: detailSource });
+            if (detailCache.size > 12) detailCache.delete(detailCache.keys().next().value);
+            return rows;
+        }
+
+        // keep at most `max` points (always the first and the last one) so charts and map stay fast
+        function decimateRows(rows, max) {
+            if (rows.length <= max) return rows;
+            const step = rows.length / max, out = [];
+            for (let i = 0; i < max; i++) out.push(rows[Math.floor(i * step)]);
+            if (out[out.length - 1] !== rows[rows.length - 1]) out.push(rows[rows.length - 1]);
+            return out;
+        }
+        function computeDetailStats(rows) {
+            const pts = rows.filter(r => okNum(r.lat) && okNum(r.lon));
+            const st = { count: pts.length, center: null, radius: 0, first: pts[0] || null };
+            if (pts.length > 1) {
+                let la = 0, lo = 0; pts.forEach(p => { la += p.lat; lo += p.lon; });
+                st.center = [la / pts.length, lo / pts.length];
+                st.radius = pts.reduce((mx, p) => Math.max(mx, haversineM(st.center, [p.lat, p.lon])), 0);
+            }
+            return st;
         }
 
         async function loadDetailData(keepSel) {
@@ -3463,15 +3572,19 @@ a.sx-sup-v:hover{color:var(--accent)}
             updateDetailRangeText();
             const note = document.getElementById('detail-note');
             if (note && !keepSel) note.innerHTML = `<i class="fa-solid fa-spinner fa-spin me-1"></i>${dT().dLoading}`;
+            const lay = document.querySelector('.sx-detail-layout'); if (lay && !keepSel) lay.classList.add('sx-loading-lite');
             const w = detailWindow();
             let rows = [];
             try { rows = await fetchDetailRows(b.id, w.from, w.to); } catch (e) { console.warn('detail load', e); }
             if (token !== detailLoadToken) return;
-            detailRows = rows; detailLoaded = true;
+            detailFullCount = rows.length;
+            detailStats = computeDetailStats(rows);
+            detailRows = decimateRows(rows, 900); detailLoaded = true;
             if (detailSelSticky && detailSelT !== null) {
                 const idx = rows.findIndex(r => +r._t === detailSelT);
                 if (idx >= 0) detailSel = idx; else { detailSel = null; detailSelT = null; detailSelSticky = false; }
             } else detailSel = null;
+            const lay2 = document.querySelector('.sx-detail-layout'); if (lay2) lay2.classList.remove('sx-loading-lite');
             renderDetailAll();
         }
 
@@ -3530,8 +3643,8 @@ a.sx-sup-v:hover{color:var(--accent)}
                 { id: 'curr', icon: 'fa-bolt', color: '#06b6d4', title: t.dCurr, val: s => fmt(s.curr, ' mA'), series: [{ label: 'mA', get: r => r.current_ma, color: '#06b6d4' }] },
                 { id: 'gsm', icon: 'fa-signal', color: '#64748b', title: t.dGsm, val: s => fmt(s.rssi, ' dBm'), series: [{ label: 'RSSI (dBm)', get: r => r.rssi, color: '#64748b' }] },
                 { id: 'pos', icon: 'fa-location-dot', color: '#ef4444', title: t.dPos, val: s => fmtCoords(s.lat, s.lon).replace('° ', '°'),
-                  series: [{ label: t.dDrift, color: '#ef4444', get: (r, i, rows) => {
-                      const f = rows.find(x => okNum(x.lat) && okNum(x.lon));
+                  series: [{ label: t.dDrift, color: '#ef4444', get: (r) => {
+                      const f = detailStats.first;
                       if (!f || !okNum(r.lat) || !okNum(r.lon)) return null;
                       return Math.round(haversineM([f.lat, f.lon], [r.lat, r.lon]));
                   } }] },
@@ -3607,7 +3720,7 @@ a.sx-sup-v:hover{color:var(--accent)}
             if (detailView.mode === 'live') el.setAttribute('hidden', '');
             else { el.innerHTML = `<i class="fa-solid fa-filter"></i>${t.dFilteredBanner}`; el.removeAttribute('hidden'); }
             if (note) note.innerHTML = detailRows.length
-                ? `<i class="fa-solid fa-circle-info me-1"></i>${detailRows.length} ${t.dRecords}${src ? ' — ' + src : ''}`
+                ? `<i class="fa-solid fa-circle-info me-1"></i>${detailFullCount} ${t.dRecords}${src ? ' — ' + src : ''}`
                 : `<i class="fa-solid fa-circle-info me-1"></i>${detailLoaded ? (detailView.mode === 'live' ? t.dNoDataLive : t.dNoData) : t.dLoading}`;
         }
 
@@ -3616,6 +3729,8 @@ a.sx-sup-v:hover{color:var(--accent)}
             const s = detailSnapshot();
             const defs = detailMetricDefs();
             Object.values(detailCharts).forEach(ch => ch && ch.destroy()); detailCharts = {};
+            wrap.style.minHeight = wrap.offsetHeight + 'px';
+            requestAnimationFrame(() => requestAnimationFrame(() => { wrap.style.minHeight = ''; }));
             wrap.innerHTML = defs.map(d => {
                 const open = detailOpen.has(d.id);
                 const val = d.soon ? d.val(s) : (s.empty ? '—' : d.val(s));
@@ -3685,7 +3800,7 @@ a.sx-sup-v:hover{color:var(--accent)}
             detailCharts[def.id] = new Chart(canvas.getContext('2d'), {
                 type: 'line', data: { labels, datasets }, plugins: [detailCursorPlugin],
                 options: {
-                    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                    responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false },
                     plugins: { legend: { display: def.series.length > 1, labels: { color: tick } } }, scales,
                     onHover: (e, els) => { if (!els || !els.length) return; const touch = isTouch(e); if (detailSelSticky && !touch) return; if (detailSel !== els[0].index) setDetailSel(els[0].index, touch); },
                     onClick: (e, els) => { if (els && els.length) detailPick(els[0].index); }
@@ -3720,18 +3835,13 @@ a.sx-sup-v:hover{color:var(--accent)}
             detailPtsLayer.clearLayers();
             const pts = [];
             detailRows.forEach((r, i) => { if (okNum(r.lat) && okNum(r.lon)) pts.push({ i, ll: [r.lat, r.lon] }); });
-            const MAX = 2500, step = pts.length > MAX ? Math.ceil(pts.length / MAX) : 1;
-            const shown = step === 1 ? pts : pts.filter((p, k) => k % step === 0 || k === pts.length - 1);
+            const shown = pts.length > 500 ? pts.filter((p, k) => k % Math.ceil(pts.length / 500) === 0 || k === pts.length - 1) : pts;
 
-            // mooring circle: the buoy is tied to an anchor, so it drifts inside a circle
-            let center = null, radius = 0, rr = 0;
-            if (pts.length > 1) {
-                center = [pts.reduce((a, p) => a + p.ll[0], 0) / pts.length, pts.reduce((a, p) => a + p.ll[1], 0) / pts.length];
-                radius = pts.reduce((mx, p) => Math.max(mx, haversineM(center, p.ll)), 0);
-                rr = Math.max(radius * 1.08, 8);
-                L.circle(center, { radius: rr, color: '#0284c7', weight: 2, dashArray: '6,6', fillColor: '#0284c7', fillOpacity: 0.1, interactive: false }).addTo(detailPtsLayer);
-            }
-            if (shown.length > 1) L.polyline(shown.map(p => p.ll), { color: '#0284c7', weight: 1.5, dashArray: '4,5', opacity: 0.8, interactive: false }).addTo(detailPtsLayer);
+            // mooring circle: computed from ALL recorded positions (before thinning)
+            const center = detailStats.center, radius = detailStats.radius;
+            const rr = center ? Math.max(radius * 1.08, 8) : 0;
+            if (center) L.circle(center, { radius: rr, color: '#0284c7', weight: 2, dashArray: '6,6', fillColor: '#0284c7', fillOpacity: 0.1, interactive: false }).addTo(detailPtsLayer);
+            if (pts.length > 1) L.polyline(pts.map(p => p.ll), { color: '#0284c7', weight: 1.5, dashArray: '4,5', opacity: 0.8, interactive: false }).addTo(detailPtsLayer);
             shown.forEach(p => L.circleMarker(p.ll, { radius: 4, color: '#a16207', weight: 1, fillColor: '#facc15', fillOpacity: 0.9 }).on('click', () => detailPick(p.i)).addTo(detailPtsLayer));
 
             const s = detailSnapshot();
@@ -3740,17 +3850,17 @@ a.sx-sup-v:hover{color:var(--accent)}
             const doFit = key !== detailMapKey && (pts.length > 0 || has);
             if (doFit) detailMapKey = key;
             setTimeout(() => {
-                m.invalidateSize();
+                m.invalidateSize({ animate: false });
                 if (!doFit) return;
                 if (center) {
                     const dLat = rr / 111320, dLon = rr / (111320 * Math.max(0.2, Math.cos(center[0] * Math.PI / 180)));
-                    m.fitBounds([[center[0] - dLat, center[1] - dLon], [center[0] + dLat, center[1] + dLon]], { padding: [16, 16], maxZoom: 18 });
-                } else if (pts.length === 1) m.setView(pts[0].ll, 16);
-                else if (has) m.setView([s.lat, s.lon], 14);
+                    m.fitBounds([[center[0] - dLat, center[1] - dLon], [center[0] + dLat, center[1] + dLon]], { padding: [16, 16], maxZoom: 18, animate: false });
+                } else if (pts.length === 1) m.setView(pts[0].ll, 16, { animate: false });
+                else if (has) m.setView([s.lat, s.lon], 14, { animate: false });
             }, 60);
 
             const noteEl = document.getElementById('detail-loc-note');
-            if (noteEl) noteEl.innerText = pts.length ? `${pts.length} ${t.dPositions}${center ? ` · ${t.dRadius} ≈ ${fmtMeters(radius)}` : ''}` : '';
+            if (noteEl) noteEl.innerText = detailStats.count ? `${detailStats.count} ${t.dPositions}${center ? ` · ${t.dRadius} ≈ ${fmtMeters(radius)}` : ''}` : '';
             updateDetailMapSelection();
         }
 
@@ -4721,7 +4831,7 @@ a.sx-sup-v:hover{color:var(--accent)}
 
         async function enterApp() {
             await loadFleetFromServer();
-            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('auth-screen').style.display = 'none'; document.body.classList.remove('sx-login-open');
             document.getElementById('app-shell').style.display = 'block';
             applyRolePermissions();
             showSection('recent-data');
