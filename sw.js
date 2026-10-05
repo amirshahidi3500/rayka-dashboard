@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sayra-buoy-v7';
+const CACHE_NAME = 'sayra-buoy-v9';
 
 // فایل‌های داخلی (اگر یکی نبود، نصب SW خراب نمی‌شود)
 const LOCAL_ASSETS = [
