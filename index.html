@@ -996,6 +996,14 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 .sx-st-failed{background:rgba(239,68,68,.14);color:#ef4444;border-color:rgba(239,68,68,.5)}
 .sx-st-connected{background:rgba(59,130,246,.14);color:#3b82f6;border-color:rgba(59,130,246,.5)}
 .sx-st-has_data{background:rgba(16,185,129,.15);color:#059669;border-color:rgba(16,185,129,.5)}
+.sx-acc-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.sx-gs-wrap{overflow-x:auto;border:1px solid rgba(148,163,184,.25);border-radius:10px}
+.sx-gs-table{width:100%;font-size:.82rem;border-collapse:collapse}
+.sx-gs-table th,.sx-gs-table td{padding:7px 10px;border-bottom:1px solid rgba(148,163,184,.18);white-space:nowrap;text-align:start}
+.sx-gs-table th{font-weight:700;color:var(--subtext-color,#94a3b8)}
+.sx-gs-on{color:#10b981;font-weight:700}
+.sx-gs-warn{color:#d97706}
+.sx-st-pending_host,.sx-st-pending_buoy{background:rgba(245,158,11,.16);color:#d97706;border-color:rgba(245,158,11,.5)}
 .buoy-item-card .d-flex.justify-content-between{flex-wrap:wrap;gap:6px}
 
 /* modals / forms */
@@ -1495,6 +1503,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <div id="sec-settings" style="display: none;">
 <div class="card p-4 mx-auto" style="max-width: 650px;">
 <h4 class="fw-bold mb-4 border-bottom border-secondary pb-2"><i class="fa-solid fa-sliders me-2 text-warning"></i><span id="txt-setting-heading">تنظیمات سیستم و تم</span></h4>
+<div class="d-flex gap-2 mb-3" id="sys-tabs" style="display:none;"><button class="btn btn-sm btn-primary" id="sys-tab-btn-general" onclick="showSysTab('general')" type="button" data-i18n="sysTabGeneral">تنظیمات</button><button class="btn btn-sm btn-outline-secondary" id="sys-tab-btn-guests" onclick="showSysTab('guests')" type="button" data-i18n="sysTabGuests">ورود و خروج مهمان‌ها</button></div>
+<div id="sys-tab-general">
 <!-- Connection Mode Toggle (Online / Offline) -->
 <div class="mb-4">
 <label class="form-label fw-bold" id="txt-connmode-label">حالت اتصال داده (Online / Offline):</label>
@@ -1546,6 +1556,13 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <label class="form-label fw-bold" data-i18n="referralLabel" id="txt-referral-label">کد معرف شما برای دعوت مهمان:</label>
 <div class="sx-ref-row"><div class="referral-code-box" id="val-referral-code">-</div><button class="sx-icon-btn" onclick="copyReferral(this)" title="کپی" type="button"><i class="fa-regular fa-copy"></i></button><button class="sx-qr-thumb" id="ref-qr-thumb" onclick="openRefQr()" title="QR" type="button"></button></div>
 </div>
+<!-- Relay key (host only) -->
+<div class="mt-4 pt-3 border-top border-secondary" id="relay-key-block" style="display:none;">
+<label class="form-label fw-bold" data-i18n="rkLabel">کلید اتصال اپ واسط (relay_key):</label>
+<div class="sx-ref-row"><div class="referral-code-box" dir="ltr" id="val-relay-key" style="font-size:.78rem;word-break:break-all;">-</div><button class="sx-icon-btn" onclick="toggleRelayKey()" type="button"><i class="fa-regular fa-eye"></i></button><button class="sx-icon-btn" onclick="copyRelayKey(this)" type="button"><i class="fa-regular fa-copy"></i></button></div>
+<p class="locked-note mt-1 mb-2" data-i18n="rkNote">این کلید را در اپ واسط وارد کنید و به کسی ندهید.</p>
+<button class="btn btn-outline-warning btn-sm" data-i18n="rkRotate" onclick="rotateRelayKey()" type="button">ساخت کلید جدید</button>
+</div>
 <!-- Cloud sync status (Supabase) -->
 <div class="mt-4 pt-3 border-top border-secondary" id="cloud-sync-block">
 <label class="form-label fw-bold" data-i18n="cloudsyncLabel" id="txt-cloudsync-label">وضعیت اتصال به سرور ابری:</label>
@@ -1554,6 +1571,12 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <span id="val-cloud-sync-status">-</span>
 </div>
 <p class="locked-note mt-1 mb-0" data-i18n="cloudsyncNote" id="txt-cloudsync-note">داده‌ها هنگام اتصال به اینترنت خودکار با سرور همگام می‌شوند و برای مشاهده آفلاین روی همین دستگاه کش می‌شوند.</p>
+</div>
+</div><!-- /sys-tab-general -->
+<div id="sys-tab-guests" style="display:none;">
+<div class="d-flex justify-content-between align-items-center mb-2 gap-2 flex-wrap"><span class="fw-bold" data-i18n="sysTabGuests">ورود و خروج مهمان‌ها</span><div class="d-flex gap-2"><button class="btn btn-sm btn-outline-secondary" onclick="loadGuestSessions()" type="button"><i class="fa-solid fa-rotate me-1"></i><span data-i18n="gsRefresh">به‌روزرسانی</span></button><button class="btn btn-sm btn-outline-success" onclick="exportGuestSessionsExcel(this)" type="button"><i class="fa-solid fa-file-excel me-1"></i><span data-i18n="xlDownload">دانلود اکسل</span></button></div></div>
+<div class="sx-gs-wrap"><table class="sx-gs-table"><thead><tr><th data-i18n="gsName">نام مهمان</th><th data-i18n="gsIn">ورود</th><th data-i18n="gsOut">خروج</th><th data-i18n="gsDur">مدت</th></tr></thead><tbody id="gs-body"></tbody></table></div>
+<p class="text-muted small mt-2 mb-0" id="gs-note"></p>
 </div>
 </div>
 </div>
@@ -1628,11 +1651,18 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <div class="modal-body">
 <div class="mb-3"><label class="form-label small text-muted" data-i18n="nbName" for="nbName">نام بویه</label><input autocomplete="off" class="form-control" id="nbName" type="text"/></div>
 <div class="mb-3"><label class="form-label small text-muted" data-i18n="nbSim" for="nbSim">شماره موبایل بویه</label><input class="form-control" dir="ltr" id="nbSim" inputmode="tel" placeholder="09xxxxxxxxx" type="tel"/></div>
-<div class="mb-3"><label class="form-label small text-muted" data-i18n="nbRelay" for="nbRelay">شماره موبایل واسط</label><input class="form-control" dir="ltr" id="nbRelay" inputmode="tel" placeholder="09xxxxxxxxx" type="tel"/></div>
+<div class="mb-3"><label class="form-label small text-muted" data-i18n="nbRelay" for="nbRelaySel">شماره موبایل واسط</label><select class="form-select" dir="ltr" id="nbRelaySel" onchange="onRelaySelChange()"></select><input class="form-control mt-2" dir="ltr" id="nbRelay" inputmode="tel" placeholder="09xxxxxxxxx" type="tel" style="display:none"/></div>
+<div class="mb-3"><label class="form-label small text-muted" data-i18n="nbPass" for="nbPass">رمز بویه</label><input autocomplete="off" class="form-control" dir="ltr" id="nbPass" maxlength="16" type="text"/><div class="small text-muted mt-1" data-i18n="nbPassHint">رمزی که شرکت همراه بویه به شما داده است.</div></div>
 <p class="text-muted small mb-2"><i class="fa-solid fa-location-crosshairs me-1"></i><span data-i18n="nbLocHint">محل بویه به‌صورت خودکار از اولین موقعیتی که ارسال می‌کند مشخص می‌شود.</span></p>
 <p class="sx-err mb-0" id="nbError"></p>
 </div>
 <div class="modal-footer border-top border-secondary"><button class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="nbCancel" type="button">انصراف</button><button class="btn btn-success" data-i18n="nbSave" id="nbSaveBtn" onclick="addNewBuoy()" type="button">ذخیره</button></div>
+</div></div></div>
+<!-- PAIR PASSWORD MODAL (resend pairing SMS with a new password) -->
+<div aria-hidden="true" class="modal fade" id="pairPassModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+<div class="modal-header border-bottom border-secondary"><h5 class="modal-title"><i class="fa-solid fa-key me-2 text-warning"></i><span data-i18n="ppTitle">رمز بویه</span></h5><button class="btn-close btn-close-white" data-bs-dismiss="modal" type="button"></button></div>
+<div class="modal-body"><p class="small" data-i18n="ppDesc">رمز را دوباره وارد کنید.</p><input autocomplete="off" class="form-control" dir="ltr" id="ppPass" maxlength="16" type="text"/><p class="sx-err mb-0 mt-2" id="ppMsg"></p></div>
+<div class="modal-footer border-top border-secondary"><button class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="nbCancel" type="button">انصراف</button><button class="btn btn-warning" data-i18n="ppSend" onclick="submitPairPass()" type="button">ارسال</button></div>
 </div></div></div>
 <!-- VERIFY BUOY (email code) MODAL -->
 <div aria-hidden="true" class="modal fade" data-bs-backdrop="static" id="verifyBuoyModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content">
@@ -1641,6 +1671,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <p class="small mb-3" id="vbDesc"></p>
 <input autocomplete="one-time-code" class="form-control sx-code-input" id="vbCode" inputmode="numeric" maxlength="6" placeholder="••••••" type="text"/>
 <p class="small text-muted mt-2 mb-1" id="vbAttempts"></p>
+<p class="small text-warning mb-1" id="vbWarn"></p>
 <p class="sx-err mb-0" id="vbMsg"></p>
 </div>
 <div class="modal-footer border-top border-secondary d-flex justify-content-between">
@@ -1693,6 +1724,11 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <div class="mb-3">
 <label class="form-label small text-muted">نام محل استقرار</label>
 <input class="form-control" id="editBuoyLocation" type="text"/>
+</div>
+<div class="mb-3">
+<label class="form-label small text-muted" data-i18n="ebRelay" for="editBuoyRelay">شماره واسط اصلی</label>
+<input class="form-control" dir="ltr" id="editBuoyRelay" inputmode="tel" placeholder="09xxxxxxxxx" type="tel"/>
+<p class="text-muted small mt-1 mb-0" data-i18n="ebRelayHint">با تغییر این شماره، پیامکی برای اطلاع بویه ارسال می‌شود.</p>
 </div>
 </div>
 <div class="modal-footer border-top border-secondary">
@@ -1892,7 +1928,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 
             const b = buoysFleet.find(x => x.id === t.buoy_id);
             if (!b) return;
-            if (b.meta && (b.meta.status === 'pending' || b.meta.status === 'failed')) return; // email not verified yet
+            if (b.pairStatus && b.pairStatus !== 'connected') return; // not paired yet: ignore any data
 
             if (t.lat !== null && t.lat !== undefined) b.lat = t.lat;
             if (t.lon !== null && t.lon !== undefined) b.lon = t.lon;
@@ -2343,6 +2379,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                             role: 'guest', uid: authData.user.id, username: username,
                             hostUid: host.id, hostUsername: host.username
                         };
+                        startGuestSession(username, hostMobile, referralCode);   // log: guest name + login time
                         enterApp();
                     });
                 })
@@ -2352,7 +2389,12 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 });
         }
 
-        function logout() {
+        async function logout() {
+            clearInterval(gsTimer); gsTimer = null;
+            if (guestSessionId && sb) {                       // log the guest's exit time before the session is closed
+                const sid = guestSessionId; guestSessionId = null; clearInterval(guestPingTimer);
+                try { await Promise.race([sb.rpc('guest_session_end', { p_id: sid }), new Promise(r => setTimeout(r, 1500))]); } catch (e) {}
+            }
             if (sb) sb.auth.signOut();
             currentUser = null;
             document.getElementById('app-shell').style.display = 'none';
@@ -2369,6 +2411,11 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 const b = makeEmptyBuoy(row.id, row.name, row.location_name, row.lat, row.lon);
                 b.partNumber = row.id.split('-').pop();
                 b.meta = Object.assign({}, loadBuoyMetaLocal(row.id), (row.meta && typeof row.meta === 'object') ? row.meta : {});
+                b.pairStatus = row.pair_status || 'connected';
+                b.pairError = row.pair_error || null;
+                b.relayPhone = row.relay_phone || null;
+                if (typeof b.meta.rs485 === 'boolean') b.rs485 = b.meta.rs485;
+                if (typeof b.meta.display === 'boolean') b.display = b.meta.display;
                 if (row.lat === 0 && row.lon === 0) { b.lat = null; b.lon = null; }
                 return b;
             });
@@ -2377,6 +2424,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 
             renderFleetLists();
             renderQuickSwitcher();
+            startPairPoll();
         }
 
         // MISSION CONFIG - 14 day mission
@@ -2407,7 +2455,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', missionStateDone: 'پایان یافته', missionStateOff: 'متوقف', stPending: 'در انتظار تایید ایمیل', stFailed: 'متصل نشد', stConnected: 'متصل شده', stHasData: 'دارای داده', nbTitle: 'افزودن بویه', nbName: 'نام بویه', nbSim: 'شماره موبایل بویه', nbRelay: 'شماره موبایل واسط', nbLocHint: 'محل بویه به‌صورت خودکار از اولین موقعیتی که ارسال می‌کند مشخص می‌شود.', nbCancel: 'انصراف', nbSave: 'ذخیره', nbErrSim: 'شماره موبایل بویه معتبر نیست.', nbErrRelay: 'شماره موبایل واسط معتبر نیست.', nbErrServer: 'ثبت بویه روی سرور ناموفق بود:', nbHostOnly: 'فقط میزبان می‌تواند بویه اضافه کند.', nbDefaultName: 'بویه جدید', nbNoBuoy: 'هیچ بویه‌ای انتخاب نشده است.', vbTitle: 'تایید ایمیل بویه', vbResend: 'ارسال مجدد کد', vbLater: 'بعداً', vbConfirm: 'تایید', vbDesc: 'کد ۶ رقمی به ایمیل {email} ارسال شد. آن را وارد کنید.', vbSending: 'در حال ارسال کد...', vbAttempts: 'تلاش باقی‌مانده: {n}', vbWrong: 'کد اشتباه است.', vbFailed: 'سه بار کد اشتباه وارد شد؛ وضعیت بویه «متصل نشد» شد.', vbOk: 'بویه متصل شد. منتظر اولین داده می‌ماند.', vbSendFail: 'ارسال یا بررسی کد ناموفق بود. اتصال اینترنت را بررسی کنید.', vbRetry: 'تایید ایمیل (کد جدید)', vbCodeLen: 'کد باید ۶ رقم باشد.', confirmTitle: 'تایید عملیات', confirmYes: 'بله', confirmNo: 'خیر', cfRs485On: 'آیا مطمئن هستید که سوکت روشن شود؟', cfRs485Off: 'آیا مطمئن هستید که سوکت قطع شود؟', cfDisplayOn: 'آیا مطمئن هستید که نمایشگر روشن شود؟', cfDisplayOff: 'آیا مطمئن هستید که نمایشگر خاموش شود؟', cfMissionOn: 'آیا مطمئن هستید که ماموریت فعال شود؟', cfMissionOff: 'آیا مطمئن هستید که ماموریت متوقف شود؟', refQrTitle: 'QR کد میزبان', refQrHint: 'مهمان این QR را در صفحه ورود اسکن کند.', btnScanQr: 'اسکن QR میزبان', scanTitle: 'اسکن QR میزبان', scanClose: 'بستن', scanNoCamera: 'دسترسی به دوربین ممکن نشد. اجازه دوربین را بررسی کنید.', scanSearching: 'QR را داخل کادر بگیرید...', scanBad: 'این QR مربوط به سایرا نیست.', scanNeedUsername: 'کد میزبان وارد شد؛ نام کاربری خود را بنویسید.', qrLibFail: 'کتابخانه QR بارگذاری نشد؛ اینترنت را بررسی کنید.', copyEmpty: 'چیزی برای کپی وجود ندارد.', fxTitle: 'صدا و ویبره', fxSound: 'صدای کلیدها', fxVibe: 'ویبره', bsSpecsTitle: 'مشخصات بویه', bsBuoy: 'بویه', bsRobotW: 'وزن ربات (کیلوگرم)', bsAnchorLen: 'طول لنگر (متر)', bsAnchorW: 'وزن لنگر (کیلوگرم)', msTitle: 'ماموریت', msToggle: 'انجام ماموریت', msStart: 'تاریخ و ساعت شروع', msEnd: 'تاریخ و ساعت پایان', phonesNote: 'بویه برای همه شماره‌های ثبت‌شده پیامک می‌فرستد؛ شماره ستاره‌دار «واسط اصلی» است.', phonesEmpty: 'هنوز شماره‌ای ثبت نشده است.', phoneMainTip: 'انتخاب به‌عنوان واسط اصلی', errMissionDates: 'تاریخ پایان ماموریت باید بعد از شروع باشد.', errSpecs: 'مقادیر وزن و طول باید عدد معتبر باشند.', errPhones: 'یکی از شماره‌ها معتبر نیست.', dSoon: 'به زودی', dSoonNote: 'این بخش به زودی فعال می‌شود.', dTempInOnly: 'دمای داخل', dTempIn2: 'دمای داخل (°C)', dHumIn: 'رطوبت داخل', dTempOutOnly: 'دمای بیرون', dHumOut: 'رطوبت بیرون', dHumOutAxis: 'رطوبت بیرون (%)', dNotSent: 'این مقدار هنوز از سخت‌افزار ارسال نمی‌شود.', dRobotW: 'وزن ربات', dAnchorLen: 'طول لنگر', dAnchorW: 'وزن لنگر', supWork: 'محل کار', supLeadElec: 'مسئول برق (سرپرست تیم)', supElec: 'مسئول برق', supMech: 'مسئول مکانیک', supDev: 'مسئول برنامه‌نویسی و کدنویسی', supPhone: 'شماره تماس', supGithub: 'لینک گیت‌هاب', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره', dStart: 'تاریخ شروع', dEnd: 'تاریخ پایان', dPickStart: 'روز شروع را انتخاب کنید', dPickEnd: 'روز پایان را انتخاب کنید', dSelSample: 'نمونه انتخاب‌شده', dPositions: 'موقعیت ثبت‌شده', dRadius: 'شعاع حرکت', dClearSel: 'بازگشت به آخرین نمونه', dSelectBuoy: 'انتخاب بویه', dCalendar: 'بازه تاریخ', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'برای یک روز، همان روز را دو بار انتخاب کنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', missionStateDone: 'پایان یافته', missionStateOff: 'متوقف', stPending: 'در انتظار تایید ایمیل', stFailed: 'متصل نشد', stConnected: 'متصل شده', stHasData: 'دارای داده', nbTitle: 'افزودن بویه', nbName: 'نام بویه', nbSim: 'شماره موبایل بویه', nbRelay: 'شماره موبایل واسط', nbLocHint: 'محل بویه به‌صورت خودکار از اولین موقعیتی که ارسال می‌کند مشخص می‌شود.', nbCancel: 'انصراف', nbSave: 'ذخیره', nbErrSim: 'شماره موبایل بویه معتبر نیست.', nbErrRelay: 'شماره موبایل واسط معتبر نیست.', nbErrServer: 'ثبت بویه روی سرور ناموفق بود:', nbHostOnly: 'فقط میزبان می‌تواند بویه اضافه کند.', nbDefaultName: 'بویه جدید', nbNoBuoy: 'هیچ بویه‌ای انتخاب نشده است.', vbTitle: 'تایید میزبان با ایمیل', vbResend: 'ارسال مجدد کد', vbLater: 'بعداً', vbConfirm: 'تایید', cmdQueued: 'فرمان برای ارسال پیامکی به بویه در صف قرار گرفت.', cmdFailed: 'ثبت فرمان در سرور ناموفق بود.', cmdNotConnected: 'بویه هنوز متصل نیست؛ تغییر ذخیره شد ولی پیامکی برای بویه ارسال نشد.', ebRelay: 'شماره واسط اصلی', ebRelayHint: 'با تغییر این شماره، پیامکی برای اطلاع بویه ارسال می‌شود.', sysTabGeneral: 'تنظیمات', sysTabGuests: 'ورود و خروج مهمان‌ها', gsName: 'نام مهمان', gsIn: 'ورود', gsOut: 'خروج', gsDur: 'مدت', gsOnline: 'آنلاین', gsNoExit: 'بدون ثبت خروج (آخرین حضور نمایش داده شده)', gsEmpty: 'هنوز هیچ مهمانی وارد نشده است.', gsRefresh: 'به‌روزرسانی', gsLoadFail: 'دریافت فهرست ناموفق بود.', xlDownload: 'دانلود کلیه اطلاعات (Excel)', xlPreparing: 'در حال آماده‌سازی فایل…', xlDone: 'فایل دانلود شد.', xlFail: 'تهیه فایل ناموفق بود.', xlNoData: 'اطلاعاتی برای دانلود وجود ندارد.', xlCsvFallback: 'کتابخانه Excel بارگذاری نشد؛ فایل CSV (قابل‌باز شدن در Excel) دانلود شد.', xlColTime: 'زمان (محلی)', xlColUtc: 'زمان (UTC)', stPendingHost: 'در حال تایید میزبان', stPendingBuoy: 'در حال تایید بویه', stRejected: 'بویه رمز را نپذیرفت', stSmsFailed: 'ارسال پیامک به بویه ناموفق بود', nbRelayNew: 'شماره جدید…', nbPass: 'رمز بویه', nbPassHint: 'رمزی که شرکت همراه بویه به شما داده است (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrPass: 'رمز بویه معتبر نیست (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrSame: 'شماره بویه و شماره واسط نباید یکی باشند.', vbNeedNew: 'سه بار کد اشتباه بود. کد جدید به ایمیل شما ارسال شد؛ اگر دوباره اشتباه وارد کنید بویه حذف می‌شود.', vbLastRound: 'این آخرین فرصت است؛ با کد اشتباه بویه حذف می‌شود.', vbDeleted: 'کد دوباره اشتباه بود و بویه حذف شد.', vbOkPending: 'کد درست بود. پیامک اتصال برای بویه ارسال می‌شود…', vbCooldown: 'لطفاً {n} ثانیه صبر کنید.', vbResendSms: 'ارسال مجدد پیامک به بویه', vbSmsQueued: 'پیامک اتصال دوباره در صف ارسال قرار گرفت.', vbConnectedNow: 'بویه «{name}» متصل شد.', ppTitle: 'رمز بویه', ppDesc: 'رمز را دوباره وارد کنید تا پیامک اتصال دوباره ارسال شود.', ppSend: 'ارسال', rkLabel: 'کلید اتصال اپ واسط (relay_key):', rkNote: 'این کلید را در اپ واسط وارد کنید و به کسی ندهید.', rkRotate: 'ساخت کلید جدید', rkRotateAsk: 'با ساخت کلید جدید، کلید قبلی از کار می‌افتد و باید در اپ واسط عوض شود. ادامه می‌دهید؟', rkRotated: 'کلید جدید ساخته شد.', vbDesc: 'کد ۶ رقمی به ایمیل {email} ارسال شد. آن را وارد کنید.', vbSending: 'در حال ارسال کد...', vbAttempts: 'تلاش باقی‌مانده: {n}', vbWrong: 'کد اشتباه است.', vbFailed: 'سه بار کد اشتباه وارد شد؛ وضعیت بویه «متصل نشد» شد.', vbOk: 'بویه متصل شد. منتظر اولین داده می‌ماند.', vbSendFail: 'ارسال یا بررسی کد ناموفق بود. اتصال اینترنت را بررسی کنید.', vbRetry: 'تایید ایمیل (کد جدید)', vbCodeLen: 'کد باید ۶ رقم باشد.', confirmTitle: 'تایید عملیات', confirmYes: 'بله', confirmNo: 'خیر', cfRs485On: 'آیا مطمئن هستید که سوکت روشن شود؟', cfRs485Off: 'آیا مطمئن هستید که سوکت قطع شود؟', cfDisplayOn: 'آیا مطمئن هستید که نمایشگر روشن شود؟', cfDisplayOff: 'آیا مطمئن هستید که نمایشگر خاموش شود؟', cfMissionOn: 'آیا مطمئن هستید که ماموریت فعال شود؟', cfMissionOff: 'آیا مطمئن هستید که ماموریت متوقف شود؟', refQrTitle: 'QR کد میزبان', refQrHint: 'مهمان این QR را در صفحه ورود اسکن کند.', btnScanQr: 'اسکن QR میزبان', scanTitle: 'اسکن QR میزبان', scanClose: 'بستن', scanNoCamera: 'دسترسی به دوربین ممکن نشد. اجازه دوربین را بررسی کنید.', scanSearching: 'QR را داخل کادر بگیرید...', scanBad: 'این QR مربوط به سایرا نیست.', scanNeedUsername: 'کد میزبان وارد شد؛ نام کاربری خود را بنویسید.', qrLibFail: 'کتابخانه QR بارگذاری نشد؛ اینترنت را بررسی کنید.', copyEmpty: 'چیزی برای کپی وجود ندارد.', fxTitle: 'صدا و ویبره', fxSound: 'صدای کلیدها', fxVibe: 'ویبره', bsSpecsTitle: 'مشخصات بویه', bsBuoy: 'بویه', bsRobotW: 'وزن ربات (کیلوگرم)', bsAnchorLen: 'طول لنگر (متر)', bsAnchorW: 'وزن لنگر (کیلوگرم)', msTitle: 'ماموریت', msToggle: 'انجام ماموریت', msStart: 'تاریخ و ساعت شروع', msEnd: 'تاریخ و ساعت پایان', phonesNote: 'بویه برای همه شماره‌های ثبت‌شده پیامک می‌فرستد؛ شماره ستاره‌دار «واسط اصلی» است.', phonesEmpty: 'هنوز شماره‌ای ثبت نشده است.', phoneMainTip: 'انتخاب به‌عنوان واسط اصلی', errMissionDates: 'تاریخ پایان ماموریت باید بعد از شروع باشد.', errSpecs: 'مقادیر وزن و طول باید عدد معتبر باشند.', errPhones: 'یکی از شماره‌ها معتبر نیست.', dSoon: 'به زودی', dSoonNote: 'این بخش به زودی فعال می‌شود.', dTempInOnly: 'دمای داخل', dTempIn2: 'دمای داخل (°C)', dHumIn: 'رطوبت داخل', dTempOutOnly: 'دمای بیرون', dHumOut: 'رطوبت بیرون', dHumOutAxis: 'رطوبت بیرون (%)', dNotSent: 'این مقدار هنوز از سخت‌افزار ارسال نمی‌شود.', dRobotW: 'وزن ربات', dAnchorLen: 'طول لنگر', dAnchorW: 'وزن لنگر', supWork: 'محل کار', supLeadElec: 'مسئول برق (سرپرست تیم)', supElec: 'مسئول برق', supMech: 'مسئول مکانیک', supDev: 'مسئول برنامه‌نویسی و کدنویسی', supPhone: 'شماره تماس', supGithub: 'لینک گیت‌هاب', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره', dStart: 'تاریخ شروع', dEnd: 'تاریخ پایان', dPickStart: 'روز شروع را انتخاب کنید', dPickEnd: 'روز پایان را انتخاب کنید', dSelSample: 'نمونه انتخاب‌شده', dPositions: 'موقعیت ثبت‌شده', dRadius: 'شعاع حرکت', dClearSel: 'بازگشت به آخرین نمونه', dSelectBuoy: 'انتخاب بویه', dCalendar: 'بازه تاریخ', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'برای یک روز، همان روز را دو بار انتخاب کنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
                 mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
@@ -2499,7 +2547,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 errSendCodeFailed: 'ارسال کد فعال‌سازی ناموفق بود؛ ایمیل یا اتصال اینترنت را بررسی کنید',
                 errSignupFailed: 'ثبت‌نام ناموفق بود؛ شاید این ایمیل قبلاً ثبت شده باشد',
                 cannotDeleteLast: 'حداقل باید یک بویه در ناوگان باقی بماند',
-                confirmDeleteBuoy: 'آیا از حذف بویه {id} مطمئن هستید؟',
+                confirmDeleteBuoy: 'آیا از حذف بویه {id} مطمئن هستید؟ تمام اطلاعات آن از اپ و سرور برای همیشه پاک می‌شود.',
                 addBuoyBtn: 'افزودن بویه',
                 fleetLockedText: 'افزودن/حذف بویه فقط برای میزبان ممکن است',
                 phonesLabel: 'شماره‌های گیرنده گزارش پیامکی از بویه:',
@@ -2534,7 +2582,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', missionStateDone: 'Finished', missionStateOff: 'Stopped', stPending: 'Awaiting email confirmation', stFailed: 'Not connected', stConnected: 'Connected', stHasData: 'Has data', nbTitle: 'Add Buoy', nbName: 'Buoy name', nbSim: 'Buoy mobile number', nbRelay: 'Relay mobile number', nbLocHint: 'The buoy location is detected automatically from the first position it sends.', nbCancel: 'Cancel', nbSave: 'Save', nbErrSim: 'The buoy mobile number is not valid.', nbErrRelay: 'The relay mobile number is not valid.', nbErrServer: 'Could not register the buoy on the server:', nbHostOnly: 'Only the host can add a buoy.', nbDefaultName: 'New buoy', nbNoBuoy: 'No buoy selected.', vbTitle: 'Confirm buoy by email', vbResend: 'Resend code', vbLater: 'Later', vbConfirm: 'Confirm', vbDesc: 'A 6-digit code was sent to {email}. Enter it below.', vbSending: 'Sending code...', vbAttempts: 'Attempts left: {n}', vbWrong: 'Wrong code.', vbFailed: 'Three wrong codes: the buoy is now “Not connected”.', vbOk: 'Buoy connected. Waiting for its first data.', vbSendFail: 'Could not send or check the code. Check your connection.', vbRetry: 'Confirm email (new code)', vbCodeLen: 'The code must be 6 digits.', confirmTitle: 'Confirm action', confirmYes: 'Yes', confirmNo: 'No', cfRs485On: 'Are you sure you want to switch the socket on?', cfRs485Off: 'Are you sure you want to switch the socket off?', cfDisplayOn: 'Are you sure you want to turn the display on?', cfDisplayOff: 'Are you sure you want to turn the display off?', cfMissionOn: 'Are you sure you want to start the mission?', cfMissionOff: 'Are you sure you want to stop the mission?', refQrTitle: 'Host QR', refQrHint: 'The guest scans this QR on the login page.', btnScanQr: 'Scan host QR', scanTitle: 'Scan host QR', scanClose: 'Close', scanNoCamera: 'Camera unavailable. Check the camera permission.', scanSearching: 'Point the camera at the QR...', scanBad: 'This QR is not from SAYRA.', scanNeedUsername: 'Host code filled in; type your username.', qrLibFail: 'QR library did not load; check your connection.', copyEmpty: 'Nothing to copy.', fxTitle: 'Sound & vibration', fxSound: 'Button sounds', fxVibe: 'Vibration', bsSpecsTitle: 'Buoy specifications', bsBuoy: 'Buoy', bsRobotW: 'Robot weight (kg)', bsAnchorLen: 'Anchor length (m)', bsAnchorW: 'Anchor weight (kg)', msTitle: 'Mission', msToggle: 'Run mission', msStart: 'Start date & time', msEnd: 'End date & time', phonesNote: 'The buoy sends an SMS to every saved number; the starred number is the main relay.', phonesEmpty: 'No numbers saved yet.', phoneMainTip: 'Set as main relay', errMissionDates: 'Mission end must be after its start.', errSpecs: 'Weight and length must be valid numbers.', errPhones: 'One of the numbers is not valid.', dSoon: 'Coming soon', dSoonNote: 'This section will be available soon.', dTempInOnly: 'Inside temperature', dTempIn2: 'Inside temp (°C)', dHumIn: 'Inside humidity', dTempOutOnly: 'Outside temperature', dHumOut: 'Outside humidity', dHumOutAxis: 'Outside humidity (%)', dNotSent: 'The hardware does not send this value yet.', dRobotW: 'Robot weight', dAnchorLen: 'Anchor length', dAnchorW: 'Anchor weight', supWork: 'Workplace', supLeadElec: 'Electrical lead (team supervisor)', supElec: 'Electrical', supMech: 'Mechanical', supDev: 'Programming & coding', supPhone: 'Phone', supGithub: 'GitHub', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save', dStart: 'Start date', dEnd: 'End date', dPickStart: 'Pick the start day', dPickEnd: 'Pick the end day', dSelSample: 'Selected sample', dPositions: 'positions', dRadius: 'Drift radius', dClearSel: 'Back to latest sample', dSelectBuoy: 'Select buoy', dCalendar: 'Date range', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'For a single day, pick the same day twice.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', missionStateDone: 'Finished', missionStateOff: 'Stopped', stPending: 'Awaiting email confirmation', stFailed: 'Not connected', stConnected: 'Connected', stHasData: 'Has data', nbTitle: 'Add Buoy', nbName: 'Buoy name', nbSim: 'Buoy mobile number', nbRelay: 'Relay mobile number', nbLocHint: 'The buoy location is detected automatically from the first position it sends.', nbCancel: 'Cancel', nbSave: 'Save', nbErrSim: 'The buoy mobile number is not valid.', nbErrRelay: 'The relay mobile number is not valid.', nbErrServer: 'Could not register the buoy on the server:', nbHostOnly: 'Only the host can add a buoy.', nbDefaultName: 'New buoy', nbNoBuoy: 'No buoy selected.', vbTitle: 'Host email confirmation', vbResend: 'Resend code', vbLater: 'Later', vbConfirm: 'Confirm', cmdQueued: 'The command was queued to be sent to the buoy by SMS.', cmdFailed: 'Could not register the command on the server.', cmdNotConnected: 'The buoy is not connected yet; the change was saved but no SMS was sent to the buoy.', ebRelay: 'Main relay number', ebRelayHint: 'When this number changes, an SMS is sent to tell the buoy.', sysTabGeneral: 'Settings', sysTabGuests: 'Guest logins and exits', gsName: 'Guest name', gsIn: 'Login', gsOut: 'Exit', gsDur: 'Duration', gsOnline: 'Online', gsNoExit: 'No exit recorded (last seen time shown)', gsEmpty: 'No guest has logged in yet.', gsRefresh: 'Refresh', gsLoadFail: 'Could not load the list.', xlDownload: 'Download all data (Excel)', xlPreparing: 'Preparing the file…', xlDone: 'File downloaded.', xlFail: 'Could not create the file.', xlNoData: 'There is no data to download.', xlCsvFallback: 'The Excel library did not load; a CSV file (opens in Excel) was downloaded.', xlColTime: 'Time (local)', xlColUtc: 'Time (UTC)', stPendingHost: 'Confirming host', stPendingBuoy: 'Confirming buoy', stRejected: 'Buoy rejected the password', stSmsFailed: 'SMS to the buoy failed', nbRelayNew: 'New number…', nbPass: 'Buoy password', nbPassHint: 'The password the company gave you with the buoy (4-16 English letters or digits).', nbErrPass: 'The buoy password is not valid (4-16 English letters or digits).', nbErrSame: 'The buoy number and the relay number must be different.', vbNeedNew: 'Three wrong codes. A new code was emailed to you; another wrong code will delete the buoy.', vbLastRound: 'This is the last chance; a wrong code will delete the buoy.', vbDeleted: 'Wrong code again, the buoy was deleted.', vbOkPending: 'Code accepted. The pairing SMS is being sent to the buoy…', vbCooldown: 'Please wait {n} seconds.', vbResendSms: 'Resend SMS to buoy', vbSmsQueued: 'The pairing SMS was queued again.', vbConnectedNow: 'Buoy "{name}" is connected.', ppTitle: 'Buoy password', ppDesc: 'Enter the password again to resend the pairing SMS.', ppSend: 'Send', rkLabel: 'Relay app key (relay_key):', rkNote: 'Enter this key in the relay app and do not share it.', rkRotate: 'Generate new key', rkRotateAsk: 'Generating a new key disables the old one; you must update the relay app. Continue?', rkRotated: 'New key generated.', vbDesc: 'A 6-digit code was sent to {email}. Enter it below.', vbSending: 'Sending code...', vbAttempts: 'Attempts left: {n}', vbWrong: 'Wrong code.', vbFailed: 'Three wrong codes: the buoy is now “Not connected”.', vbOk: 'Buoy connected. Waiting for its first data.', vbSendFail: 'Could not send or check the code. Check your connection.', vbRetry: 'Confirm email (new code)', vbCodeLen: 'The code must be 6 digits.', confirmTitle: 'Confirm action', confirmYes: 'Yes', confirmNo: 'No', cfRs485On: 'Are you sure you want to switch the socket on?', cfRs485Off: 'Are you sure you want to switch the socket off?', cfDisplayOn: 'Are you sure you want to turn the display on?', cfDisplayOff: 'Are you sure you want to turn the display off?', cfMissionOn: 'Are you sure you want to start the mission?', cfMissionOff: 'Are you sure you want to stop the mission?', refQrTitle: 'Host QR', refQrHint: 'The guest scans this QR on the login page.', btnScanQr: 'Scan host QR', scanTitle: 'Scan host QR', scanClose: 'Close', scanNoCamera: 'Camera unavailable. Check the camera permission.', scanSearching: 'Point the camera at the QR...', scanBad: 'This QR is not from SAYRA.', scanNeedUsername: 'Host code filled in; type your username.', qrLibFail: 'QR library did not load; check your connection.', copyEmpty: 'Nothing to copy.', fxTitle: 'Sound & vibration', fxSound: 'Button sounds', fxVibe: 'Vibration', bsSpecsTitle: 'Buoy specifications', bsBuoy: 'Buoy', bsRobotW: 'Robot weight (kg)', bsAnchorLen: 'Anchor length (m)', bsAnchorW: 'Anchor weight (kg)', msTitle: 'Mission', msToggle: 'Run mission', msStart: 'Start date & time', msEnd: 'End date & time', phonesNote: 'The buoy sends an SMS to every saved number; the starred number is the main relay.', phonesEmpty: 'No numbers saved yet.', phoneMainTip: 'Set as main relay', errMissionDates: 'Mission end must be after its start.', errSpecs: 'Weight and length must be valid numbers.', errPhones: 'One of the numbers is not valid.', dSoon: 'Coming soon', dSoonNote: 'This section will be available soon.', dTempInOnly: 'Inside temperature', dTempIn2: 'Inside temp (°C)', dHumIn: 'Inside humidity', dTempOutOnly: 'Outside temperature', dHumOut: 'Outside humidity', dHumOutAxis: 'Outside humidity (%)', dNotSent: 'The hardware does not send this value yet.', dRobotW: 'Robot weight', dAnchorLen: 'Anchor length', dAnchorW: 'Anchor weight', supWork: 'Workplace', supLeadElec: 'Electrical lead (team supervisor)', supElec: 'Electrical', supMech: 'Mechanical', supDev: 'Programming & coding', supPhone: 'Phone', supGithub: 'GitHub', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save', dStart: 'Start date', dEnd: 'End date', dPickStart: 'Pick the start day', dPickEnd: 'Pick the end day', dSelSample: 'Selected sample', dPositions: 'positions', dRadius: 'Drift radius', dClearSel: 'Back to latest sample', dSelectBuoy: 'Select buoy', dCalendar: 'Date range', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'For a single day, pick the same day twice.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
                 mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
@@ -2626,7 +2674,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 errSendCodeFailed: 'Could not send the activation code; check the email address or your internet connection',
                 errSignupFailed: 'Signup failed; this email may already be registered',
                 cannotDeleteLast: 'At least one buoy must remain in the fleet',
-                confirmDeleteBuoy: 'Are you sure you want to delete buoy {id}?',
+                confirmDeleteBuoy: 'Are you sure you want to delete buoy {id}? All its data will be permanently erased from the app and the server.',
                 addBuoyBtn: 'Add Buoy',
                 fleetLockedText: 'Only the host can add or remove buoys',
                 phonesLabel: 'SMS Report Recipient Numbers:',
@@ -2661,7 +2709,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', missionStateDone: 'منتهية', missionStateOff: 'متوقفة', stPending: 'بانتظار تأكيد البريد', stFailed: 'لم يتصل', stConnected: 'متصل', stHasData: 'يحتوي بيانات', nbTitle: 'إضافة عوامة', nbName: 'اسم العوامة', nbSim: 'رقم جوال العوامة', nbRelay: 'رقم جوال الوسيط', nbLocHint: 'يُحدَّد موقع العوامة تلقائيًا من أول موقع ترسله.', nbCancel: 'إلغاء', nbSave: 'حفظ', nbErrSim: 'رقم جوال العوامة غير صالح.', nbErrRelay: 'رقم جوال الوسيط غير صالح.', nbErrServer: 'تعذّر تسجيل العوامة على الخادم:', nbHostOnly: 'يمكن للمضيف فقط إضافة عوامة.', nbDefaultName: 'عوامة جديدة', nbNoBuoy: 'لم تُحدَّد عوامة.', vbTitle: 'تأكيد العوامة بالبريد', vbResend: 'إعادة إرسال الرمز', vbLater: 'لاحقًا', vbConfirm: 'تأكيد', vbDesc: 'تم إرسال رمز من ٦ أرقام إلى {email}. أدخله أدناه.', vbSending: 'جارٍ إرسال الرمز...', vbAttempts: 'المحاولات المتبقية: {n}', vbWrong: 'الرمز غير صحيح.', vbFailed: 'ثلاث محاولات خاطئة: أصبحت العوامة «لم يتصل».', vbOk: 'تم ربط العوامة. بانتظار أول بيانات.', vbSendFail: 'تعذّر إرسال الرمز أو التحقق منه. تحقق من الاتصال.', vbRetry: 'تأكيد البريد (رمز جديد)', vbCodeLen: 'يجب أن يتكون الرمز من ٦ أرقام.', confirmTitle: 'تأكيد العملية', confirmYes: 'نعم', confirmNo: 'لا', cfRs485On: 'هل أنت متأكد من تشغيل المقبس؟', cfRs485Off: 'هل أنت متأكد من فصل المقبس؟', cfDisplayOn: 'هل أنت متأكد من تشغيل الشاشة؟', cfDisplayOff: 'هل أنت متأكد من إطفاء الشاشة؟', cfMissionOn: 'هل أنت متأكد من بدء المهمة؟', cfMissionOff: 'هل أنت متأكد من إيقاف المهمة؟', refQrTitle: 'رمز QR للمضيف', refQrHint: 'يمسح الضيف هذا الرمز في صفحة الدخول.', btnScanQr: 'مسح QR المضيف', scanTitle: 'مسح QR المضيف', scanClose: 'إغلاق', scanNoCamera: 'الكاميرا غير متاحة. تحقق من إذن الكاميرا.', scanSearching: 'وجّه الكاميرا نحو الرمز...', scanBad: 'هذا الرمز ليس من سايرا.', scanNeedUsername: 'تم إدخال رمز المضيف؛ اكتب اسم المستخدم.', qrLibFail: 'لم تُحمَّل مكتبة QR؛ تحقق من الاتصال.', copyEmpty: 'لا يوجد ما يُنسخ.', fxTitle: 'الصوت والاهتزاز', fxSound: 'أصوات الأزرار', fxVibe: 'الاهتزاز', bsSpecsTitle: 'مواصفات العوامة', bsBuoy: 'العوامة', bsRobotW: 'وزن الروبوت (كغ)', bsAnchorLen: 'طول المرساة (م)', bsAnchorW: 'وزن المرساة (كغ)', msTitle: 'المهمة', msToggle: 'تنفيذ المهمة', msStart: 'تاريخ ووقت البداية', msEnd: 'تاريخ ووقت النهاية', phonesNote: 'ترسل العوامة رسالة إلى كل الأرقام المحفوظة؛ الرقم المميز بنجمة هو الوسيط الرئيسي.', phonesEmpty: 'لا توجد أرقام محفوظة بعد.', phoneMainTip: 'تعيين كوسيط رئيسي', errMissionDates: 'يجب أن تكون نهاية المهمة بعد بدايتها.', errSpecs: 'يجب أن تكون قيم الوزن والطول أرقامًا صحيحة.', errPhones: 'أحد الأرقام غير صالح.', dSoon: 'قريبًا', dSoonNote: 'سيتوفر هذا القسم قريبًا.', dTempInOnly: 'الحرارة الداخلية', dTempIn2: 'الحرارة الداخلية (°C)', dHumIn: 'الرطوبة الداخلية', dTempOutOnly: 'الحرارة الخارجية', dHumOut: 'الرطوبة الخارجية', dHumOutAxis: 'الرطوبة الخارجية (%)', dNotSent: 'لا يرسل الجهاز هذه القيمة بعد.', dRobotW: 'وزن الروبوت', dAnchorLen: 'طول المرساة', dAnchorW: 'وزن المرساة', supWork: 'مكان العمل', supLeadElec: 'مسؤول الكهرباء (مشرف الفريق)', supElec: 'مسؤول الكهرباء', supMech: 'مسؤول الميكانيك', supDev: 'مسؤول البرمجة', supPhone: 'رقم الهاتف', supGithub: 'رابط GitHub', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ', dStart: 'تاريخ البداية', dEnd: 'تاريخ النهاية', dPickStart: 'اختر يوم البداية', dPickEnd: 'اختر يوم النهاية', dSelSample: 'العينة المحددة', dPositions: 'موقع مسجل', dRadius: 'نصف قطر الحركة', dClearSel: 'العودة لآخر عينة', dSelectBuoy: 'اختيار العوامة', dCalendar: 'الفترة', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'ليوم واحد، اختر اليوم نفسه مرتين.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', missionStateDone: 'منتهية', missionStateOff: 'متوقفة', stPending: 'بانتظار تأكيد البريد', stFailed: 'لم يتصل', stConnected: 'متصل', stHasData: 'يحتوي بيانات', nbTitle: 'إضافة عوامة', nbName: 'اسم العوامة', nbSim: 'رقم جوال العوامة', nbRelay: 'رقم جوال الوسيط', nbLocHint: 'يُحدَّد موقع العوامة تلقائيًا من أول موقع ترسله.', nbCancel: 'إلغاء', nbSave: 'حفظ', nbErrSim: 'رقم جوال العوامة غير صالح.', nbErrRelay: 'رقم جوال الوسيط غير صالح.', nbErrServer: 'تعذّر تسجيل العوامة على الخادم:', nbHostOnly: 'يمكن للمضيف فقط إضافة عوامة.', nbDefaultName: 'عوامة جديدة', nbNoBuoy: 'لم تُحدَّد عوامة.', vbTitle: 'تأكيد المضيف بالبريد', vbResend: 'إعادة إرسال الرمز', vbLater: 'لاحقًا', vbConfirm: 'تأكيد', cmdQueued: 'تمت إضافة الأمر إلى قائمة الإرسال إلى العوامة برسالة نصية.', cmdFailed: 'تعذّر تسجيل الأمر على الخادم.', cmdNotConnected: 'العوامة غير متصلة بعد؛ تم حفظ التغيير لكن لم تُرسل رسالة إلى العوامة.', ebRelay: 'رقم الوسيط الرئيسي', ebRelayHint: 'عند تغيير هذا الرقم تُرسل رسالة لإعلام العوامة.', sysTabGeneral: 'الإعدادات', sysTabGuests: 'دخول وخروج الضيوف', gsName: 'اسم الضيف', gsIn: 'الدخول', gsOut: 'الخروج', gsDur: 'المدة', gsOnline: 'متصل', gsNoExit: 'لم يُسجَّل خروج (يظهر وقت آخر تواجد)', gsEmpty: 'لم يدخل أي ضيف بعد.', gsRefresh: 'تحديث', gsLoadFail: 'تعذّر تحميل القائمة.', xlDownload: 'تنزيل كل البيانات (Excel)', xlPreparing: 'جارٍ تجهيز الملف…', xlDone: 'تم تنزيل الملف.', xlFail: 'تعذّر إنشاء الملف.', xlNoData: 'لا توجد بيانات للتنزيل.', xlCsvFallback: 'لم يتم تحميل مكتبة Excel؛ تم تنزيل ملف CSV (يُفتح في Excel).', xlColTime: 'الوقت (محلي)', xlColUtc: 'الوقت (UTC)', stPendingHost: 'جارٍ تأكيد المضيف', stPendingBuoy: 'جارٍ تأكيد العوامة', stRejected: 'رفضت العوامة كلمة المرور', stSmsFailed: 'فشل إرسال الرسالة إلى العوامة', nbRelayNew: 'رقم جديد…', nbPass: 'كلمة مرور العوامة', nbPassHint: 'كلمة المرور التي أعطتك إياها الشركة مع العوامة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrPass: 'كلمة مرور العوامة غير صالحة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrSame: 'يجب أن يختلف رقم العوامة عن رقم الوسيط.', vbNeedNew: 'ثلاث محاولات خاطئة. أُرسل رمز جديد إلى بريدك؛ أي رمز خاطئ آخر سيحذف العوامة.', vbLastRound: 'هذه الفرصة الأخيرة؛ الرمز الخاطئ سيحذف العوامة.', vbDeleted: 'الرمز خاطئ مرة أخرى وتم حذف العوامة.', vbOkPending: 'الرمز صحيح. جارٍ إرسال رسالة الربط إلى العوامة…', vbCooldown: 'يرجى الانتظار {n} ثانية.', vbResendSms: 'إعادة إرسال الرسالة إلى العوامة', vbSmsQueued: 'أُعيدت رسالة الربط إلى قائمة الإرسال.', vbConnectedNow: 'تم ربط العوامة «{name}».', ppTitle: 'كلمة مرور العوامة', ppDesc: 'أدخل كلمة المرور مرة أخرى لإعادة إرسال رسالة الربط.', ppSend: 'إرسال', rkLabel: 'مفتاح تطبيق الوسيط (relay_key):', rkNote: 'أدخل هذا المفتاح في تطبيق الوسيط ولا تشاركه مع أحد.', rkRotate: 'إنشاء مفتاح جديد', rkRotateAsk: 'إنشاء مفتاح جديد يعطّل القديم، وعليك تحديثه في تطبيق الوسيط. هل تتابع؟', rkRotated: 'تم إنشاء مفتاح جديد.', vbDesc: 'تم إرسال رمز من ٦ أرقام إلى {email}. أدخله أدناه.', vbSending: 'جارٍ إرسال الرمز...', vbAttempts: 'المحاولات المتبقية: {n}', vbWrong: 'الرمز غير صحيح.', vbFailed: 'ثلاث محاولات خاطئة: أصبحت العوامة «لم يتصل».', vbOk: 'تم ربط العوامة. بانتظار أول بيانات.', vbSendFail: 'تعذّر إرسال الرمز أو التحقق منه. تحقق من الاتصال.', vbRetry: 'تأكيد البريد (رمز جديد)', vbCodeLen: 'يجب أن يتكون الرمز من ٦ أرقام.', confirmTitle: 'تأكيد العملية', confirmYes: 'نعم', confirmNo: 'لا', cfRs485On: 'هل أنت متأكد من تشغيل المقبس؟', cfRs485Off: 'هل أنت متأكد من فصل المقبس؟', cfDisplayOn: 'هل أنت متأكد من تشغيل الشاشة؟', cfDisplayOff: 'هل أنت متأكد من إطفاء الشاشة؟', cfMissionOn: 'هل أنت متأكد من بدء المهمة؟', cfMissionOff: 'هل أنت متأكد من إيقاف المهمة؟', refQrTitle: 'رمز QR للمضيف', refQrHint: 'يمسح الضيف هذا الرمز في صفحة الدخول.', btnScanQr: 'مسح QR المضيف', scanTitle: 'مسح QR المضيف', scanClose: 'إغلاق', scanNoCamera: 'الكاميرا غير متاحة. تحقق من إذن الكاميرا.', scanSearching: 'وجّه الكاميرا نحو الرمز...', scanBad: 'هذا الرمز ليس من سايرا.', scanNeedUsername: 'تم إدخال رمز المضيف؛ اكتب اسم المستخدم.', qrLibFail: 'لم تُحمَّل مكتبة QR؛ تحقق من الاتصال.', copyEmpty: 'لا يوجد ما يُنسخ.', fxTitle: 'الصوت والاهتزاز', fxSound: 'أصوات الأزرار', fxVibe: 'الاهتزاز', bsSpecsTitle: 'مواصفات العوامة', bsBuoy: 'العوامة', bsRobotW: 'وزن الروبوت (كغ)', bsAnchorLen: 'طول المرساة (م)', bsAnchorW: 'وزن المرساة (كغ)', msTitle: 'المهمة', msToggle: 'تنفيذ المهمة', msStart: 'تاريخ ووقت البداية', msEnd: 'تاريخ ووقت النهاية', phonesNote: 'ترسل العوامة رسالة إلى كل الأرقام المحفوظة؛ الرقم المميز بنجمة هو الوسيط الرئيسي.', phonesEmpty: 'لا توجد أرقام محفوظة بعد.', phoneMainTip: 'تعيين كوسيط رئيسي', errMissionDates: 'يجب أن تكون نهاية المهمة بعد بدايتها.', errSpecs: 'يجب أن تكون قيم الوزن والطول أرقامًا صحيحة.', errPhones: 'أحد الأرقام غير صالح.', dSoon: 'قريبًا', dSoonNote: 'سيتوفر هذا القسم قريبًا.', dTempInOnly: 'الحرارة الداخلية', dTempIn2: 'الحرارة الداخلية (°C)', dHumIn: 'الرطوبة الداخلية', dTempOutOnly: 'الحرارة الخارجية', dHumOut: 'الرطوبة الخارجية', dHumOutAxis: 'الرطوبة الخارجية (%)', dNotSent: 'لا يرسل الجهاز هذه القيمة بعد.', dRobotW: 'وزن الروبوت', dAnchorLen: 'طول المرساة', dAnchorW: 'وزن المرساة', supWork: 'مكان العمل', supLeadElec: 'مسؤول الكهرباء (مشرف الفريق)', supElec: 'مسؤول الكهرباء', supMech: 'مسؤول الميكانيك', supDev: 'مسؤول البرمجة', supPhone: 'رقم الهاتف', supGithub: 'رابط GitHub', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ', dStart: 'تاريخ البداية', dEnd: 'تاريخ النهاية', dPickStart: 'اختر يوم البداية', dPickEnd: 'اختر يوم النهاية', dSelSample: 'العينة المحددة', dPositions: 'موقع مسجل', dRadius: 'نصف قطر الحركة', dClearSel: 'العودة لآخر عينة', dSelectBuoy: 'اختيار العوامة', dCalendar: 'الفترة', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'ليوم واحد، اختر اليوم نفسه مرتين.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
                 mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
@@ -2753,7 +2801,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 errSendCodeFailed: 'فشل إرسال رمز التفعيل؛ تحقق من البريد الإلكتروني أو الاتصال بالإنترنت',
                 errSignupFailed: 'فشل التسجيل؛ ربما يكون هذا البريد الإلكتروني مسجلاً بالفعل',
                 cannotDeleteLast: 'يجب أن تبقى عوامة واحدة على الأقل في الأسطول',
-                confirmDeleteBuoy: 'هل أنت متأكد من حذف العوامة {id}؟',
+                confirmDeleteBuoy: 'هل أنت متأكد من حذف العوامة {id}؟ ستُمحى جميع بياناتها نهائياً من التطبيق والخادم.',
                 addBuoyBtn: 'إضافة عوامة',
                 fleetLockedText: 'إضافة/حذف العوامات ممكن فقط للمضيف',
                 phonesLabel: 'أرقام مستلمي تقارير الرسائل النصية من العوامة:',
@@ -2875,7 +2923,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                     ? `<div class="buoy-card-menu-wrap" onclick="event.stopPropagation();">
                            <button class="btn btn-sm btn-outline-secondary" onclick="toggleBuoyCardMenu('${b.id}')" title="گزینه‌ها"><i class="fa-solid fa-ellipsis-vertical"></i></button>
                            <div class="buoy-card-menu-dropdown" id="buoy-menu-${b.id}">
-                               ${['pending', 'failed'].includes(buoyStatus(b)) ? `<button onclick="retryBuoyVerify('${b.id}')"><i class="fa-solid fa-envelope-circle-check me-2"></i>${translations[currentLang()].vbRetry}</button>` : ''}
+                               ${b.pairStatus === 'pending_host' ? `<button onclick="startBuoyVerify('${b.id}')"><i class="fa-solid fa-envelope-circle-check me-2"></i>${translations[currentLang()].vbRetry}</button>` : ''}
+                               ${b.pairStatus === 'pending_buoy' ? `<button onclick="resendPairSms('${b.id}')"><i class="fa-solid fa-paper-plane me-2"></i>${translations[currentLang()].vbResendSms}</button>` : ''}
                                 <button onclick="openEditBuoyModal('${b.id}')"><i class="fa-solid fa-pen me-2"></i>ویرایش اطلاعات بویه</button>
                                <button class="text-danger" onclick="deleteBuoy('${b.id}')"><i class="fa-solid fa-trash me-2"></i>حذف بویه</button>
                            </div>
@@ -2927,20 +2976,53 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             document.getElementById('editBuoyPartNumber').value = b.partNumber || b.id.split('-').pop();
             document.getElementById('editBuoyName').value = b.name;
             document.getElementById('editBuoyLocation').value = b.locationName;
+            document.getElementById('editBuoyRelay').value = currentMainRelay(b);
+            document.getElementById('editBuoyRelay').disabled = !isHostUser();
             const modalEl = document.getElementById('editBuoyModal');
             bootstrap.Modal.getOrCreateInstance(modalEl).show();
         }
 
-        function saveBuoyEdit() {
+        // the main relay number of a buoy (from its recipients list, else the number given when it was added)
+        function currentMainRelay(b) {
+            const m = b.meta || {};
+            const rec = (Array.isArray(m.recipients) ? m.recipients : []).map(cleanPhone).filter(Boolean);
+            return rec[m.mainIdx || 0] || cleanPhone(b.relayPhone || m.relayPhone || '');
+        }
+
+        async function saveBuoyEdit() {
+            const t = translations[currentLang()];
             const buoyId = document.getElementById('editBuoyId').value;
             const b = buoysFleet.find(x => x.id === buoyId);
             if (!b) return;
 
             const newName = document.getElementById('editBuoyName').value.trim();
             const newLocation = document.getElementById('editBuoyLocation').value.trim();
+            const newRelay = cleanPhone(document.getElementById('editBuoyRelay').value);
+            if (isHostUser() && newRelay && !PHONE_RE.test(newRelay)) { sxToast(t.nbErrRelay, 'err'); return; }
+
             b.name = newName || b.name;
             b.locationName = newLocation || b.locationName;
             // پارت نامبر عمداً خوانده یا ذخیره نمی‌شود — همیشه ثابت و قفل می‌ماند
+
+            // name / location are saved on the server too (before, they were lost after a reload)
+            if (isHostUser() && sb && supabaseReady) {
+                try { await sb.from('buoys').update({ name: b.name, location_name: b.locationName }).eq('id', b.id); } catch (e) { console.warn(e); }
+            }
+
+            // the relay number changed: store it and tell the buoy by SMS
+            const cmds = [];
+            const oldMain = currentMainRelay(b);
+            if (isHostUser() && newRelay && newRelay !== oldMain) {
+                const m = b.meta || {};
+                const list = (Array.isArray(m.recipients) ? m.recipients : []).map(cleanPhone).filter(Boolean);
+                const oi = list.indexOf(oldMain);
+                if (oi >= 0) list[oi] = newRelay; else list.push(newRelay);
+                const uniq = []; list.forEach(n => { if (!uniq.includes(n)) uniq.push(n); });
+                b.meta = Object.assign({}, b.meta, { recipients: uniq, mainIdx: uniq.indexOf(newRelay), relayPhone: newRelay });
+                b.relayPhone = newRelay;
+                saveBuoyMeta(b);
+                cmds.push(['relay', { relay: newRelay }]);
+            }
 
             renderFleetLists();
             renderQuickSwitcher();
@@ -2948,9 +3030,27 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (b.id === appState.buoyId) applyBuoy(b.id);
 
             bootstrap.Modal.getOrCreateInstance(document.getElementById('editBuoyModal')).hide();
+            if (cmds.length) sendBuoyCommands(b, cmds);
         }
 
         // ===== ADD / DELETE BUOY (host only) =====
+        // removes everything this device still keeps about a buoy (local telemetry cache, chart cache, settings copy)
+        async function purgeLocalBuoyData(buoyId) {
+            try {
+                const db = await openTelemetryDB();
+                await new Promise((resolve) => {
+                    const tx = db.transaction(IDB_STORE, 'readwrite');
+                    const idx = tx.objectStore(IDB_STORE).index('by_buoy');
+                    const req = idx.openCursor(IDBKeyRange.only(buoyId));
+                    req.onsuccess = () => { const c = req.result; if (c) { c.delete(); c.continue(); } };
+                    tx.oncomplete = () => resolve(); tx.onerror = () => resolve(); tx.onabort = () => resolve();
+                });
+            } catch (e) { console.warn('local purge', e); }
+            try { for (const k of Array.from(detailCache.keys())) if (k.startsWith(buoyId + '|')) detailCache.delete(k); } catch (e) {}
+            try { localStorage.removeItem(META_KEY(buoyId)); } catch (e) {}
+            if (typeof markers !== 'undefined' && markers[buoyId]) { try { map.removeLayer(markers[buoyId]); } catch (e) {} delete markers[buoyId]; }
+        }
+
         async function deleteBuoy(buoyId) {
             if (buoysFleet.length <= 1) {
                 alert(translations[currentLang()].cannotDeleteLast);
@@ -2958,24 +3058,24 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             }
             if (!confirm(translations[currentLang()].confirmDeleteBuoy.replace('{id}', buoyId))) return;
 
-            // حذف واقعی از سرور — بدون این، هر ۵ ثانیه دوباره از جدول telemetry بازسازی می‌شد
+            // حذف کامل از سرور (تلمتری + تاریخچه + فرمان‌ها + رمز + خود بویه) با یک تابع SQL
             if (sb && supabaseReady) {
-                const { error: e1 } = await sb.from(TELEMETRY_TABLE).delete().eq('buoy_id', buoyId);
-                const { error: e2 } = await sb.from('buoys').delete().eq('id', buoyId);
-                if (e1 || e2) {
-                    alert('حذف از سرور ناموفق بود: ' + ((e1 || e2).message));
+                const { error } = await sb.rpc('delete_buoy', { p_id: buoyId });
+                if (error) {
+                    alert('حذف از سرور ناموفق بود: ' + error.message);
                     return; // اگر سرور پاک نشد، لوکال هم پاک نکن تا دوباره برنگردد
                 }
             }
 
-            if (markers[buoyId]) { map.removeLayer(markers[buoyId]); delete markers[buoyId]; }
+            await purgeLocalBuoyData(buoyId);
             buoysFleet = buoysFleet.filter(x => x.id !== buoyId);
-            try { localStorage.removeItem(META_KEY(buoyId)); } catch (e) {}
 
             if (appState.buoyId === buoyId) {
-                applyBuoy(buoysFleet[0].id);
+                appState.buoyId = buoysFleet[0] ? buoysFleet[0].id : null;
+                if (buoysFleet[0]) applyBuoy(buoysFleet[0].id);
             }
             if (pendingState.buoyId === buoyId) pendingState.buoyId = appState.buoyId;
+            if (typeof selectedDetailBuoyId !== 'undefined' && selectedDetailBuoyId === buoyId) selectedDetailBuoyId = appState.buoyId;
 
             renderFleetLists();
             renderQuickSwitcher();
@@ -3798,8 +3898,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (detailCharts[def.id]) { detailCharts[def.id].destroy(); delete detailCharts[def.id]; }
             if (def.soon) { body.innerHTML = `<div class="sx-acc-empty">${dT().dSoonNote}</div>`; return; }
             const rows = detailRows;
-            if (!rows.length) { body.innerHTML = `<div class="sx-acc-empty">${dT().dNoData}</div>`; return; }
-            body.innerHTML = '<div class="sx-acc-chartwrap"><canvas></canvas></div>';
+            if (!rows.length) { body.innerHTML = `<div class="sx-acc-empty">${dT().dNoData}</div>` + exportBtnHtml(def); return; }
+            body.innerHTML = '<div class="sx-acc-chartwrap"><canvas></canvas></div>' + exportBtnHtml(def);
             const canvas = body.querySelector('canvas');
             const spanDays = (rows[rows.length - 1]._t - rows[0]._t) / 864e5;
             const labels = rows.map(r => fmtAxis(r._t, spanDays > 1.2));
@@ -3811,7 +3911,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 tension: sr.step ? 0 : 0.3, stepped: !!sr.step, spanGaps: true, pointRadius: rows.length > 80 ? 0 : 2, borderWidth: 2,
                 borderDash: sr.dash ? [5, 4] : [], yAxisID: sr.axis || 'y'
             }));
-            if (datasets.every(ds => ds.data.every(v => v === null || v === undefined))) { body.innerHTML = `<div class="sx-acc-empty">${dT().dNotSent}</div>`; return; }
+            if (datasets.every(ds => ds.data.every(v => v === null || v === undefined))) { body.innerHTML = `<div class="sx-acc-empty">${dT().dNotSent}</div>` + exportBtnHtml(def); return; }
             const scales = { x: { ticks: { color: tick, maxTicksLimit: 6, maxRotation: 0 }, grid: { color: grid } }, y: { ticks: { color: tick }, grid: { color: grid } } };
             if (def.series.some(x => x.axis === 'y1')) scales.y1 = { position: 'right', ticks: { color: tick }, grid: { drawOnChartArea: false } };
             const isTouch = e => !!(e && e.native && ((e.native.type || '').startsWith('touch') || e.native.pointerType === 'touch'));
@@ -4294,6 +4394,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (pendingRobotPowerChoice === null) return;
             appState.robotPower = pendingRobotPowerChoice;
             pendingState.robotPower = pendingRobotPowerChoice;
+            { const rb = buoysFleet.find(x => x.id === appState.buoyId);
+              if (rb) { rb.meta = Object.assign({}, rb.meta, { robot: appState.robotPower }); saveBuoyMeta(rb); sendBuoyCommands(rb, [['switch', { robot: appState.robotPower }]]); } }
             const modalEl = document.getElementById('robotPowerConfirmModal');
             const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.hide();
@@ -4321,6 +4423,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             b.rs485 = checked;
             const t = translations[currentLang()];
             document.getElementById('val-rs485-status').innerText = checked ? t.rs485On : t.rs485Off;
+            b.meta = Object.assign({}, b.meta, { rs485: checked }); saveBuoyMeta(b);
+            sendBuoyCommands(b, [['switch', { rs485: checked }]]);
         }
 
         // ===== DISPLAY SWITCH (host only) =====
@@ -4330,7 +4434,11 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 return;
             }
             const b = buoysFleet.find(x => x.id === appState.buoyId);
-            if (b) b.display = checked;
+            if (b) {
+                b.display = checked;
+                b.meta = Object.assign({}, b.meta, { display: checked }); saveBuoyMeta(b);
+                sendBuoyCommands(b, [['switch', { display: checked }]]);
+            }
         }
 
         // ===== COPY COORDINATES =====
@@ -4390,17 +4498,22 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             } catch (e) {}
         }
 
-        // ---- statuses: pending -> (code ok) connected -> (first real data) has_data ; 3 wrong codes -> failed ----
+        // ---- statuses (ستون pair_status روی سرور): pending_host -> pending_buoy -> connected -> (اولین داده) has_data ----
         function buoyStatus(b) {
-            const st = b.meta && b.meta.status;
-            if (st === 'pending' || st === 'failed' || st === 'has_data') return st;
-            if (b.hasData) return 'has_data';
+            const ps = b.pairStatus || 'connected';
+            if (ps === 'pending_host') return 'pending_host';
+            if (ps === 'pending_buoy') return b.pairError ? 'failed' : 'pending_buoy';
+            if ((b.meta && b.meta.status === 'has_data') || b.hasData) return 'has_data';
             return 'connected';
         }
         function statusBadgeHtml(b) {
             const t = translations[currentLang()];
             const st = buoyStatus(b);
-            const map = { pending: ['fa-hourglass-half', t.stPending], failed: ['fa-circle-xmark', t.stFailed], connected: ['fa-link', t.stConnected], has_data: ['fa-database', t.stHasData] };
+            const failLabel = b.pairError === 'sms_failed' ? t.stSmsFailed : t.stRejected;
+            const map = {
+                pending_host: ['fa-envelope', t.stPendingHost], pending_buoy: ['fa-hourglass-half', t.stPendingBuoy],
+                failed: ['fa-circle-xmark', failLabel], connected: ['fa-link', t.stConnected], has_data: ['fa-database', t.stHasData]
+            };
             return `<span class="sx-st sx-st-${st}"><i class="fa-solid ${map[st][0]}"></i>${map[st][1]}</span>`;
         }
         function onFirstRealData(b) {
@@ -4504,36 +4617,78 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             });
         }
 
-        // ---- add buoy: mini page -> pending (email code) ----
+        // ---- add buoy: mini page -> pending_host (email code) -> pending_buoy (SMS to buoy) -> connected ----
         const PHONE_RE = /^\+?\d{10,15}$/;
+        const PASS_RE = /^[A-Za-z0-9]{4,16}$/;
+        const cleanPhone = v => normDigits(String(v === null || v === undefined ? '' : v)).replace(/[\s\-]/g, '');
+
+        // all relay numbers the host has already saved in the settings of any buoy
+        function savedRelayNumbers() {
+            const out = [];
+            buoysFleet.forEach(b => {
+                const list = (b.meta && Array.isArray(b.meta.recipients)) ? b.meta.recipients : [];
+                list.forEach(n => { const v = cleanPhone(n); if (v && PHONE_RE.test(v) && !out.includes(v)) out.push(v); });
+            });
+            return out;
+        }
+        function onRelaySelChange() {
+            const sel = document.getElementById('nbRelaySel');
+            document.getElementById('nbRelay').style.display = (sel.value === '__new__') ? '' : 'none';
+        }
         function openAddBuoyModal() {
             if (!isHostUser()) return;
-            ['nbName', 'nbSim', 'nbRelay'].forEach(id => { document.getElementById(id).value = ''; });
+            const t = translations[currentLang()];
+            ['nbName', 'nbSim', 'nbRelay', 'nbPass'].forEach(id => { document.getElementById(id).value = ''; });
             document.getElementById('nbError').innerText = '';
+            const sel = document.getElementById('nbRelaySel');
+            const saved = savedRelayNumbers();
+            sel.innerHTML = '';
+            saved.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = n; sel.appendChild(o); });
+            const o = document.createElement('option'); o.value = '__new__'; o.textContent = t.nbRelayNew; sel.appendChild(o);
+            // default = the main relay number of the buoy that is currently selected
+            const cur = buoysFleet.find(x => x.id === appState.buoyId);
+            const curMain = cur && cur.meta && Array.isArray(cur.meta.recipients) ? cleanPhone(cur.meta.recipients[cur.meta.mainIdx || 0]) : '';
+            sel.value = saved.length ? (saved.includes(curMain) ? curMain : saved[0]) : '__new__';
+            sel.style.display = saved.length ? '' : 'none';   // nothing saved yet: only the typing box is shown
+            onRelaySelChange();
             bootstrap.Modal.getOrCreateInstance(document.getElementById('addBuoyModal')).show();
         }
         async function addNewBuoy() {
             const t = translations[currentLang()];
             const err = document.getElementById('nbError');
-            const sim = normDigits(document.getElementById('nbSim').value).replace(/[\s\-]/g, '');
-            const relay = normDigits(document.getElementById('nbRelay').value).replace(/[\s\-]/g, '');
+            const sim = cleanPhone(document.getElementById('nbSim').value);
+            const sel = document.getElementById('nbRelaySel');
+            const typed = (sel.style.display === 'none') || sel.value === '__new__';
+            const relay = cleanPhone(typed ? document.getElementById('nbRelay').value : sel.value);
+            const pass = document.getElementById('nbPass').value.trim();
             const name = document.getElementById('nbName').value.trim() || t.nbDefaultName;
             err.innerText = '';
             if (!isHostUser()) { err.innerText = t.nbHostOnly; return; }
             if (!PHONE_RE.test(sim)) { err.innerText = t.nbErrSim; return; }
             if (!PHONE_RE.test(relay)) { err.innerText = t.nbErrRelay; return; }
+            if (sim === relay) { err.innerText = t.nbErrSame; return; }
+            if (!PASS_RE.test(pass)) { err.innerText = t.nbErrPass; return; }
             if (!sb || !supabaseReady) { err.innerText = t.errSupabaseNotConfigured; return; }
 
             const btn = document.getElementById('nbSaveBtn'); btn.disabled = true;
-            const { data: newRow, error } = await sb.rpc('create_buoy', { p_sim_number: sim, p_name: name, p_location_name: '—', p_lat: 0, p_lon: 0 });
+            const { data: newRow, error } = await sb.rpc('create_buoy', {
+                p_sim_number: sim, p_name: name, p_location_name: '—', p_lat: 0, p_lon: 0,
+                p_relay_phone: relay, p_pair_pass: pass
+            });
             btn.disabled = false;
             if (error) { err.innerText = t.nbErrServer + ' ' + error.message; return; }
+            document.getElementById('nbPass').value = '';
 
             const row = Array.isArray(newRow) ? newRow[0] : newRow;
             const nb = makeEmptyBuoy(row.id, row.name, '—', null, null);
             nb.partNumber = row.id.split('-').pop();
-            nb.meta = { status: 'pending', buoySim: sim, relayPhone: relay, autoLoc: true, attempts: 0, createdAt: new Date().toISOString() };
+            nb.pairStatus = row.pair_status || 'pending_host';
+            nb.pairError = null;
+            nb.relayPhone = relay;
+            // the chosen relay number becomes the main (and only) recipient of this buoy; more can be added in buoy settings
+            nb.meta = { buoySim: sim, relayPhone: relay, recipients: [relay], mainIdx: 0, autoLoc: true, createdAt: new Date().toISOString() };
             buoysFleet.push(nb);
+            if (!appState.buoyId) appState.buoyId = nb.id;
             saveBuoyMeta(nb);
             renderFleetLists(); renderQuickSwitcher();
             bootstrap.Modal.getOrCreateInstance(document.getElementById('addBuoyModal')).hide();
@@ -4541,86 +4696,386 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             setTimeout(() => startBuoyVerify(nb.id), 350);
         }
 
-        // ---- email verification: 6-digit code, 3 tries ----
-        let verifyBuoyId = null, verifyCooldown = null;
-        function startBuoyVerify(id) {
-            const b = buoysFleet.find(x => x.id === id); if (!b) return;
-            verifyBuoyId = id;
-            b.meta = b.meta || {};
-            document.getElementById('vbCode').value = '';
-            document.getElementById('vbMsg').innerText = '';
-            updateVerifyAttempts(b);
-            document.getElementById('vbConfirmBtn').disabled = false;
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('verifyBuoyModal')).show();
-            sendBuoyCode();
-        }
-        function updateVerifyAttempts(b) {
-            const t = translations[currentLang()];
-            const left = Math.max(0, 3 - ((b.meta && b.meta.attempts) || 0));
-            document.getElementById('vbAttempts').innerText = t.vbAttempts.replace('{n}', left);
-        }
-        async function sendBuoyCode() {
-            const t = translations[currentLang()];
-            const msg = document.getElementById('vbMsg'); msg.innerText = '';
-            const email = currentUser && currentUser.email;
-            if (!email || !sb || !supabaseReady) { msg.innerText = t.vbSendFail; return; }
-            document.getElementById('vbDesc').innerText = t.vbSending;
-            const rb = document.getElementById('vbResendBtn'); rb.disabled = true;
+        // ---- server call (Edge Function "buoy-pair") ----
+        async function callPair(action, buoyId, extra) {
+            if (!sb || !supabaseReady) return { error: 'no-supabase' };
             try {
-                const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-                if (error) { msg.innerText = t.vbSendFail + ' ' + error.message; document.getElementById('vbDesc').innerText = ''; rb.disabled = false; return; }
-                document.getElementById('vbDesc').innerText = t.vbDesc.replace('{email}', email);
-            } catch (e) { msg.innerText = t.vbSendFail; rb.disabled = false; return; }
-            let left = 60; clearInterval(verifyCooldown);
-            const lbl = rb.querySelector('span');
+                const { data, error } = await sb.functions.invoke('buoy-pair', { body: Object.assign({ action, buoy_id: buoyId }, extra || {}) });
+                if (error) return { error: error.message || 'error' };
+                return data || {};
+            } catch (e) { return { error: String(e) }; }
+        }
+
+        // ---- host email verification: 6-digit code, 3 tries -> new code -> 3 tries -> buoy deleted ----
+        let verifyBuoyId = null, verifyCooldown = null, verifyLastRound = false;
+        function updateVerifyAttempts(left, lastRound) {
+            const t = translations[currentLang()];
+            if (typeof lastRound === 'boolean') verifyLastRound = lastRound;
+            document.getElementById('vbAttempts').innerText = (left === null || left === undefined) ? '' : t.vbAttempts.replace('{n}', left);
+            document.getElementById('vbWarn').innerText = verifyLastRound ? t.vbLastRound : '';
+        }
+        function startResendCooldown(sec) {
+            const t = translations[currentLang()];
+            const rb = document.getElementById('vbResendBtn'); const lbl = rb.querySelector('span');
+            let left = Math.max(1, sec | 0); clearInterval(verifyCooldown); rb.disabled = true;
+            lbl.innerText = `${t.vbResend} (${left})`;
             verifyCooldown = setInterval(() => {
                 left--;
                 if (left <= 0) { clearInterval(verifyCooldown); rb.disabled = false; lbl.innerText = t.vbResend; }
                 else lbl.innerText = `${t.vbResend} (${left})`;
             }, 1000);
         }
+        function startBuoyVerify(id) {
+            const b = buoysFleet.find(x => x.id === id); if (!b) return;
+            verifyBuoyId = id; verifyLastRound = false;
+            document.getElementById('vbCode').value = '';
+            document.getElementById('vbMsg').innerText = '';
+            document.getElementById('vbAttempts').innerText = '';
+            document.getElementById('vbWarn').innerText = '';
+            document.getElementById('vbConfirmBtn').disabled = false;
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('verifyBuoyModal')).show();
+            requestBuoyCode();
+        }
+        function sendBuoyCode() { requestBuoyCode(); }   // "resend" button
+        async function requestBuoyCode() {
+            const t = translations[currentLang()];
+            const msg = document.getElementById('vbMsg'); msg.innerText = '';
+            const desc = document.getElementById('vbDesc');
+            const email = (currentUser && currentUser.email) || '';
+            const rb = document.getElementById('vbResendBtn'); rb.disabled = true;
+            desc.innerText = t.vbSending;
+            const r = await callPair('send', verifyBuoyId);
+            if (r.error || r.state === 'email_failed' || r.state === 'rate_limited') {
+                msg.innerText = t.vbSendFail; desc.innerText = ''; rb.disabled = false; return;
+            }
+            if (r.state === 'deleted') { onBuoyDeleted(verifyBuoyId); return; }
+            if (r.state === 'pending_buoy' || r.state === 'connected') { markBuoyPairState(verifyBuoyId, r.state); closeVerifyModal(); return; }
+            if (r.state === 'cooldown') {
+                desc.innerText = t.vbDesc.replace('{email}', email);
+                msg.innerText = t.vbCooldown.replace('{n}', r.wait);
+                updateVerifyAttempts(r.attempts_left, !!(r.round >= 2));
+                startResendCooldown(r.wait); return;
+            }
+            desc.innerText = t.vbDesc.replace('{email}', email);
+            updateVerifyAttempts(r.attempts_left, !!r.last_round);
+            startResendCooldown(60);
+        }
+        function closeVerifyModal() {
+            clearInterval(verifyCooldown);
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('verifyBuoyModal')).hide();
+        }
+        function markBuoyPairState(id, state) {
+            const b = buoysFleet.find(x => x.id === id); if (!b) return;
+            b.pairStatus = state; b.pairError = null;
+            renderFleetLists(); renderQuickSwitcher(); startPairPoll();
+        }
+        function onBuoyDeleted(id) {
+            const t = translations[currentLang()];
+            closeVerifyModal();
+            purgeLocalBuoyData(id);
+            buoysFleet = buoysFleet.filter(x => x.id !== id);
+            if (appState.buoyId === id) {
+                appState.buoyId = buoysFleet[0] ? buoysFleet[0].id : null;
+                if (buoysFleet[0]) applyBuoy(buoysFleet[0].id);
+            }
+            renderFleetLists(); renderQuickSwitcher();
+            sxToast(t.vbDeleted, 'err');
+        }
         async function submitBuoyCode() {
             const t = translations[currentLang()];
-            const b = buoysFleet.find(x => x.id === verifyBuoyId); if (!b) return;
             const msg = document.getElementById('vbMsg');
-            const code = normDigits(document.getElementById('vbCode').value).replace(/\D/g, '');
+            const codeEl = document.getElementById('vbCode');
+            const code = normDigits(codeEl.value).replace(/\D/g, '');
             if (code.length !== 6) { msg.innerText = t.vbCodeLen; return; }
-            const email = currentUser && currentUser.email;
             const btn = document.getElementById('vbConfirmBtn'); btn.disabled = true;
-            let error = null;
-            try { ({ error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' })); } catch (e) { error = e; }
+            const r = await callPair('confirm', verifyBuoyId, { code });
             btn.disabled = false;
-            const network = error && (/fetch|network/i.test(error.message || '') || error.status === 0);
-            if (!error) {
-                clearInterval(verifyCooldown);
-                b.meta.status = 'connected'; b.meta.attempts = 0; b.meta.verifiedAt = new Date().toISOString();
-                saveBuoyMeta(b);
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('verifyBuoyModal')).hide();
-                renderFleetLists(); renderQuickSwitcher();
-                sxToast(t.vbOk, 'ok'); sxFeedback('success');
+            if (r.error || r.state === 'server_error') { msg.innerText = t.vbSendFail; return; }
+            if (r.state === 'pending_buoy' || r.state === 'connected') {
+                markBuoyPairState(verifyBuoyId, r.state);
+                closeVerifyModal();
+                sxToast(t.vbOkPending, 'ok'); sxFeedback('success');
                 return;
             }
-            if (network) { msg.innerText = t.vbSendFail; return; }
-            b.meta.attempts = (b.meta.attempts || 0) + 1;
-            if (b.meta.attempts >= 3) {
-                clearInterval(verifyCooldown);
-                b.meta.status = 'failed';
-                saveBuoyMeta(b);
-                bootstrap.Modal.getOrCreateInstance(document.getElementById('verifyBuoyModal')).hide();
-                renderFleetLists(); renderQuickSwitcher();
-                sxToast(t.vbFailed, 'err');
+            if (r.state === 'deleted') { onBuoyDeleted(verifyBuoyId); return; }
+            codeEl.value = '';
+            if (r.state === 'need_new_code') {
+                await requestBuoyCode();            // a fresh code is e-mailed automatically
+                document.getElementById('vbMsg').innerText = t.vbNeedNew; sxFeedback('warn');
                 return;
             }
-            saveBuoyMeta(b);
-            updateVerifyAttempts(b);
-            document.getElementById('vbCode').value = '';
-            msg.innerText = t.vbWrong; sxFeedback('warn');
+            if (r.state === 'wrong') { updateVerifyAttempts(r.attempts_left); msg.innerText = t.vbWrong; sxFeedback('warn'); return; }
+            msg.innerText = t.vbCodeLen;
         }
-        function retryBuoyVerify(id) {
+
+        // ---- step 2: SMS to the buoy (resend, optionally with a new password) ----
+        let ppBuoyId = null;
+        function resendPairSms(id) {
             const b = buoysFleet.find(x => x.id === id); if (!b || !isHostUser()) return;
-            b.meta = b.meta || {}; b.meta.status = 'pending'; b.meta.attempts = 0;
-            saveBuoyMeta(b); renderFleetLists();
-            startBuoyVerify(id);
+            if (b.pairError === 'rejected') {          // the buoy refused the password: ask for it again
+                ppBuoyId = id;
+                document.getElementById('ppPass').value = ''; document.getElementById('ppMsg').innerText = '';
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('pairPassModal')).show();
+                return;
+            }
+            doResendSms(id);
+        }
+        function submitPairPass() {
+            const t = translations[currentLang()];
+            const pass = document.getElementById('ppPass').value.trim();
+            if (!PASS_RE.test(pass)) { document.getElementById('ppMsg').innerText = t.nbErrPass; return; }
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('pairPassModal')).hide();
+            document.getElementById('ppPass').value = '';
+            doResendSms(ppBuoyId, pass);
+        }
+        async function doResendSms(id, pass) {
+            const t = translations[currentLang()];
+            const r = await callPair('resend_sms', id, pass ? { pass } : {});
+            if (r.error || r.state === 'queue_failed') { sxToast(t.vbSendFail, 'err'); return; }
+            if (r.state === 'cooldown') { sxToast(t.vbCooldown.replace('{n}', r.wait), 'err'); return; }
+            if (r.state === 'bad_pass') { sxToast(t.nbErrPass, 'err'); return; }
+            if (r.state === 'pending_buoy') {
+                const b = buoysFleet.find(x => x.id === id);
+                if (b) { b.pairStatus = 'pending_buoy'; b.pairError = null; }
+                renderFleetLists(); startPairPoll();
+                sxToast(t.vbSmsQueued, 'ok');
+            }
+        }
+
+        // ---- while a buoy is "pending_buoy", check the server every 8 s until it turns connected ----
+        let pairPollTimer = null;
+        function startPairPoll() {
+            clearInterval(pairPollTimer); pairPollTimer = null;
+            if (!buoysFleet.some(b => b.pairStatus === 'pending_buoy')) return;
+            pairPollTimer = setInterval(pollPairStatus, 8000);
+        }
+        async function pollPairStatus() {
+            if (!sb || !supabaseReady || !currentUser) { clearInterval(pairPollTimer); pairPollTimer = null; return; }
+            const pend = buoysFleet.filter(b => b.pairStatus === 'pending_buoy').map(b => b.id);
+            if (!pend.length) { clearInterval(pairPollTimer); pairPollTimer = null; return; }
+            const { data, error } = await sb.from('buoys').select('id, pair_status, pair_error').in('id', pend);
+            if (error || !data) return;
+            const t = translations[currentLang()];
+            let changed = false;
+            data.forEach(row => {
+                const b = buoysFleet.find(x => x.id === row.id); if (!b) return;
+                if (row.pair_status !== b.pairStatus || (row.pair_error || null) !== (b.pairError || null)) {
+                    const nowConnected = row.pair_status === 'connected' && b.pairStatus !== 'connected';
+                    b.pairStatus = row.pair_status; b.pairError = row.pair_error || null; changed = true;
+                    if (nowConnected) { sxToast(t.vbConnectedNow.replace('{name}', b.name), 'ok'); sxFeedback('success'); }
+                }
+            });
+            if (changed) { renderFleetLists(); renderQuickSwitcher(); }
+            if (!buoysFleet.some(b => b.pairStatus === 'pending_buoy')) { clearInterval(pairPollTimer); pairPollTimer = null; }
+        }
+
+        // ---- SMS commands to the buoy (Edge Function "buoy-command" -> queue -> relay app) ----
+        async function sendBuoyCommands(b, list) {
+            if (!b || !isHostUser() || !sb || !supabaseReady || !list || !list.length) return;
+            const t = translations[currentLang()];
+            let todo = list, skipped = false;
+            if (b.pairStatus && b.pairStatus !== 'connected') {      // not connected yet: only the relay number is stored
+                todo = list.filter(c => c[0] === 'relay'); skipped = true;
+            }
+            let ok = 0, bad = 0;
+            for (const [kind, params] of todo) {
+                try {
+                    const { data, error } = await sb.functions.invoke('buoy-command', { body: Object.assign({ buoy_id: b.id, kind }, params || {}) });
+                    if (!error && data && data.ok) { if (data.state === 'queued') ok++; else skipped = true; } else bad++;
+                } catch (e) { bad++; }
+            }
+            if (bad) sxToast(t.cmdFailed, 'err');
+            else if (skipped) sxToast(t.cmdNotConnected, 'err');
+            else if (ok) sxToast(t.cmdQueued, 'ok');
+        }
+
+        // ---- guests: login / logout log (host sees it in System settings, second tab) ----
+        let guestSessionId = null, guestPingTimer = null, gsTimer = null, gsRows = [];
+        async function startGuestSession(name, mobile, referral) {
+            try {
+                const { data, error } = await sb.rpc('guest_session_start', {
+                    p_mobile: mobile, p_referral: referral, p_name: name, p_user_agent: (navigator.userAgent || '').slice(0, 200)
+                });
+                if (error || !data) { console.warn('guest session:', error && error.message); return; }
+                guestSessionId = data;
+                clearInterval(guestPingTimer);
+                guestPingTimer = setInterval(() => { if (guestSessionId && sb) sb.rpc('guest_session_ping', { p_id: guestSessionId }); }, 60000);
+            } catch (e) { console.warn('guest session failed', e); }
+        }
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && guestSessionId && sb) sb.rpc('guest_session_ping', { p_id: guestSessionId });
+        });
+        function gsEffective(r) {
+            const seen = new Date(r.last_seen).getTime();
+            if (r.logout_at) return { out: new Date(r.logout_at), online: false, noExit: false };
+            if (Date.now() - seen <= 3 * 60 * 1000) return { out: null, online: true, noExit: false };
+            return { out: new Date(r.last_seen), online: false, noExit: true };   // closed the app without pressing exit
+        }
+        function fmtDuration(ms) {
+            const s = Math.max(0, Math.round(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+            const p = n => String(n).padStart(2, '0');
+            return `${p(h)}:${p(m)}:${p(x)}`;
+        }
+        function renderGuestSessions() {
+            const t = translations[currentLang()];
+            const body = document.getElementById('gs-body'), note = document.getElementById('gs-note');
+            if (!body) return;
+            if (!gsRows.length) { body.innerHTML = ''; note.innerText = t.gsEmpty; return; }
+            note.innerText = '';
+            body.innerHTML = gsRows.map(r => {
+                const e = gsEffective(r), inn = new Date(r.login_at);
+                const out = e.online ? `<span class="sx-gs-on">${t.gsOnline}</span>` : `${fmtDT(e.out, true)}${e.noExit ? ` <span class="sx-gs-warn" title="${escHtml(t.gsNoExit)}">*</span>` : ''}`;
+                const dur = fmtDuration((e.online ? Date.now() : e.out.getTime()) - inn.getTime());
+                return `<tr><td>${escHtml(r.guest_name)}</td><td>${fmtDT(inn, true)}</td><td>${out}</td><td>${dur}</td></tr>`;
+            }).join('');
+            if (gsRows.some(r => gsEffective(r).noExit)) note.innerText = '* ' + t.gsNoExit;
+        }
+        async function loadGuestSessions() {
+            if (!isHostUser() || !sb || !supabaseReady) return;
+            const t = translations[currentLang()];
+            const { data, error } = await sb.from('guest_sessions').select('*').order('login_at', { ascending: false }).limit(500);
+            if (error) { const n = document.getElementById('gs-note'); if (n) n.innerText = t.gsLoadFail; return; }
+            gsRows = data || []; renderGuestSessions();
+        }
+        function showSysTab(tab) {
+            const g = tab === 'guests' && isHostUser();
+            document.getElementById('sys-tab-general').style.display = g ? 'none' : '';
+            document.getElementById('sys-tab-guests').style.display = g ? '' : 'none';
+            document.getElementById('sys-tab-btn-general').className = 'btn btn-sm ' + (g ? 'btn-outline-secondary' : 'btn-primary');
+            document.getElementById('sys-tab-btn-guests').className = 'btn btn-sm ' + (g ? 'btn-primary' : 'btn-outline-secondary');
+            clearInterval(gsTimer); gsTimer = null;
+            if (g) { loadGuestSessions(); gsTimer = setInterval(loadGuestSessions, 30000); }
+        }
+
+        // ---- Excel export (one file per chart, ALL stored data of the selected buoy) ----
+        let xlsxLoading = null;
+        function loadXlsxLib() {
+            if (window.XLSX) return Promise.resolve(window.XLSX);
+            if (xlsxLoading) return xlsxLoading;
+            xlsxLoading = new Promise((resolve, reject) => {
+                const sc = document.createElement('script');
+                sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+                sc.onload = () => resolve(window.XLSX);
+                sc.onerror = () => { xlsxLoading = null; reject(new Error('xlsx library failed to load')); };
+                document.head.appendChild(sc);
+            });
+            return xlsxLoading;
+        }
+        function xlStamp(d) {
+            const p = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;
+        }
+        function xlTime(d) {
+            const p = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+        }
+        // writes the table as .xlsx (SheetJS, loaded on demand); if the library cannot load, a CSV that Excel opens is downloaded
+        async function downloadTable(aoa, sheetName, fileBase) {
+            const t = translations[currentLang()];
+            try {
+                const X = await loadXlsxLib();
+                const ws = X.utils.aoa_to_sheet(aoa);
+                ws['!cols'] = aoa[0].map((_, c) => ({ wch: Math.min(34, Math.max(10, ...aoa.slice(0, 60).map(r => String(r[c] === null || r[c] === undefined ? '' : r[c]).length)) + 2) }));
+                const wb = X.utils.book_new();
+                X.utils.book_append_sheet(wb, ws, String(sheetName).replace(/[\[\]\*\?\/\\:]/g, '').slice(0, 31) || 'Data');
+                X.writeFile(wb, fileBase + '.xlsx');
+                sxToast(t.xlDone, 'ok');
+            } catch (e) {
+                console.warn(e);
+                const q = v => { const x = (v === null || v === undefined) ? '' : String(v); return /[",\n]/.test(x) ? '"' + x.replace(/"/g, '""') + '"' : x; };
+                const csv = '\ufeff' + aoa.map(r => r.map(q).join(',')).join('\r\n');
+                const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+                const a = document.createElement('a'); a.href = url; a.download = fileBase + '.csv';
+                document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+                sxToast(t.xlCsvFallback, 'ok');
+            }
+        }
+        // ALL rows of one buoy (not only the window shown on the chart); server first, then this device's local cache
+        async function fetchAllBuoyRows(buoyId) {
+            let rows = null;
+            if (sb && supabaseReady) {
+                try {
+                    const PAGE = 1000; let out = [];
+                    for (let p = 0; p < 500; p++) {
+                        const { data, error } = await sb.from(TELEMETRY_TABLE).select('*').eq('buoy_id', buoyId)
+                            .order('device_ts', { ascending: true }).range(p * PAGE, (p + 1) * PAGE - 1);
+                        if (error) throw error;
+                        out = out.concat(data || []);
+                        if (!data || data.length < PAGE) break;
+                    }
+                    rows = out;
+                } catch (e) { rows = null; }
+            }
+            if (!rows || !rows.length) { try { rows = await getBuoyHistoryFromCache(buoyId); } catch (e) { rows = rows || []; } }
+            return rows.map(r => { r._t = new Date(r.device_ts || r.created_at || r.cached_at); return r; })
+                .filter(r => !Number.isNaN(r._t.getTime())).sort((x, y) => x._t - y._t);
+        }
+        function exportBtnHtml(def) {
+            return `<div class="sx-acc-foot"><button type="button" class="btn btn-sm btn-outline-success" onclick="exportChartExcel('${def.id}', this)"><i class="fa-solid fa-file-excel me-1"></i>${dT().xlDownload}</button></div>`;
+        }
+        async function exportChartExcel(defId, btn) {
+            const t = dT(); const b = curDetailBuoy();
+            const def = detailMetricDefs().find(d => d.id === defId);
+            if (!b || !def || def.soon) return;
+            if (btn) btn.disabled = true;
+            sxToast(t.xlPreparing, 'ok');
+            try {
+                const rows = await fetchAllBuoyRows(b.id);
+                if (!rows.length) { sxToast(t.xlNoData, 'err'); return; }
+                const savedStats = detailStats; detailStats = computeDetailStats(rows);   // "drift" is measured from the very first position
+                let aoa;
+                try {
+                    const extra = defId === 'pos' ? [['lat', r => r.lat], ['lon', r => r.lon]] : [];
+                    aoa = [[t.xlColTime, t.xlColUtc, ...def.series.map(sr => sr.label), ...extra.map(x => x[0])]];
+                    rows.forEach((r, i) => aoa.push([xlTime(r._t), r._t.toISOString(),
+                        ...def.series.map(sr => { const v = sr.get(r, i, rows); return (v === undefined) ? null : v; }),
+                        ...extra.map(x => x[1](r))]));
+                } finally { detailStats = savedStats; }
+                if (!aoa.slice(1).some(row => row.slice(2).some(v => v !== null && v !== undefined))) { sxToast(t.dNotSent, 'err'); return; }
+                await downloadTable(aoa, def.title, `${b.id}_${def.id}_${xlStamp(new Date())}`);
+            } catch (e) { console.warn(e); sxToast(t.xlFail, 'err'); }
+            finally { if (btn) btn.disabled = false; }
+        }
+        async function exportGuestSessionsExcel(btn) {
+            const t = translations[currentLang()];
+            if (!gsRows.length) { sxToast(t.xlNoData, 'err'); return; }
+            if (btn) btn.disabled = true;
+            try {
+                const aoa = [[t.gsName, t.gsIn, t.gsOut, t.gsDur]];
+                gsRows.forEach(r => {
+                    const e = gsEffective(r), inn = new Date(r.login_at);
+                    aoa.push([r.guest_name, xlTime(inn), e.online ? t.gsOnline : xlTime(e.out) + (e.noExit ? ' *' : ''), fmtDuration((e.online ? Date.now() : e.out.getTime()) - inn.getTime())]);
+                });
+                await downloadTable(aoa, t.sysTabGuests, `guests_${xlStamp(new Date())}`);
+            } catch (e) { console.warn(e); sxToast(t.xlFail, 'err'); }
+            finally { if (btn) btn.disabled = false; }
+        }
+
+        // ---- relay_key (host only): shown in settings, can be copied or regenerated ----
+        let relayKeyValue = '', relayKeyShown = false;
+        function renderRelayKey() {
+            const el = document.getElementById('val-relay-key'); if (!el) return;
+            el.innerText = relayKeyValue ? (relayKeyShown ? relayKeyValue : relayKeyValue.slice(0, 5) + '••••••••••••••••••••') : '-';
+        }
+        async function loadRelayKey() {
+            if (!isHostUser() || !sb || !supabaseReady) return;
+            try {
+                const { data, error } = await sb.rpc('get_my_relay_key');
+                if (error) { console.warn('relay key:', error.message); return; }
+                relayKeyValue = data || ''; renderRelayKey();
+            } catch (e) { console.warn('relay key failed', e); }
+        }
+        function toggleRelayKey() { relayKeyShown = !relayKeyShown; renderRelayKey(); }
+        function copyRelayKey(btn) { if (relayKeyValue) sxCopy(relayKeyValue, btn); }
+        function rotateRelayKey() {
+            if (!isHostUser()) return;
+            const t = translations[currentLang()];
+            sxAsk(t.rkRotateAsk, async () => {
+                const { data, error } = await sb.rpc('rotate_relay_key');
+                if (error || !data) { sxToast(t.vbSendFail, 'err'); return; }
+                relayKeyValue = data; relayKeyShown = true; renderRelayKey();
+                sxToast(t.rkRotated, 'ok');
+            });
         }
 
         // ---- per-buoy settings page: specs, mission, interval, recipients ----
@@ -4677,12 +5132,30 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             const list = pendingState.smsRecipients.map(n => normDigits(String(n)).replace(/[\s\-]/g, '')).filter(n => n !== '');
             if (list.some(n => !PHONE_RE.test(n))) { sxToast(t.errPhones, 'err'); return; }
             let mainIdx = list.indexOf(mainRaw); if (mainIdx < 0) mainIdx = 0;
+            // values before saving, to know what changed and must be sent to the buoy
+            const pm = b.meta || {};
+            const prevRecipients = (Array.isArray(pm.recipients) ? pm.recipients : []).map(cleanPhone).filter(Boolean);
+            const prevMain = prevRecipients[pm.mainIdx || 0] || '';
+            const prevInterval = pm.intervalSeconds || 900;
+            const prevMs = pm.missionStart ? new Date(pm.missionStart) : new Date(DEFAULT_MISSION_START);
+            const prevMe = pm.missionEnd ? new Date(pm.missionEnd) : new Date(+prevMs + 14 * 864e5);
+            const prevOn = pm.missionOn !== false;
             b.meta = Object.assign({}, b.meta, {
                 robotWeightKg: rw, anchorLengthM: al, anchorWeightKg: aw,
                 missionOn: document.getElementById('missionToggle').checked, missionStart: ms.toISOString(), missionEnd: me.toISOString(),
                 intervalSeconds: pendingState.smsIntervalSeconds, recipients: list, mainIdx
             });
             saveBuoyMeta(b);
+            { const cmds = [];
+              const nowOn = document.getElementById('missionToggle').checked;
+              if (pendingState.smsIntervalSeconds !== prevInterval) cmds.push(['interval', { seconds: pendingState.smsIntervalSeconds }]);
+              if (nowOn !== prevOn || ms.toISOString() !== prevMs.toISOString() || me.toISOString() !== prevMe.toISOString()) cmds.push(['mission', { on: nowOn, start: ms.toISOString(), end: me.toISOString() }]);
+              const added = list.filter(n => !prevRecipients.includes(n)), removed = prevRecipients.filter(n => !list.includes(n));
+              if (added.length) cmds.push(['add_relay', { numbers: added }]);
+              if (removed.length) cmds.push(['del_relay', { numbers: removed }]);
+              const newMain = list[mainIdx] || '';
+              if (newMain && newMain !== prevMain) cmds.push(['relay', { relay: newMain }]);
+              if (cmds.length) sendBuoyCommands(b, cmds); }
             pendingState.smsRecipients = list.slice(); pendingState.mainIdx = mainIdx; renderPhoneRows();
             if (b.id === appState.buoyId) applyBuoyConfigToApp(b);
             flashSaveFeedback('settings-save-feedback');
@@ -4887,6 +5360,10 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (isHost) document.getElementById('val-referral-code').innerText = currentUser.referralCode;
             document.querySelectorAll('[data-host-only]').forEach(el => { el.style.display = isHost ? '' : 'none'; });
             if (isHost) renderReferralQr();
+            document.getElementById('relay-key-block').style.display = isHost ? 'block' : 'none';
+            document.getElementById('sys-tabs').style.display = isHost ? 'flex' : 'none';
+            showSysTab('general');
+            if (isHost) loadRelayKey();
 
             renderPhoneRows();
             renderFleetLists();
