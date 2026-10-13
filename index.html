@@ -997,6 +997,24 @@ html[dir="rtl"] .sx-detail-layout>*{direction:rtl}
 .sx-st-connected{background:rgba(59,130,246,.14);color:#3b82f6;border-color:rgba(59,130,246,.5)}
 .sx-st-has_data{background:rgba(16,185,129,.15);color:#059669;border-color:rgba(16,185,129,.5)}
 .sx-acc-foot{display:flex;justify-content:flex-end;margin-top:8px}
+.sx-pend{display:none;align-items:center;gap:5px;font-size:.66rem;color:#d97706;white-space:nowrap}
+.sx-pend.on{display:inline-flex}
+#cmd-pending-pill{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:2100;background:#1f2937;color:#fbbf24;border:1px solid #d97706;border-radius:999px;padding:8px 16px;font-size:.8rem;display:none;box-shadow:0 6px 20px rgba(0,0,0,.4)}
+#cmd-pending-pill.show{display:flex;align-items:center;gap:8px}
+#alert-overlay{position:fixed;inset:0;z-index:3000;background:rgba(127,29,29,.95);display:none;overflow-y:auto;padding:16px}
+#alert-overlay.show{display:block}
+.al-box{max-width:560px;margin:0 auto}
+.al-head{color:#fff;font-size:1.25rem;font-weight:800;text-align:center;margin:8px 0 14px}
+.al-card{background:#fff;color:#111827;border-radius:14px;padding:14px;margin-bottom:12px;border-inline-start:8px solid #dc2626}
+.al-card.battery{border-inline-start-color:#d97706}
+.al-title{font-weight:800;font-size:1.05rem;margin-bottom:6px}
+.al-row{font-size:.86rem;margin:3px 0}
+.al-note{font-size:.84rem;color:#991b1b;margin-top:8px;font-weight:700}
+.al-actions{position:sticky;bottom:0;padding:10px 0}
+.al-ack{width:100%;padding:16px;font-size:1.1rem;font-weight:800;border:none;border-radius:14px;background:#fbbf24;color:#111827}
+.al-notif-btn{background:transparent;border:1px solid #fff;color:#fff;border-radius:10px;padding:6px 12px;font-size:.8rem}
+@keyframes alpulse{0%,100%{opacity:1}50%{opacity:.55}}
+.al-pulse{animation:alpulse 1s infinite}
 .sx-gs-wrap{overflow-x:auto;border:1px solid rgba(148,163,184,.25);border-radius:10px}
 .sx-gs-table{width:100%;font-size:.82rem;border-collapse:collapse}
 .sx-gs-table th,.sx-gs-table td{padding:7px 10px;border-bottom:1px solid rgba(148,163,184,.18);white-space:nowrap;text-align:start}
@@ -1351,16 +1369,19 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <label class="sx-ctl-row">
 <i class="fa-solid fa-power-off sx-ctl-ico text-danger"></i>
 <span class="visually-hidden" data-i18n="powerLabel">روشن/خاموش بویه</span>
+<span class="sx-pend" id="pend-robot"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-i18n="cmdWaitBuoy">منتظر تأیید بویه…</span></span>
 <span class="form-check form-switch"><input checked="" class="form-check-input" id="robotPowerSwitch" onclick="event.preventDefault(); requestRobotPowerToggle();" type="checkbox"/></span>
 </label>
 <label class="sx-ctl-row">
 <i class="fa-solid fa-plug sx-ctl-ico text-warning"></i>
 <span class="visually-hidden" id="txt-lbl-rs485">سوکت بدنه RS485-E</span><span class="visually-hidden" id="val-rs485-status">وصل</span>
+<span class="sx-pend" id="pend-rs485"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-i18n="cmdWaitBuoy">منتظر تأیید بویه…</span></span>
 <span class="form-check form-switch"><input checked="" class="form-check-input" id="rs485Toggle" onclick="event.preventDefault(); askSwitch('rs485');" type="checkbox"/></span>
 </label>
 <label class="sx-ctl-row">
 <i class="fa-solid fa-display sx-ctl-ico text-info"></i>
 <span class="visually-hidden" data-i18n="displayLabel">نمایشگر</span>
+<span class="sx-pend" id="pend-display"><i class="fa-solid fa-circle-notch fa-spin"></i><span data-i18n="cmdWaitBuoy">منتظر تأیید بویه…</span></span>
 <span class="form-check form-switch"><input checked="" class="form-check-input" id="displayToggle" onclick="event.preventDefault(); askSwitch('display');" type="checkbox"/></span>
 </label>
 </div></div>
@@ -1409,7 +1430,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 <i class="fa-solid fa-droplet text-info" id="leak-icon"></i>
 </div>
 <div class="metric-val status-ok mt-2 fs-5" id="val-leak-status">خشک (عادی)</div>
-<button class="btn btn-sm btn-outline-secondary mt-2" id="btn-simulate-leak" onclick="toggleSimulateLeak()" style="font-size:0.68rem;"><span id="txt-simulate-leak-btn">شبیه‌سازی نشتی (تست)</span></button>
+
 </div></div>
 <div class="sx-cell "><div class="card p-3 sx-box"><div class="d-flex justify-content-between align-items-center"><span class="text-muted small" data-i18n="tempInBox">دما و رطوبت داخل</span><i class="fa-solid fa-temperature-half text-danger"></i></div>
 <div class="sx-row mt-3"><span id="txt-temp-in">دمای داخل محفظه:</span><span class="badge bg-primary"><span id="val-temp-in">28.5</span> °C</span></div>
@@ -1900,9 +1921,10 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
         }
 
         // تخمین درصد شارژ باتری از روی ولتاژ (سرب-اسیدی/لیتیومی ۱۲ ولت، تقریبی)
+                const BAT_EMPTY_V = 6.0, BAT_FULL_V = 8.5;   // two cells: the buoy shuts itself down below 6 V
         function estimateSocFromVoltage(v) {
             if (v === null || v === undefined) return null;
-            const pct = ((v - 11.0) / (13.2 - 11.0)) * 100;
+            const pct = ((v - BAT_EMPTY_V) / (BAT_FULL_V - BAT_EMPTY_V)) * 100;
             return Math.max(0, Math.min(100, Math.round(pct)));
         }
 
@@ -2391,6 +2413,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
 
         async function logout() {
             clearInterval(gsTimer); gsTimer = null;
+            stopAlertWatch();
             if (guestSessionId && sb) {                       // log the guest's exit time before the session is closed
                 const sid = guestSessionId; guestSessionId = null; clearInterval(guestPingTimer);
                 try { await Promise.race([sb.rpc('guest_session_end', { p_id: sid }), new Promise(r => setTimeout(r, 1500))]); } catch (e) {}
@@ -2455,7 +2478,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'سوکت بدنه RS485-E',
                 rs485On: 'وصل',
                 rs485Off: 'قطع',
-                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', missionStateDone: 'پایان یافته', missionStateOff: 'متوقف', stPending: 'در انتظار تایید ایمیل', stFailed: 'متصل نشد', stConnected: 'متصل شده', stHasData: 'دارای داده', nbTitle: 'افزودن بویه', nbName: 'نام بویه', nbSim: 'شماره موبایل بویه', nbRelay: 'شماره موبایل واسط', nbLocHint: 'محل بویه به‌صورت خودکار از اولین موقعیتی که ارسال می‌کند مشخص می‌شود.', nbCancel: 'انصراف', nbSave: 'ذخیره', nbErrSim: 'شماره موبایل بویه معتبر نیست.', nbErrRelay: 'شماره موبایل واسط معتبر نیست.', nbErrServer: 'ثبت بویه روی سرور ناموفق بود:', nbHostOnly: 'فقط میزبان می‌تواند بویه اضافه کند.', nbDefaultName: 'بویه جدید', nbNoBuoy: 'هیچ بویه‌ای انتخاب نشده است.', vbTitle: 'تایید میزبان با ایمیل', vbResend: 'ارسال مجدد کد', vbLater: 'بعداً', vbConfirm: 'تایید', vbFnProblem: 'ارتباط با سرویس تأیید برقرار نشد. بررسی کنید تابع buoy-pair در Supabase اضافه (Deploy) شده و «Enforce JWT Verification» آن خاموش باشد.', vbEmailFailed: 'ارسال ایمیل از سمت سرور ناموفق بود (تنظیمات SMTP را بررسی کنید).', vbRateLimited: 'تعداد ایمیل‌های ارسالی زیاد است؛ چند دقیقه صبر کنید و «ارسال مجدد کد» را بزنید.', cmdQueued: 'فرمان برای ارسال پیامکی به بویه در صف قرار گرفت.', cmdFailed: 'ثبت فرمان در سرور ناموفق بود.', cmdNotConnected: 'بویه هنوز متصل نیست؛ تغییر ذخیره شد ولی پیامکی برای بویه ارسال نشد.', ebRelay: 'شماره واسط اصلی', ebRelayHint: 'با تغییر این شماره، پیامکی برای اطلاع بویه ارسال می‌شود.', sysTabGeneral: 'تنظیمات', sysTabGuests: 'ورود و خروج مهمان‌ها', gsName: 'نام مهمان', gsIn: 'ورود', gsOut: 'خروج', gsDur: 'مدت', gsOnline: 'آنلاین', gsNoExit: 'بدون ثبت خروج (آخرین حضور نمایش داده شده)', gsEmpty: 'هنوز هیچ مهمانی وارد نشده است.', gsRefresh: 'به‌روزرسانی', gsLoadFail: 'دریافت فهرست ناموفق بود.', xlDownload: 'دانلود کلیه اطلاعات (Excel)', xlPreparing: 'در حال آماده‌سازی فایل…', xlDone: 'فایل دانلود شد.', xlFail: 'تهیه فایل ناموفق بود.', xlNoData: 'اطلاعاتی برای دانلود وجود ندارد.', xlCsvFallback: 'کتابخانه Excel بارگذاری نشد؛ فایل CSV (قابل‌باز شدن در Excel) دانلود شد.', xlColTime: 'زمان (محلی)', xlColUtc: 'زمان (UTC)', stPendingHost: 'در حال تایید میزبان', stPendingBuoy: 'در حال تایید بویه', stRejected: 'بویه رمز را نپذیرفت', stSmsFailed: 'ارسال پیامک به بویه ناموفق بود', nbRelayNew: 'شماره جدید…', nbPass: 'رمز بویه', nbPassHint: 'رمزی که شرکت همراه بویه به شما داده است (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrPass: 'رمز بویه معتبر نیست (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrSame: 'شماره بویه و شماره واسط نباید یکی باشند.', vbNeedNew: 'سه بار کد اشتباه بود. کد جدید به ایمیل شما ارسال شد؛ اگر دوباره اشتباه وارد کنید بویه حذف می‌شود.', vbLastRound: 'این آخرین فرصت است؛ با کد اشتباه بویه حذف می‌شود.', vbDeleted: 'کد دوباره اشتباه بود و بویه حذف شد.', vbOkPending: 'کد درست بود. پیامک اتصال برای بویه ارسال می‌شود…', vbCooldown: 'لطفاً {n} ثانیه صبر کنید.', vbResendSms: 'ارسال مجدد پیامک به بویه', vbSmsQueued: 'پیامک اتصال دوباره در صف ارسال قرار گرفت.', vbConnectedNow: 'بویه «{name}» متصل شد.', ppTitle: 'رمز بویه', ppDesc: 'رمز را دوباره وارد کنید تا پیامک اتصال دوباره ارسال شود.', ppSend: 'ارسال', rkLabel: 'کلید اتصال اپ واسط (relay_key):', rkNote: 'این کلید را در اپ واسط وارد کنید و به کسی ندهید.', rkRotate: 'ساخت کلید جدید', rkRotateAsk: 'با ساخت کلید جدید، کلید قبلی از کار می‌افتد و باید در اپ واسط عوض شود. ادامه می‌دهید؟', rkRotated: 'کلید جدید ساخته شد.', vbDesc: 'کد تأیید به ایمیل {email} ارسال شد. آن را وارد کنید.', vbSending: 'در حال ارسال کد...', vbAttempts: 'تلاش باقی‌مانده: {n}', vbWrong: 'کد اشتباه است.', vbFailed: 'سه بار کد اشتباه وارد شد؛ وضعیت بویه «متصل نشد» شد.', vbOk: 'بویه متصل شد. منتظر اولین داده می‌ماند.', vbSendFail: 'ارسال یا بررسی کد ناموفق بود. اتصال اینترنت را بررسی کنید.', vbRetry: 'تایید ایمیل (کد جدید)', vbCodeLen: 'کد را کامل وارد کنید (فقط عدد).', confirmTitle: 'تایید عملیات', confirmYes: 'بله', confirmNo: 'خیر', cfRs485On: 'آیا مطمئن هستید که سوکت روشن شود؟', cfRs485Off: 'آیا مطمئن هستید که سوکت قطع شود؟', cfDisplayOn: 'آیا مطمئن هستید که نمایشگر روشن شود؟', cfDisplayOff: 'آیا مطمئن هستید که نمایشگر خاموش شود؟', cfMissionOn: 'آیا مطمئن هستید که ماموریت فعال شود؟', cfMissionOff: 'آیا مطمئن هستید که ماموریت متوقف شود؟', refQrTitle: 'QR کد میزبان', refQrHint: 'مهمان این QR را در صفحه ورود اسکن کند.', btnScanQr: 'اسکن QR میزبان', scanTitle: 'اسکن QR میزبان', scanClose: 'بستن', scanNoCamera: 'دسترسی به دوربین ممکن نشد. اجازه دوربین را بررسی کنید.', scanSearching: 'QR را داخل کادر بگیرید...', scanBad: 'این QR مربوط به سایرا نیست.', scanNeedUsername: 'کد میزبان وارد شد؛ نام کاربری خود را بنویسید.', qrLibFail: 'کتابخانه QR بارگذاری نشد؛ اینترنت را بررسی کنید.', copyEmpty: 'چیزی برای کپی وجود ندارد.', fxTitle: 'صدا و ویبره', fxSound: 'صدای کلیدها', fxVibe: 'ویبره', bsSpecsTitle: 'مشخصات بویه', bsBuoy: 'بویه', bsRobotW: 'وزن ربات (کیلوگرم)', bsAnchorLen: 'طول لنگر (متر)', bsAnchorW: 'وزن لنگر (کیلوگرم)', msTitle: 'ماموریت', msToggle: 'انجام ماموریت', msStart: 'تاریخ و ساعت شروع', msEnd: 'تاریخ و ساعت پایان', phonesNote: 'بویه برای همه شماره‌های ثبت‌شده پیامک می‌فرستد؛ شماره ستاره‌دار «واسط اصلی» است.', phonesEmpty: 'هنوز شماره‌ای ثبت نشده است.', phoneMainTip: 'انتخاب به‌عنوان واسط اصلی', errMissionDates: 'تاریخ پایان ماموریت باید بعد از شروع باشد.', errSpecs: 'مقادیر وزن و طول باید عدد معتبر باشند.', errPhones: 'یکی از شماره‌ها معتبر نیست.', dSoon: 'به زودی', dSoonNote: 'این بخش به زودی فعال می‌شود.', dTempInOnly: 'دمای داخل', dTempIn2: 'دمای داخل (°C)', dHumIn: 'رطوبت داخل', dTempOutOnly: 'دمای بیرون', dHumOut: 'رطوبت بیرون', dHumOutAxis: 'رطوبت بیرون (%)', dNotSent: 'این مقدار هنوز از سخت‌افزار ارسال نمی‌شود.', dRobotW: 'وزن ربات', dAnchorLen: 'طول لنگر', dAnchorW: 'وزن لنگر', supWork: 'محل کار', supLeadElec: 'مسئول برق (سرپرست تیم)', supElec: 'مسئول برق', supMech: 'مسئول مکانیک', supDev: 'مسئول برنامه‌نویسی و کدنویسی', supPhone: 'شماره تماس', supGithub: 'لینک گیت‌هاب', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره', dStart: 'تاریخ شروع', dEnd: 'تاریخ پایان', dPickStart: 'روز شروع را انتخاب کنید', dPickEnd: 'روز پایان را انتخاب کنید', dSelSample: 'نمونه انتخاب‌شده', dPositions: 'موقعیت ثبت‌شده', dRadius: 'شعاع حرکت', dClearSel: 'بازگشت به آخرین نمونه', dSelectBuoy: 'انتخاب بویه', dCalendar: 'بازه تاریخ', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'برای یک روز، همان روز را دو بار انتخاب کنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
+                controlTitle: 'کنترل بویه', powerLabel: 'روشن/خاموش بویه', displayLabel: 'نمایشگر', copyCoords: 'کپی مختصات', copied: 'کپی شد', missionStateDone: 'پایان یافته', missionStateOff: 'متوقف', stPending: 'در انتظار تایید ایمیل', stFailed: 'متصل نشد', stConnected: 'متصل شده', stHasData: 'دارای داده', nbTitle: 'افزودن بویه', nbName: 'نام بویه', nbSim: 'شماره موبایل بویه', nbRelay: 'شماره موبایل واسط', nbLocHint: 'محل بویه به‌صورت خودکار از اولین موقعیتی که ارسال می‌کند مشخص می‌شود.', nbCancel: 'انصراف', nbSave: 'ذخیره', nbErrSim: 'شماره موبایل بویه معتبر نیست.', nbErrRelay: 'شماره موبایل واسط معتبر نیست.', nbErrServer: 'ثبت بویه روی سرور ناموفق بود:', nbHostOnly: 'فقط میزبان می‌تواند بویه اضافه کند.', nbDefaultName: 'بویه جدید', nbNoBuoy: 'هیچ بویه‌ای انتخاب نشده است.', vbTitle: 'تایید میزبان با ایمیل', vbResend: 'ارسال مجدد کد', vbLater: 'بعداً', vbConfirm: 'تایید', cmdWaitBuoy: 'منتظر تأیید بویه…', cmdPendingPill: 'در انتظار تأیید بویه ({n})…', cmdAcked: 'بویه تأیید کرد؛ تغییر اعمال شد.', cmdAckedLate: 'بویه با تأخیر تأیید کرد؛ تغییر اعمال شد.', cmdRejected: 'بویه فرمان را نپذیرفت؛ تغییری اعمال نشد.', cmdSmsFailed: 'ارسال پیامک از گوشی واسط ناموفق بود؛ تغییری اعمال نشد.', cmdTimeout: 'بویه تأیید نکرد؛ تغییری اعمال نشد. دوباره تلاش کنید.', alLeakTitle: 'هشدار نشتی آب!', alBatTitle: 'هشدار باتری کم!', alBuoy: 'بویه', alTime: 'زمان', alPos: 'آخرین موقعیت', alVolt: 'ولتاژ باتری', alTemp: 'دمای بیرون', alHum: 'رطوبت داخل', alRssi: 'سیگنال', alLeakNote: 'نشتی آب در بویه تشخیص داده شد و بویه خاموش شد. لطفاً هرچه زودتر برای برداشتن بویه اقدام کنید.', alBatNote: 'ولتاژ باتری بویه به زیر ۶ ولت رسید و بویه خاموش شد. لطفاً برای برداشتن یا شارژ آن اقدام کنید.', alAck: 'دیدم؛ توقف هشدار', alEnableNotif: 'فعال‌سازی اعلان‌ها', alNotifBlocked: 'اعلان‌ها در مرورگر مسدود است؛ فقط صدا و لرزش فعال است.', alNotifBody: '{id} ({name}) — برنامه را باز کنید و هشدار را تأیید کنید.', vbFnProblem: 'ارتباط با سرویس تأیید برقرار نشد. بررسی کنید تابع buoy-pair در Supabase اضافه (Deploy) شده و «Enforce JWT Verification» آن خاموش باشد.', vbEmailFailed: 'ارسال ایمیل از سمت سرور ناموفق بود (تنظیمات SMTP را بررسی کنید).', vbRateLimited: 'تعداد ایمیل‌های ارسالی زیاد است؛ چند دقیقه صبر کنید و «ارسال مجدد کد» را بزنید.', cmdQueued: 'فرمان برای ارسال پیامکی به بویه در صف قرار گرفت.', cmdFailed: 'ثبت فرمان در سرور ناموفق بود.', cmdNotConnected: 'بویه هنوز متصل نیست؛ تغییر ذخیره شد ولی پیامکی برای بویه ارسال نشد.', ebRelay: 'شماره واسط اصلی', ebRelayHint: 'با تغییر این شماره، پیامکی برای اطلاع بویه ارسال می‌شود.', sysTabGeneral: 'تنظیمات', sysTabGuests: 'ورود و خروج مهمان‌ها', gsName: 'نام مهمان', gsIn: 'ورود', gsOut: 'خروج', gsDur: 'مدت', gsOnline: 'آنلاین', gsNoExit: 'بدون ثبت خروج (آخرین حضور نمایش داده شده)', gsEmpty: 'هنوز هیچ مهمانی وارد نشده است.', gsRefresh: 'به‌روزرسانی', gsLoadFail: 'دریافت فهرست ناموفق بود.', xlDownload: 'دانلود کلیه اطلاعات (Excel)', xlPreparing: 'در حال آماده‌سازی فایل…', xlDone: 'فایل دانلود شد.', xlFail: 'تهیه فایل ناموفق بود.', xlNoData: 'اطلاعاتی برای دانلود وجود ندارد.', xlCsvFallback: 'کتابخانه Excel بارگذاری نشد؛ فایل CSV (قابل‌باز شدن در Excel) دانلود شد.', xlColTime: 'زمان (محلی)', xlColUtc: 'زمان (UTC)', stPendingHost: 'در حال تایید میزبان', stPendingBuoy: 'در حال تایید بویه', stRejected: 'بویه رمز را نپذیرفت', stSmsFailed: 'ارسال پیامک به بویه ناموفق بود', nbRelayNew: 'شماره جدید…', nbPass: 'رمز بویه', nbPassHint: 'رمزی که شرکت همراه بویه به شما داده است (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrPass: 'رمز بویه معتبر نیست (۴ تا ۱۶ حرف یا عدد انگلیسی).', nbErrSame: 'شماره بویه و شماره واسط نباید یکی باشند.', vbNeedNew: 'سه بار کد اشتباه بود. کد جدید به ایمیل شما ارسال شد؛ اگر دوباره اشتباه وارد کنید بویه حذف می‌شود.', vbLastRound: 'این آخرین فرصت است؛ با کد اشتباه بویه حذف می‌شود.', vbDeleted: 'کد دوباره اشتباه بود و بویه حذف شد.', vbOkPending: 'کد درست بود. پیامک اتصال برای بویه ارسال می‌شود…', vbCooldown: 'لطفاً {n} ثانیه صبر کنید.', vbResendSms: 'ارسال مجدد پیامک به بویه', vbSmsQueued: 'پیامک اتصال دوباره در صف ارسال قرار گرفت.', vbConnectedNow: 'بویه «{name}» متصل شد.', ppTitle: 'رمز بویه', ppDesc: 'رمز را دوباره وارد کنید تا پیامک اتصال دوباره ارسال شود.', ppSend: 'ارسال', rkLabel: 'کلید اتصال اپ واسط (relay_key):', rkNote: 'این کلید را در اپ واسط وارد کنید و به کسی ندهید.', rkRotate: 'ساخت کلید جدید', rkRotateAsk: 'با ساخت کلید جدید، کلید قبلی از کار می‌افتد و باید در اپ واسط عوض شود. ادامه می‌دهید؟', rkRotated: 'کلید جدید ساخته شد.', vbDesc: 'کد تأیید به ایمیل {email} ارسال شد. آن را وارد کنید.', vbSending: 'در حال ارسال کد...', vbAttempts: 'تلاش باقی‌مانده: {n}', vbWrong: 'کد اشتباه است.', vbFailed: 'سه بار کد اشتباه وارد شد؛ وضعیت بویه «متصل نشد» شد.', vbOk: 'بویه متصل شد. منتظر اولین داده می‌ماند.', vbSendFail: 'ارسال یا بررسی کد ناموفق بود. اتصال اینترنت را بررسی کنید.', vbRetry: 'تایید ایمیل (کد جدید)', vbCodeLen: 'کد را کامل وارد کنید (فقط عدد).', confirmTitle: 'تایید عملیات', confirmYes: 'بله', confirmNo: 'خیر', cfRs485On: 'آیا مطمئن هستید که سوکت روشن شود؟', cfRs485Off: 'آیا مطمئن هستید که سوکت قطع شود؟', cfDisplayOn: 'آیا مطمئن هستید که نمایشگر روشن شود؟', cfDisplayOff: 'آیا مطمئن هستید که نمایشگر خاموش شود؟', cfMissionOn: 'آیا مطمئن هستید که ماموریت فعال شود؟', cfMissionOff: 'آیا مطمئن هستید که ماموریت متوقف شود؟', refQrTitle: 'QR کد میزبان', refQrHint: 'مهمان این QR را در صفحه ورود اسکن کند.', btnScanQr: 'اسکن QR میزبان', scanTitle: 'اسکن QR میزبان', scanClose: 'بستن', scanNoCamera: 'دسترسی به دوربین ممکن نشد. اجازه دوربین را بررسی کنید.', scanSearching: 'QR را داخل کادر بگیرید...', scanBad: 'این QR مربوط به سایرا نیست.', scanNeedUsername: 'کد میزبان وارد شد؛ نام کاربری خود را بنویسید.', qrLibFail: 'کتابخانه QR بارگذاری نشد؛ اینترنت را بررسی کنید.', copyEmpty: 'چیزی برای کپی وجود ندارد.', fxTitle: 'صدا و ویبره', fxSound: 'صدای کلیدها', fxVibe: 'ویبره', bsSpecsTitle: 'مشخصات بویه', bsBuoy: 'بویه', bsRobotW: 'وزن ربات (کیلوگرم)', bsAnchorLen: 'طول لنگر (متر)', bsAnchorW: 'وزن لنگر (کیلوگرم)', msTitle: 'ماموریت', msToggle: 'انجام ماموریت', msStart: 'تاریخ و ساعت شروع', msEnd: 'تاریخ و ساعت پایان', phonesNote: 'بویه برای همه شماره‌های ثبت‌شده پیامک می‌فرستد؛ شماره ستاره‌دار «واسط اصلی» است.', phonesEmpty: 'هنوز شماره‌ای ثبت نشده است.', phoneMainTip: 'انتخاب به‌عنوان واسط اصلی', errMissionDates: 'تاریخ پایان ماموریت باید بعد از شروع باشد.', errSpecs: 'مقادیر وزن و طول باید عدد معتبر باشند.', errPhones: 'یکی از شماره‌ها معتبر نیست.', dSoon: 'به زودی', dSoonNote: 'این بخش به زودی فعال می‌شود.', dTempInOnly: 'دمای داخل', dTempIn2: 'دمای داخل (°C)', dHumIn: 'رطوبت داخل', dTempOutOnly: 'دمای بیرون', dHumOut: 'رطوبت بیرون', dHumOutAxis: 'رطوبت بیرون (%)', dNotSent: 'این مقدار هنوز از سخت‌افزار ارسال نمی‌شود.', dRobotW: 'وزن ربات', dAnchorLen: 'طول لنگر', dAnchorW: 'وزن لنگر', supWork: 'محل کار', supLeadElec: 'مسئول برق (سرپرست تیم)', supElec: 'مسئول برق', supMech: 'مسئول مکانیک', supDev: 'مسئول برنامه‌نویسی و کدنویسی', supPhone: 'شماره تماس', supGithub: 'لینک گیت‌هاب', popBattery: 'باتری', popTemp: 'دما و رطوبت', popTempIn: 'داخل', popTempOut: 'بیرون', popSignal: 'سیگنال GSM / GPS', popLeak: 'نشتی آب', popMore: 'اطلاعات بیشتر', menuFleetCount: 'تعداد بویه‌ها (افزودن / ویرایش / حذف)', menuFleetDetail: 'اطلاعات جامع هر بویه', menuSettingsSystem: 'تنظیمات سیستم', menuSettingsBuoys: 'تنظیمات بویه‌ها', btnSaveSys: 'ذخیره', dStart: 'تاریخ شروع', dEnd: 'تاریخ پایان', dPickStart: 'روز شروع را انتخاب کنید', dPickEnd: 'روز پایان را انتخاب کنید', dSelSample: 'نمونه انتخاب‌شده', dPositions: 'موقعیت ثبت‌شده', dRadius: 'شعاع حرکت', dClearSel: 'بازگشت به آخرین نمونه', dSelectBuoy: 'انتخاب بویه', dCalendar: 'بازه تاریخ', dTimeFrom: 'از ساعت', dTimeTo: 'تا ساعت', dLive: 'آخرین اطلاعات', dRangeLive: 'آخرین اطلاعات (۷ روز اخیر)', dToday: 'امروز', dYesterday: 'دیروز', d7: '۷ روز اخیر', d30: '۳۰ روز اخیر', dCalHint: 'برای یک روز، همان روز را دو بار انتخاب کنید.', dFilteredBanner: 'مقادیر و نمودارها مربوط به بازه انتخابی هستند؛ صفحه اصلی همچنان آخرین اطلاعات بویه را نشان می‌دهد.', dNoData: 'در این بازه داده‌ای ثبت نشده است.', dNoDataLive: 'هنوز داده‌ای برای ۷ روز اخیر ثبت نشده است.', dRecords: 'رکورد', dLoading: 'در حال بارگذاری...', dSrcServer: 'منبع: سرور', dSrcCache: 'منبع: حافظه این دستگاه', dLocTitle: 'موقعیت جغرافیایی بویه', dLocNone: 'موقعیتی ثبت نشده', dLastUpdate: 'آخرین به‌روزرسانی', dSampleTime: 'آخرین نمونه بازه', dPlace: 'محل استقرار', dPart: 'پارت نامبر', dNoBuoys: 'هیچ بویه‌ای ثبت نشده است.', dBat: 'باتری', dSolar: 'ولتاژ خورشیدی', dCurr: 'جریان', dGsm: 'سیگنال GSM', dGps: 'GPS', dPos: 'موقعیت', dTempIn: 'دما و رطوبت داخل', dTempOut: 'دما و رطوبت بیرون', dLeak: 'نشتی آب', dVolt: 'ولتاژ (V)', dSoc: 'شارژ (%)', dAlt: 'ارتفاع (m)', dDrift: 'جابه‌جایی از اولین نقطه (m)', dHum: 'رطوبت داخل (%)', dTemp: 'دمای بیرون (°C)', dLeakAxis: 'نشتی (۱ = دارد)',
                 mapTitle: 'نقشه زنده',
                 mapHint: 'روی هر بویه کلیک کنید تا انتخاب شود',
                 quickSwitchLabel: 'سوییچ سریع:',
@@ -2582,7 +2605,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'Body Socket RS485-E',
                 rs485On: 'ON',
                 rs485Off: 'OFF',
-                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', missionStateDone: 'Finished', missionStateOff: 'Stopped', stPending: 'Awaiting email confirmation', stFailed: 'Not connected', stConnected: 'Connected', stHasData: 'Has data', nbTitle: 'Add Buoy', nbName: 'Buoy name', nbSim: 'Buoy mobile number', nbRelay: 'Relay mobile number', nbLocHint: 'The buoy location is detected automatically from the first position it sends.', nbCancel: 'Cancel', nbSave: 'Save', nbErrSim: 'The buoy mobile number is not valid.', nbErrRelay: 'The relay mobile number is not valid.', nbErrServer: 'Could not register the buoy on the server:', nbHostOnly: 'Only the host can add a buoy.', nbDefaultName: 'New buoy', nbNoBuoy: 'No buoy selected.', vbTitle: 'Host email confirmation', vbResend: 'Resend code', vbLater: 'Later', vbConfirm: 'Confirm', vbFnProblem: 'Could not reach the confirmation service. Check that the buoy-pair function is deployed in Supabase and its "Enforce JWT Verification" is off.', vbEmailFailed: 'The server could not send the email (check the SMTP settings).', vbRateLimited: 'Too many emails were sent; wait a few minutes and press "Resend code".', cmdQueued: 'The command was queued to be sent to the buoy by SMS.', cmdFailed: 'Could not register the command on the server.', cmdNotConnected: 'The buoy is not connected yet; the change was saved but no SMS was sent to the buoy.', ebRelay: 'Main relay number', ebRelayHint: 'When this number changes, an SMS is sent to tell the buoy.', sysTabGeneral: 'Settings', sysTabGuests: 'Guest logins and exits', gsName: 'Guest name', gsIn: 'Login', gsOut: 'Exit', gsDur: 'Duration', gsOnline: 'Online', gsNoExit: 'No exit recorded (last seen time shown)', gsEmpty: 'No guest has logged in yet.', gsRefresh: 'Refresh', gsLoadFail: 'Could not load the list.', xlDownload: 'Download all data (Excel)', xlPreparing: 'Preparing the file…', xlDone: 'File downloaded.', xlFail: 'Could not create the file.', xlNoData: 'There is no data to download.', xlCsvFallback: 'The Excel library did not load; a CSV file (opens in Excel) was downloaded.', xlColTime: 'Time (local)', xlColUtc: 'Time (UTC)', stPendingHost: 'Confirming host', stPendingBuoy: 'Confirming buoy', stRejected: 'Buoy rejected the password', stSmsFailed: 'SMS to the buoy failed', nbRelayNew: 'New number…', nbPass: 'Buoy password', nbPassHint: 'The password the company gave you with the buoy (4-16 English letters or digits).', nbErrPass: 'The buoy password is not valid (4-16 English letters or digits).', nbErrSame: 'The buoy number and the relay number must be different.', vbNeedNew: 'Three wrong codes. A new code was emailed to you; another wrong code will delete the buoy.', vbLastRound: 'This is the last chance; a wrong code will delete the buoy.', vbDeleted: 'Wrong code again, the buoy was deleted.', vbOkPending: 'Code accepted. The pairing SMS is being sent to the buoy…', vbCooldown: 'Please wait {n} seconds.', vbResendSms: 'Resend SMS to buoy', vbSmsQueued: 'The pairing SMS was queued again.', vbConnectedNow: 'Buoy "{name}" is connected.', ppTitle: 'Buoy password', ppDesc: 'Enter the password again to resend the pairing SMS.', ppSend: 'Send', rkLabel: 'Relay app key (relay_key):', rkNote: 'Enter this key in the relay app and do not share it.', rkRotate: 'Generate new key', rkRotateAsk: 'Generating a new key disables the old one; you must update the relay app. Continue?', rkRotated: 'New key generated.', vbDesc: 'A confirmation code was sent to {email}. Enter it below.', vbSending: 'Sending code...', vbAttempts: 'Attempts left: {n}', vbWrong: 'Wrong code.', vbFailed: 'Three wrong codes: the buoy is now “Not connected”.', vbOk: 'Buoy connected. Waiting for its first data.', vbSendFail: 'Could not send or check the code. Check your connection.', vbRetry: 'Confirm email (new code)', vbCodeLen: 'Enter the full code (digits only).', confirmTitle: 'Confirm action', confirmYes: 'Yes', confirmNo: 'No', cfRs485On: 'Are you sure you want to switch the socket on?', cfRs485Off: 'Are you sure you want to switch the socket off?', cfDisplayOn: 'Are you sure you want to turn the display on?', cfDisplayOff: 'Are you sure you want to turn the display off?', cfMissionOn: 'Are you sure you want to start the mission?', cfMissionOff: 'Are you sure you want to stop the mission?', refQrTitle: 'Host QR', refQrHint: 'The guest scans this QR on the login page.', btnScanQr: 'Scan host QR', scanTitle: 'Scan host QR', scanClose: 'Close', scanNoCamera: 'Camera unavailable. Check the camera permission.', scanSearching: 'Point the camera at the QR...', scanBad: 'This QR is not from SAYRA.', scanNeedUsername: 'Host code filled in; type your username.', qrLibFail: 'QR library did not load; check your connection.', copyEmpty: 'Nothing to copy.', fxTitle: 'Sound & vibration', fxSound: 'Button sounds', fxVibe: 'Vibration', bsSpecsTitle: 'Buoy specifications', bsBuoy: 'Buoy', bsRobotW: 'Robot weight (kg)', bsAnchorLen: 'Anchor length (m)', bsAnchorW: 'Anchor weight (kg)', msTitle: 'Mission', msToggle: 'Run mission', msStart: 'Start date & time', msEnd: 'End date & time', phonesNote: 'The buoy sends an SMS to every saved number; the starred number is the main relay.', phonesEmpty: 'No numbers saved yet.', phoneMainTip: 'Set as main relay', errMissionDates: 'Mission end must be after its start.', errSpecs: 'Weight and length must be valid numbers.', errPhones: 'One of the numbers is not valid.', dSoon: 'Coming soon', dSoonNote: 'This section will be available soon.', dTempInOnly: 'Inside temperature', dTempIn2: 'Inside temp (°C)', dHumIn: 'Inside humidity', dTempOutOnly: 'Outside temperature', dHumOut: 'Outside humidity', dHumOutAxis: 'Outside humidity (%)', dNotSent: 'The hardware does not send this value yet.', dRobotW: 'Robot weight', dAnchorLen: 'Anchor length', dAnchorW: 'Anchor weight', supWork: 'Workplace', supLeadElec: 'Electrical lead (team supervisor)', supElec: 'Electrical', supMech: 'Mechanical', supDev: 'Programming & coding', supPhone: 'Phone', supGithub: 'GitHub', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save', dStart: 'Start date', dEnd: 'End date', dPickStart: 'Pick the start day', dPickEnd: 'Pick the end day', dSelSample: 'Selected sample', dPositions: 'positions', dRadius: 'Drift radius', dClearSel: 'Back to latest sample', dSelectBuoy: 'Select buoy', dCalendar: 'Date range', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'For a single day, pick the same day twice.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
+                controlTitle: 'Buoy control', powerLabel: 'Buoy power', displayLabel: 'Display', copyCoords: 'Copy coordinates', copied: 'Copied', missionStateDone: 'Finished', missionStateOff: 'Stopped', stPending: 'Awaiting email confirmation', stFailed: 'Not connected', stConnected: 'Connected', stHasData: 'Has data', nbTitle: 'Add Buoy', nbName: 'Buoy name', nbSim: 'Buoy mobile number', nbRelay: 'Relay mobile number', nbLocHint: 'The buoy location is detected automatically from the first position it sends.', nbCancel: 'Cancel', nbSave: 'Save', nbErrSim: 'The buoy mobile number is not valid.', nbErrRelay: 'The relay mobile number is not valid.', nbErrServer: 'Could not register the buoy on the server:', nbHostOnly: 'Only the host can add a buoy.', nbDefaultName: 'New buoy', nbNoBuoy: 'No buoy selected.', vbTitle: 'Host email confirmation', vbResend: 'Resend code', vbLater: 'Later', vbConfirm: 'Confirm', cloudNotConfigured: 'Server is not configured yet', cloudOnlineSynced: 'Connected and synced with the server', cloudOfflineCache: 'Offline - showing local cache', cmdWaitBuoy: 'Waiting for buoy…', cmdPendingPill: 'Waiting for buoy confirmation ({n})…', cmdAcked: 'The buoy confirmed; the change is applied.', cmdAckedLate: 'The buoy confirmed late; the change is applied.', cmdRejected: 'The buoy rejected the command; nothing was changed.', cmdSmsFailed: 'The relay phone could not send the SMS; nothing was changed.', cmdTimeout: 'The buoy did not confirm; nothing was changed. Please try again.', alLeakTitle: 'Water leak alert!', alBatTitle: 'Low battery alert!', alBuoy: 'Buoy', alTime: 'Time', alPos: 'Last position', alVolt: 'Battery voltage', alTemp: 'Outside temp', alHum: 'Inside humidity', alRssi: 'Signal', alLeakNote: 'A water leak was detected and the buoy shut itself down. Please recover the buoy as soon as possible.', alBatNote: 'The battery dropped below 6 V and the buoy shut itself down. Please recover or recharge it.', alAck: 'Seen, stop the alarm', alEnableNotif: 'Enable notifications', alNotifBlocked: 'Notifications are blocked in the browser; only sound and vibration are active.', alNotifBody: '{id} ({name}) - open the app and acknowledge the alert.', vbFnProblem: 'Could not reach the confirmation service. Check that the buoy-pair function is deployed in Supabase and its "Enforce JWT Verification" is off.', vbEmailFailed: 'The server could not send the email (check the SMTP settings).', vbRateLimited: 'Too many emails were sent; wait a few minutes and press "Resend code".', cmdQueued: 'The command was queued to be sent to the buoy by SMS.', cmdFailed: 'Could not register the command on the server.', cmdNotConnected: 'The buoy is not connected yet; the change was saved but no SMS was sent to the buoy.', ebRelay: 'Main relay number', ebRelayHint: 'When this number changes, an SMS is sent to tell the buoy.', sysTabGeneral: 'Settings', sysTabGuests: 'Guest logins and exits', gsName: 'Guest name', gsIn: 'Login', gsOut: 'Exit', gsDur: 'Duration', gsOnline: 'Online', gsNoExit: 'No exit recorded (last seen time shown)', gsEmpty: 'No guest has logged in yet.', gsRefresh: 'Refresh', gsLoadFail: 'Could not load the list.', xlDownload: 'Download all data (Excel)', xlPreparing: 'Preparing the file…', xlDone: 'File downloaded.', xlFail: 'Could not create the file.', xlNoData: 'There is no data to download.', xlCsvFallback: 'The Excel library did not load; a CSV file (opens in Excel) was downloaded.', xlColTime: 'Time (local)', xlColUtc: 'Time (UTC)', stPendingHost: 'Confirming host', stPendingBuoy: 'Confirming buoy', stRejected: 'Buoy rejected the password', stSmsFailed: 'SMS to the buoy failed', nbRelayNew: 'New number…', nbPass: 'Buoy password', nbPassHint: 'The password the company gave you with the buoy (4-16 English letters or digits).', nbErrPass: 'The buoy password is not valid (4-16 English letters or digits).', nbErrSame: 'The buoy number and the relay number must be different.', vbNeedNew: 'Three wrong codes. A new code was emailed to you; another wrong code will delete the buoy.', vbLastRound: 'This is the last chance; a wrong code will delete the buoy.', vbDeleted: 'Wrong code again, the buoy was deleted.', vbOkPending: 'Code accepted. The pairing SMS is being sent to the buoy…', vbCooldown: 'Please wait {n} seconds.', vbResendSms: 'Resend SMS to buoy', vbSmsQueued: 'The pairing SMS was queued again.', vbConnectedNow: 'Buoy "{name}" is connected.', ppTitle: 'Buoy password', ppDesc: 'Enter the password again to resend the pairing SMS.', ppSend: 'Send', rkLabel: 'Relay app key (relay_key):', rkNote: 'Enter this key in the relay app and do not share it.', rkRotate: 'Generate new key', rkRotateAsk: 'Generating a new key disables the old one; you must update the relay app. Continue?', rkRotated: 'New key generated.', vbDesc: 'A confirmation code was sent to {email}. Enter it below.', vbSending: 'Sending code...', vbAttempts: 'Attempts left: {n}', vbWrong: 'Wrong code.', vbFailed: 'Three wrong codes: the buoy is now “Not connected”.', vbOk: 'Buoy connected. Waiting for its first data.', vbSendFail: 'Could not send or check the code. Check your connection.', vbRetry: 'Confirm email (new code)', vbCodeLen: 'Enter the full code (digits only).', confirmTitle: 'Confirm action', confirmYes: 'Yes', confirmNo: 'No', cfRs485On: 'Are you sure you want to switch the socket on?', cfRs485Off: 'Are you sure you want to switch the socket off?', cfDisplayOn: 'Are you sure you want to turn the display on?', cfDisplayOff: 'Are you sure you want to turn the display off?', cfMissionOn: 'Are you sure you want to start the mission?', cfMissionOff: 'Are you sure you want to stop the mission?', refQrTitle: 'Host QR', refQrHint: 'The guest scans this QR on the login page.', btnScanQr: 'Scan host QR', scanTitle: 'Scan host QR', scanClose: 'Close', scanNoCamera: 'Camera unavailable. Check the camera permission.', scanSearching: 'Point the camera at the QR...', scanBad: 'This QR is not from SAYRA.', scanNeedUsername: 'Host code filled in; type your username.', qrLibFail: 'QR library did not load; check your connection.', copyEmpty: 'Nothing to copy.', fxTitle: 'Sound & vibration', fxSound: 'Button sounds', fxVibe: 'Vibration', bsSpecsTitle: 'Buoy specifications', bsBuoy: 'Buoy', bsRobotW: 'Robot weight (kg)', bsAnchorLen: 'Anchor length (m)', bsAnchorW: 'Anchor weight (kg)', msTitle: 'Mission', msToggle: 'Run mission', msStart: 'Start date & time', msEnd: 'End date & time', phonesNote: 'The buoy sends an SMS to every saved number; the starred number is the main relay.', phonesEmpty: 'No numbers saved yet.', phoneMainTip: 'Set as main relay', errMissionDates: 'Mission end must be after its start.', errSpecs: 'Weight and length must be valid numbers.', errPhones: 'One of the numbers is not valid.', dSoon: 'Coming soon', dSoonNote: 'This section will be available soon.', dTempInOnly: 'Inside temperature', dTempIn2: 'Inside temp (°C)', dHumIn: 'Inside humidity', dTempOutOnly: 'Outside temperature', dHumOut: 'Outside humidity', dHumOutAxis: 'Outside humidity (%)', dNotSent: 'The hardware does not send this value yet.', dRobotW: 'Robot weight', dAnchorLen: 'Anchor length', dAnchorW: 'Anchor weight', supWork: 'Workplace', supLeadElec: 'Electrical lead (team supervisor)', supElec: 'Electrical', supMech: 'Mechanical', supDev: 'Programming & coding', supPhone: 'Phone', supGithub: 'GitHub', popBattery: 'Battery', popTemp: 'Temp & humidity', popTempIn: 'In', popTempOut: 'Out', popSignal: 'GSM / GPS signal', popLeak: 'Water leak', popMore: 'More data', menuFleetCount: 'Buoy count (add / edit / remove)', menuFleetDetail: 'Comprehensive buoy info', menuSettingsSystem: 'System settings', menuSettingsBuoys: 'Buoy settings', btnSaveSys: 'Save', dStart: 'Start date', dEnd: 'End date', dPickStart: 'Pick the start day', dPickEnd: 'Pick the end day', dSelSample: 'Selected sample', dPositions: 'positions', dRadius: 'Drift radius', dClearSel: 'Back to latest sample', dSelectBuoy: 'Select buoy', dCalendar: 'Date range', dTimeFrom: 'From time', dTimeTo: 'To time', dLive: 'Latest data', dRangeLive: 'Latest data (last 7 days)', dToday: 'Today', dYesterday: 'Yesterday', d7: 'Last 7 days', d30: 'Last 30 days', dCalHint: 'For a single day, pick the same day twice.', dFilteredBanner: 'Values and charts show the selected period; the dashboard still shows the buoy’s latest data.', dNoData: 'No data recorded in this period.', dNoDataLive: 'No data recorded in the last 7 days yet.', dRecords: 'records', dLoading: 'Loading...', dSrcServer: 'Source: server', dSrcCache: 'Source: this device', dLocTitle: 'Buoy location', dLocNone: 'No location recorded', dLastUpdate: 'Last update', dSampleTime: 'Last sample in period', dPlace: 'Location', dPart: 'Part number', dNoBuoys: 'No buoys registered.', dBat: 'Battery', dSolar: 'Solar voltage', dCurr: 'Current', dGsm: 'GSM signal', dGps: 'GPS', dPos: 'Position', dTempIn: 'Inside temp & humidity', dTempOut: 'Outside temp & humidity', dLeak: 'Water leak', dVolt: 'Voltage (V)', dSoc: 'Charge (%)', dAlt: 'Altitude (m)', dDrift: 'Drift from first point (m)', dHum: 'Inside humidity (%)', dTemp: 'Outside temp (°C)', dLeakAxis: 'Leak (1 = yes)',
                 mapTitle: 'Live Map',
                 mapHint: 'Click any buoy on map to select',
                 quickSwitchLabel: 'Quick switch:',
@@ -2709,7 +2732,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 rs485: 'مقبس الهيكل RS485-E',
                 rs485On: 'متصل',
                 rs485Off: 'مقطوع',
-                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', missionStateDone: 'منتهية', missionStateOff: 'متوقفة', stPending: 'بانتظار تأكيد البريد', stFailed: 'لم يتصل', stConnected: 'متصل', stHasData: 'يحتوي بيانات', nbTitle: 'إضافة عوامة', nbName: 'اسم العوامة', nbSim: 'رقم جوال العوامة', nbRelay: 'رقم جوال الوسيط', nbLocHint: 'يُحدَّد موقع العوامة تلقائيًا من أول موقع ترسله.', nbCancel: 'إلغاء', nbSave: 'حفظ', nbErrSim: 'رقم جوال العوامة غير صالح.', nbErrRelay: 'رقم جوال الوسيط غير صالح.', nbErrServer: 'تعذّر تسجيل العوامة على الخادم:', nbHostOnly: 'يمكن للمضيف فقط إضافة عوامة.', nbDefaultName: 'عوامة جديدة', nbNoBuoy: 'لم تُحدَّد عوامة.', vbTitle: 'تأكيد المضيف بالبريد', vbResend: 'إعادة إرسال الرمز', vbLater: 'لاحقًا', vbConfirm: 'تأكيد', vbFnProblem: 'تعذّر الاتصال بخدمة التأكيد. تحقق من نشر الدالة buoy-pair في Supabase وإيقاف "Enforce JWT Verification".', vbEmailFailed: 'تعذّر على الخادم إرسال البريد (تحقق من إعدادات SMTP).', vbRateLimited: 'عدد رسائل البريد المرسلة كبير؛ انتظر بضع دقائق ثم اضغط "إعادة إرسال الرمز".', cmdQueued: 'تمت إضافة الأمر إلى قائمة الإرسال إلى العوامة برسالة نصية.', cmdFailed: 'تعذّر تسجيل الأمر على الخادم.', cmdNotConnected: 'العوامة غير متصلة بعد؛ تم حفظ التغيير لكن لم تُرسل رسالة إلى العوامة.', ebRelay: 'رقم الوسيط الرئيسي', ebRelayHint: 'عند تغيير هذا الرقم تُرسل رسالة لإعلام العوامة.', sysTabGeneral: 'الإعدادات', sysTabGuests: 'دخول وخروج الضيوف', gsName: 'اسم الضيف', gsIn: 'الدخول', gsOut: 'الخروج', gsDur: 'المدة', gsOnline: 'متصل', gsNoExit: 'لم يُسجَّل خروج (يظهر وقت آخر تواجد)', gsEmpty: 'لم يدخل أي ضيف بعد.', gsRefresh: 'تحديث', gsLoadFail: 'تعذّر تحميل القائمة.', xlDownload: 'تنزيل كل البيانات (Excel)', xlPreparing: 'جارٍ تجهيز الملف…', xlDone: 'تم تنزيل الملف.', xlFail: 'تعذّر إنشاء الملف.', xlNoData: 'لا توجد بيانات للتنزيل.', xlCsvFallback: 'لم يتم تحميل مكتبة Excel؛ تم تنزيل ملف CSV (يُفتح في Excel).', xlColTime: 'الوقت (محلي)', xlColUtc: 'الوقت (UTC)', stPendingHost: 'جارٍ تأكيد المضيف', stPendingBuoy: 'جارٍ تأكيد العوامة', stRejected: 'رفضت العوامة كلمة المرور', stSmsFailed: 'فشل إرسال الرسالة إلى العوامة', nbRelayNew: 'رقم جديد…', nbPass: 'كلمة مرور العوامة', nbPassHint: 'كلمة المرور التي أعطتك إياها الشركة مع العوامة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrPass: 'كلمة مرور العوامة غير صالحة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrSame: 'يجب أن يختلف رقم العوامة عن رقم الوسيط.', vbNeedNew: 'ثلاث محاولات خاطئة. أُرسل رمز جديد إلى بريدك؛ أي رمز خاطئ آخر سيحذف العوامة.', vbLastRound: 'هذه الفرصة الأخيرة؛ الرمز الخاطئ سيحذف العوامة.', vbDeleted: 'الرمز خاطئ مرة أخرى وتم حذف العوامة.', vbOkPending: 'الرمز صحيح. جارٍ إرسال رسالة الربط إلى العوامة…', vbCooldown: 'يرجى الانتظار {n} ثانية.', vbResendSms: 'إعادة إرسال الرسالة إلى العوامة', vbSmsQueued: 'أُعيدت رسالة الربط إلى قائمة الإرسال.', vbConnectedNow: 'تم ربط العوامة «{name}».', ppTitle: 'كلمة مرور العوامة', ppDesc: 'أدخل كلمة المرور مرة أخرى لإعادة إرسال رسالة الربط.', ppSend: 'إرسال', rkLabel: 'مفتاح تطبيق الوسيط (relay_key):', rkNote: 'أدخل هذا المفتاح في تطبيق الوسيط ولا تشاركه مع أحد.', rkRotate: 'إنشاء مفتاح جديد', rkRotateAsk: 'إنشاء مفتاح جديد يعطّل القديم، وعليك تحديثه في تطبيق الوسيط. هل تتابع؟', rkRotated: 'تم إنشاء مفتاح جديد.', vbDesc: 'تم إرسال رمز التأكيد إلى {email}. أدخله أدناه.', vbSending: 'جارٍ إرسال الرمز...', vbAttempts: 'المحاولات المتبقية: {n}', vbWrong: 'الرمز غير صحيح.', vbFailed: 'ثلاث محاولات خاطئة: أصبحت العوامة «لم يتصل».', vbOk: 'تم ربط العوامة. بانتظار أول بيانات.', vbSendFail: 'تعذّر إرسال الرمز أو التحقق منه. تحقق من الاتصال.', vbRetry: 'تأكيد البريد (رمز جديد)', vbCodeLen: 'أدخل الرمز كاملاً (أرقام فقط).', confirmTitle: 'تأكيد العملية', confirmYes: 'نعم', confirmNo: 'لا', cfRs485On: 'هل أنت متأكد من تشغيل المقبس؟', cfRs485Off: 'هل أنت متأكد من فصل المقبس؟', cfDisplayOn: 'هل أنت متأكد من تشغيل الشاشة؟', cfDisplayOff: 'هل أنت متأكد من إطفاء الشاشة؟', cfMissionOn: 'هل أنت متأكد من بدء المهمة؟', cfMissionOff: 'هل أنت متأكد من إيقاف المهمة؟', refQrTitle: 'رمز QR للمضيف', refQrHint: 'يمسح الضيف هذا الرمز في صفحة الدخول.', btnScanQr: 'مسح QR المضيف', scanTitle: 'مسح QR المضيف', scanClose: 'إغلاق', scanNoCamera: 'الكاميرا غير متاحة. تحقق من إذن الكاميرا.', scanSearching: 'وجّه الكاميرا نحو الرمز...', scanBad: 'هذا الرمز ليس من سايرا.', scanNeedUsername: 'تم إدخال رمز المضيف؛ اكتب اسم المستخدم.', qrLibFail: 'لم تُحمَّل مكتبة QR؛ تحقق من الاتصال.', copyEmpty: 'لا يوجد ما يُنسخ.', fxTitle: 'الصوت والاهتزاز', fxSound: 'أصوات الأزرار', fxVibe: 'الاهتزاز', bsSpecsTitle: 'مواصفات العوامة', bsBuoy: 'العوامة', bsRobotW: 'وزن الروبوت (كغ)', bsAnchorLen: 'طول المرساة (م)', bsAnchorW: 'وزن المرساة (كغ)', msTitle: 'المهمة', msToggle: 'تنفيذ المهمة', msStart: 'تاريخ ووقت البداية', msEnd: 'تاريخ ووقت النهاية', phonesNote: 'ترسل العوامة رسالة إلى كل الأرقام المحفوظة؛ الرقم المميز بنجمة هو الوسيط الرئيسي.', phonesEmpty: 'لا توجد أرقام محفوظة بعد.', phoneMainTip: 'تعيين كوسيط رئيسي', errMissionDates: 'يجب أن تكون نهاية المهمة بعد بدايتها.', errSpecs: 'يجب أن تكون قيم الوزن والطول أرقامًا صحيحة.', errPhones: 'أحد الأرقام غير صالح.', dSoon: 'قريبًا', dSoonNote: 'سيتوفر هذا القسم قريبًا.', dTempInOnly: 'الحرارة الداخلية', dTempIn2: 'الحرارة الداخلية (°C)', dHumIn: 'الرطوبة الداخلية', dTempOutOnly: 'الحرارة الخارجية', dHumOut: 'الرطوبة الخارجية', dHumOutAxis: 'الرطوبة الخارجية (%)', dNotSent: 'لا يرسل الجهاز هذه القيمة بعد.', dRobotW: 'وزن الروبوت', dAnchorLen: 'طول المرساة', dAnchorW: 'وزن المرساة', supWork: 'مكان العمل', supLeadElec: 'مسؤول الكهرباء (مشرف الفريق)', supElec: 'مسؤول الكهرباء', supMech: 'مسؤول الميكانيك', supDev: 'مسؤول البرمجة', supPhone: 'رقم الهاتف', supGithub: 'رابط GitHub', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ', dStart: 'تاريخ البداية', dEnd: 'تاريخ النهاية', dPickStart: 'اختر يوم البداية', dPickEnd: 'اختر يوم النهاية', dSelSample: 'العينة المحددة', dPositions: 'موقع مسجل', dRadius: 'نصف قطر الحركة', dClearSel: 'العودة لآخر عينة', dSelectBuoy: 'اختيار العوامة', dCalendar: 'الفترة', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'ليوم واحد، اختر اليوم نفسه مرتين.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
+                controlTitle: 'التحكم بالعوامة', powerLabel: 'تشغيل/إيقاف العوامة', displayLabel: 'الشاشة', copyCoords: 'نسخ الإحداثيات', copied: 'تم النسخ', missionStateDone: 'منتهية', missionStateOff: 'متوقفة', stPending: 'بانتظار تأكيد البريد', stFailed: 'لم يتصل', stConnected: 'متصل', stHasData: 'يحتوي بيانات', nbTitle: 'إضافة عوامة', nbName: 'اسم العوامة', nbSim: 'رقم جوال العوامة', nbRelay: 'رقم جوال الوسيط', nbLocHint: 'يُحدَّد موقع العوامة تلقائيًا من أول موقع ترسله.', nbCancel: 'إلغاء', nbSave: 'حفظ', nbErrSim: 'رقم جوال العوامة غير صالح.', nbErrRelay: 'رقم جوال الوسيط غير صالح.', nbErrServer: 'تعذّر تسجيل العوامة على الخادم:', nbHostOnly: 'يمكن للمضيف فقط إضافة عوامة.', nbDefaultName: 'عوامة جديدة', nbNoBuoy: 'لم تُحدَّد عوامة.', vbTitle: 'تأكيد المضيف بالبريد', vbResend: 'إعادة إرسال الرمز', vbLater: 'لاحقًا', vbConfirm: 'تأكيد', cloudNotConfigured: 'لم يتم إعداد الخادم بعد', cloudOnlineSynced: 'متصل ومتزامن مع الخادم', cloudOfflineCache: 'غير متصل - عرض من الذاكرة المحلية', cmdWaitBuoy: 'بانتظار العوامة…', cmdPendingPill: 'بانتظار تأكيد العوامة ({n})…', cmdAcked: 'أكدت العوامة؛ تم تطبيق التغيير.', cmdAckedLate: 'أكدت العوامة متأخرة؛ تم تطبيق التغيير.', cmdRejected: 'رفضت العوامة الأمر؛ لم يتغير شيء.', cmdSmsFailed: 'تعذّر على الهاتف الوسيط إرسال الرسالة؛ لم يتغير شيء.', cmdTimeout: 'لم تؤكد العوامة؛ لم يتغير شيء. حاول مرة أخرى.', alLeakTitle: 'تنبيه تسرب مياه!', alBatTitle: 'تنبيه بطارية منخفضة!', alBuoy: 'العوامة', alTime: 'الوقت', alPos: 'آخر موقع', alVolt: 'جهد البطارية', alTemp: 'الحرارة الخارجية', alHum: 'الرطوبة الداخلية', alRssi: 'الإشارة', alLeakNote: 'تم اكتشاف تسرب مياه وأطفأت العوامة نفسها. يرجى انتشالها في أقرب وقت.', alBatNote: 'انخفض جهد البطارية عن 6 فولت وأطفأت العوامة نفسها. يرجى انتشالها أو شحنها.', alAck: 'تمت المشاهدة، أوقف التنبيه', alEnableNotif: 'تفعيل الإشعارات', alNotifBlocked: 'الإشعارات محظورة في المتصفح؛ الصوت والاهتزاز فقط نشطان.', alNotifBody: '{id} ({name}) - افتح التطبيق وأكد التنبيه.', vbFnProblem: 'تعذّر الاتصال بخدمة التأكيد. تحقق من نشر الدالة buoy-pair في Supabase وإيقاف "Enforce JWT Verification".', vbEmailFailed: 'تعذّر على الخادم إرسال البريد (تحقق من إعدادات SMTP).', vbRateLimited: 'عدد رسائل البريد المرسلة كبير؛ انتظر بضع دقائق ثم اضغط "إعادة إرسال الرمز".', cmdQueued: 'تمت إضافة الأمر إلى قائمة الإرسال إلى العوامة برسالة نصية.', cmdFailed: 'تعذّر تسجيل الأمر على الخادم.', cmdNotConnected: 'العوامة غير متصلة بعد؛ تم حفظ التغيير لكن لم تُرسل رسالة إلى العوامة.', ebRelay: 'رقم الوسيط الرئيسي', ebRelayHint: 'عند تغيير هذا الرقم تُرسل رسالة لإعلام العوامة.', sysTabGeneral: 'الإعدادات', sysTabGuests: 'دخول وخروج الضيوف', gsName: 'اسم الضيف', gsIn: 'الدخول', gsOut: 'الخروج', gsDur: 'المدة', gsOnline: 'متصل', gsNoExit: 'لم يُسجَّل خروج (يظهر وقت آخر تواجد)', gsEmpty: 'لم يدخل أي ضيف بعد.', gsRefresh: 'تحديث', gsLoadFail: 'تعذّر تحميل القائمة.', xlDownload: 'تنزيل كل البيانات (Excel)', xlPreparing: 'جارٍ تجهيز الملف…', xlDone: 'تم تنزيل الملف.', xlFail: 'تعذّر إنشاء الملف.', xlNoData: 'لا توجد بيانات للتنزيل.', xlCsvFallback: 'لم يتم تحميل مكتبة Excel؛ تم تنزيل ملف CSV (يُفتح في Excel).', xlColTime: 'الوقت (محلي)', xlColUtc: 'الوقت (UTC)', stPendingHost: 'جارٍ تأكيد المضيف', stPendingBuoy: 'جارٍ تأكيد العوامة', stRejected: 'رفضت العوامة كلمة المرور', stSmsFailed: 'فشل إرسال الرسالة إلى العوامة', nbRelayNew: 'رقم جديد…', nbPass: 'كلمة مرور العوامة', nbPassHint: 'كلمة المرور التي أعطتك إياها الشركة مع العوامة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrPass: 'كلمة مرور العوامة غير صالحة (٤ إلى ١٦ حرفاً أو رقماً إنجليزياً).', nbErrSame: 'يجب أن يختلف رقم العوامة عن رقم الوسيط.', vbNeedNew: 'ثلاث محاولات خاطئة. أُرسل رمز جديد إلى بريدك؛ أي رمز خاطئ آخر سيحذف العوامة.', vbLastRound: 'هذه الفرصة الأخيرة؛ الرمز الخاطئ سيحذف العوامة.', vbDeleted: 'الرمز خاطئ مرة أخرى وتم حذف العوامة.', vbOkPending: 'الرمز صحيح. جارٍ إرسال رسالة الربط إلى العوامة…', vbCooldown: 'يرجى الانتظار {n} ثانية.', vbResendSms: 'إعادة إرسال الرسالة إلى العوامة', vbSmsQueued: 'أُعيدت رسالة الربط إلى قائمة الإرسال.', vbConnectedNow: 'تم ربط العوامة «{name}».', ppTitle: 'كلمة مرور العوامة', ppDesc: 'أدخل كلمة المرور مرة أخرى لإعادة إرسال رسالة الربط.', ppSend: 'إرسال', rkLabel: 'مفتاح تطبيق الوسيط (relay_key):', rkNote: 'أدخل هذا المفتاح في تطبيق الوسيط ولا تشاركه مع أحد.', rkRotate: 'إنشاء مفتاح جديد', rkRotateAsk: 'إنشاء مفتاح جديد يعطّل القديم، وعليك تحديثه في تطبيق الوسيط. هل تتابع؟', rkRotated: 'تم إنشاء مفتاح جديد.', vbDesc: 'تم إرسال رمز التأكيد إلى {email}. أدخله أدناه.', vbSending: 'جارٍ إرسال الرمز...', vbAttempts: 'المحاولات المتبقية: {n}', vbWrong: 'الرمز غير صحيح.', vbFailed: 'ثلاث محاولات خاطئة: أصبحت العوامة «لم يتصل».', vbOk: 'تم ربط العوامة. بانتظار أول بيانات.', vbSendFail: 'تعذّر إرسال الرمز أو التحقق منه. تحقق من الاتصال.', vbRetry: 'تأكيد البريد (رمز جديد)', vbCodeLen: 'أدخل الرمز كاملاً (أرقام فقط).', confirmTitle: 'تأكيد العملية', confirmYes: 'نعم', confirmNo: 'لا', cfRs485On: 'هل أنت متأكد من تشغيل المقبس؟', cfRs485Off: 'هل أنت متأكد من فصل المقبس؟', cfDisplayOn: 'هل أنت متأكد من تشغيل الشاشة؟', cfDisplayOff: 'هل أنت متأكد من إطفاء الشاشة؟', cfMissionOn: 'هل أنت متأكد من بدء المهمة؟', cfMissionOff: 'هل أنت متأكد من إيقاف المهمة؟', refQrTitle: 'رمز QR للمضيف', refQrHint: 'يمسح الضيف هذا الرمز في صفحة الدخول.', btnScanQr: 'مسح QR المضيف', scanTitle: 'مسح QR المضيف', scanClose: 'إغلاق', scanNoCamera: 'الكاميرا غير متاحة. تحقق من إذن الكاميرا.', scanSearching: 'وجّه الكاميرا نحو الرمز...', scanBad: 'هذا الرمز ليس من سايرا.', scanNeedUsername: 'تم إدخال رمز المضيف؛ اكتب اسم المستخدم.', qrLibFail: 'لم تُحمَّل مكتبة QR؛ تحقق من الاتصال.', copyEmpty: 'لا يوجد ما يُنسخ.', fxTitle: 'الصوت والاهتزاز', fxSound: 'أصوات الأزرار', fxVibe: 'الاهتزاز', bsSpecsTitle: 'مواصفات العوامة', bsBuoy: 'العوامة', bsRobotW: 'وزن الروبوت (كغ)', bsAnchorLen: 'طول المرساة (م)', bsAnchorW: 'وزن المرساة (كغ)', msTitle: 'المهمة', msToggle: 'تنفيذ المهمة', msStart: 'تاريخ ووقت البداية', msEnd: 'تاريخ ووقت النهاية', phonesNote: 'ترسل العوامة رسالة إلى كل الأرقام المحفوظة؛ الرقم المميز بنجمة هو الوسيط الرئيسي.', phonesEmpty: 'لا توجد أرقام محفوظة بعد.', phoneMainTip: 'تعيين كوسيط رئيسي', errMissionDates: 'يجب أن تكون نهاية المهمة بعد بدايتها.', errSpecs: 'يجب أن تكون قيم الوزن والطول أرقامًا صحيحة.', errPhones: 'أحد الأرقام غير صالح.', dSoon: 'قريبًا', dSoonNote: 'سيتوفر هذا القسم قريبًا.', dTempInOnly: 'الحرارة الداخلية', dTempIn2: 'الحرارة الداخلية (°C)', dHumIn: 'الرطوبة الداخلية', dTempOutOnly: 'الحرارة الخارجية', dHumOut: 'الرطوبة الخارجية', dHumOutAxis: 'الرطوبة الخارجية (%)', dNotSent: 'لا يرسل الجهاز هذه القيمة بعد.', dRobotW: 'وزن الروبوت', dAnchorLen: 'طول المرساة', dAnchorW: 'وزن المرساة', supWork: 'مكان العمل', supLeadElec: 'مسؤول الكهرباء (مشرف الفريق)', supElec: 'مسؤول الكهرباء', supMech: 'مسؤول الميكانيك', supDev: 'مسؤول البرمجة', supPhone: 'رقم الهاتف', supGithub: 'رابط GitHub', popBattery: 'البطارية', popTemp: 'الحرارة والرطوبة', popTempIn: 'داخل', popTempOut: 'خارج', popSignal: 'إشارة GSM / GPS', popLeak: 'تسرب الماء', popMore: 'المزيد', menuFleetCount: 'عدد العوامات (إضافة / تعديل / حذف)', menuFleetDetail: 'المعلومات الشاملة لكل عوامة', menuSettingsSystem: 'إعدادات النظام', menuSettingsBuoys: 'إعدادات العوامات', btnSaveSys: 'حفظ', dStart: 'تاريخ البداية', dEnd: 'تاريخ النهاية', dPickStart: 'اختر يوم البداية', dPickEnd: 'اختر يوم النهاية', dSelSample: 'العينة المحددة', dPositions: 'موقع مسجل', dRadius: 'نصف قطر الحركة', dClearSel: 'العودة لآخر عينة', dSelectBuoy: 'اختيار العوامة', dCalendar: 'الفترة', dTimeFrom: 'من الساعة', dTimeTo: 'إلى الساعة', dLive: 'آخر البيانات', dRangeLive: 'آخر البيانات (٧ أيام)', dToday: 'اليوم', dYesterday: 'أمس', d7: 'آخر ٧ أيام', d30: 'آخر ٣٠ يومًا', dCalHint: 'ليوم واحد، اختر اليوم نفسه مرتين.', dFilteredBanner: 'القيم والرسوم تخص الفترة المحددة؛ وتبقى الصفحة الرئيسية تعرض آخر بيانات العوامة.', dNoData: 'لا توجد بيانات مسجلة في هذه الفترة.', dNoDataLive: 'لا توجد بيانات مسجلة خلال آخر ٧ أيام.', dRecords: 'سجل', dLoading: 'جارٍ التحميل...', dSrcServer: 'المصدر: الخادم', dSrcCache: 'المصدر: هذا الجهاز', dLocTitle: 'الموقع الجغرافي للعوامة', dLocNone: 'لا يوجد موقع مسجل', dLastUpdate: 'آخر تحديث', dSampleTime: 'آخر عيّنة في الفترة', dPlace: 'موقع الاستقرار', dPart: 'رقم القطعة', dNoBuoys: 'لا توجد عوامات مسجلة.', dBat: 'البطارية', dSolar: 'جهد الطاقة الشمسية', dCurr: 'التيار', dGsm: 'إشارة GSM', dGps: 'GPS', dPos: 'الموقع', dTempIn: 'الحرارة والرطوبة الداخلية', dTempOut: 'الحرارة والرطوبة الخارجية', dLeak: 'تسرب الماء', dVolt: 'الجهد (V)', dSoc: 'الشحن (%)', dAlt: 'الارتفاع (م)', dDrift: 'الإزاحة عن أول نقطة (م)', dHum: 'الرطوبة الداخلية (%)', dTemp: 'الحرارة الخارجية (°C)', dLeakAxis: 'التسرب (١ = نعم)',
                 mapTitle: 'خريطة مباشرة',
                 mapHint: 'انقر على أي عوامة لتحديدها',
                 quickSwitchLabel: 'تبديل سريع:',
@@ -3009,8 +3032,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 try { await sb.from('buoys').update({ name: b.name, location_name: b.locationName }).eq('id', b.id); } catch (e) { console.warn(e); }
             }
 
-            // the relay number changed: store it and tell the buoy by SMS
-            const cmds = [];
+            // the relay number changed: the buoy must confirm it before it is applied
+            let relayJob = null;
             const oldMain = currentMainRelay(b);
             if (isHostUser() && newRelay && newRelay !== oldMain) {
                 const m = b.meta || {};
@@ -3018,10 +3041,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
                 const oi = list.indexOf(oldMain);
                 if (oi >= 0) list[oi] = newRelay; else list.push(newRelay);
                 const uniq = []; list.forEach(n => { if (!uniq.includes(n)) uniq.push(n); });
-                b.meta = Object.assign({}, b.meta, { recipients: uniq, mainIdx: uniq.indexOf(newRelay), relayPhone: newRelay });
-                b.relayPhone = newRelay;
-                saveBuoyMeta(b);
-                cmds.push(['relay', { relay: newRelay }]);
+                relayJob = () => changeRelays(b, uniq, uniq.indexOf(newRelay));
             }
 
             renderFleetLists();
@@ -3030,7 +3050,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (b.id === appState.buoyId) applyBuoy(b.id);
 
             bootstrap.Modal.getOrCreateInstance(document.getElementById('editBuoyModal')).hide();
-            if (cmds.length) sendBuoyCommands(b, cmds);
+            if (relayJob) relayJob();
         }
 
         // ===== ADD / DELETE BUOY (host only) =====
@@ -3215,39 +3235,10 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             card.classList.toggle('leak-alert', isLeaking);
             banner.classList.toggle('show', isLeaking);
 
-            const simBtn = document.getElementById('txt-simulate-leak-btn');
-            simBtn.innerText = isLeaking ? t.stopSimulateLeak : t.simulateLeak;
-
-            if (isLeaking && !leakNotificationShown) {
-                leakNotificationShown = true;
-                showLeakNotification(b, t);
-            } else if (!isLeaking) {
-                leakNotificationShown = false;
-            }
         }
 
-        function showLeakNotification(b, t) {
-            const msg = `${t.leakNotifTitle} - ${b.id} (${b.name})`;
-            if ('Notification' in window) {
-                if (Notification.permission === 'granted') {
-                    new Notification(t.leakNotifTitle, { body: `${b.id} (${b.name}) - ${t.leakNotifBody}`, icon: '' });
-                } else if (Notification.permission !== 'denied') {
-                    Notification.requestPermission().then(perm => {
-                        if (perm === 'granted') {
-                            new Notification(t.leakNotifTitle, { body: `${b.id} (${b.name}) - ${t.leakNotifBody}`, icon: '' });
-                        }
-                    });
-                }
-            }
-        }
 
         // Demo-only toggle since there's no real hardware sensor feeding this yet
-        function toggleSimulateLeak() {
-            const b = buoysFleet.find(x => x.id === appState.buoyId);
-            if (!b) return;
-            b.leak = (b.leak === 'WET') ? 'DRY' : 'WET';
-            updateLeakAlert(b);
-        }
 
         // APPLY (COMMIT) A BUOY AS THE ACTIVE ONE - updates dashboard fields, map, quick switcher
         function applyBuoy(buoyId) {
@@ -3265,8 +3256,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             document.getElementById('val-temp-in').innerText = fmt(b.tempIn);
             document.getElementById('val-temp-out').innerText = fmt(b.tempOut);
             document.getElementById('val-rh').innerText = fmt(b.rh);
-            document.getElementById('rs485Toggle').checked = !!b.rs485;
-            { const dsp = document.getElementById('displayToggle'); if (dsp) dsp.checked = b.display !== false; }
+            syncSwitchesFromBuoy(b);
 
             updateBatteryIcon(b.soc);
             updateIslandBattery(b);
@@ -4390,17 +4380,13 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             modal.show();
         }
 
-        function confirmRobotPowerToggle() {
+                function confirmRobotPowerToggle() {
             if (pendingRobotPowerChoice === null) return;
-            appState.robotPower = pendingRobotPowerChoice;
-            pendingState.robotPower = pendingRobotPowerChoice;
-            { const rb = buoysFleet.find(x => x.id === appState.buoyId);
-              if (rb) { rb.meta = Object.assign({}, rb.meta, { robot: appState.robotPower }); saveBuoyMeta(rb); sendBuoyCommands(rb, [['switch', { robot: appState.robotPower }]]); } }
-            const modalEl = document.getElementById('robotPowerConfirmModal');
-            const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-            modal.hide();
+            const to = pendingRobotPowerChoice;
             pendingRobotPowerChoice = null;
-            updateTopRobotPowerButton();
+            const modalEl = document.getElementById('robotPowerConfirmModal');
+            bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+            applySwitchWithConfirm('robot', to);   // applied only after the buoy confirms
         }
 
         function updateTopRobotPowerButton() {
@@ -4413,33 +4399,10 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
         }
 
         // ===== RS485 SOCKET TOGGLE (host only - sends a command to the buoy) =====
-        function toggleRs485(checked) {
-            if (!currentUser || currentUser.role !== 'host') {
-                document.getElementById('rs485Toggle').checked = !checked; // revert
-                return;
-            }
-            const b = buoysFleet.find(x => x.id === appState.buoyId);
-            if (!b) return;
-            b.rs485 = checked;
-            const t = translations[currentLang()];
-            document.getElementById('val-rs485-status').innerText = checked ? t.rs485On : t.rs485Off;
-            b.meta = Object.assign({}, b.meta, { rs485: checked }); saveBuoyMeta(b);
-            sendBuoyCommands(b, [['switch', { rs485: checked }]]);
-        }
+                function toggleRs485(checked) { applySwitchWithConfirm('rs485', checked); }
 
         // ===== DISPLAY SWITCH (host only) =====
-        function toggleDisplay(checked) {
-            if (!currentUser || currentUser.role !== 'host') {
-                document.getElementById('displayToggle').checked = !checked; // revert
-                return;
-            }
-            const b = buoysFleet.find(x => x.id === appState.buoyId);
-            if (b) {
-                b.display = checked;
-                b.meta = Object.assign({}, b.meta, { display: checked }); saveBuoyMeta(b);
-                sendBuoyCommands(b, [['switch', { display: checked }]]);
-            }
-        }
+                function toggleDisplay(checked) { applySwitchWithConfirm('display', checked); }
 
         // ===== COPY COORDINATES =====
         function copyCoords() {
@@ -4596,25 +4559,22 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             bootstrap.Modal.getOrCreateInstance(document.getElementById('sxConfirmModal')).hide();
             if (cb) cb();
         }
-        function askSwitch(kind) {
+                function askSwitch(kind) {
             if (!isHostUser()) return;
             const t = translations[currentLang()];
             const el = document.getElementById(kind === 'rs485' ? 'rs485Toggle' : 'displayToggle');
             const to = el.checked; // inside the click handler the browser has already flipped it (preventDefault restores it afterwards)
             const msg = kind === 'rs485' ? (to ? t.cfRs485On : t.cfRs485Off) : (to ? t.cfDisplayOn : t.cfDisplayOff);
-            sxAsk(msg, () => { el.checked = to; if (kind === 'rs485') toggleRs485(to); else toggleDisplay(to); sxFeedback('switch'); });
+            // the switch is NOT moved here: it only changes after the buoy confirms (see applySwitchWithConfirm)
+            sxAsk(msg, () => { applySwitchWithConfirm(kind, to); sxFeedback('switch'); });
         }
-        function askMissionToggle() {
+                function askMissionToggle() {
             if (!isHostUser()) return;
             const t = translations[currentLang()];
             const cb = document.getElementById('missionToggle');
             const to = cb.checked; // already flipped by the click; preventDefault restores the DOM, the confirmed value is applied below
-            sxAsk(to ? t.cfMissionOn : t.cfMissionOff, () => {
-                cb.checked = to;
-                const b = bsCurrent();
-                if (b) { b.meta = b.meta || {}; b.meta.missionOn = to; saveBuoyMeta(b); if (b.id === appState.buoyId) applyBuoyConfigToApp(b); }
-                sxFeedback('switch');
-            });
+            // only the form changes; it is sent to the buoy (and applied after its confirmation) when "Save" is pressed
+            sxAsk(to ? t.cfMissionOn : t.cfMissionOff, () => { cb.checked = to; sxFeedback('switch'); });
         }
 
         // ---- add buoy: mini page -> pending_host (email code) -> pending_buoy (SMS to buoy) -> connected ----
@@ -4880,24 +4840,286 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             if (!buoysFleet.some(b => b.pairStatus === 'pending_buoy')) { clearInterval(pairPollTimer); pairPollTimer = null; }
         }
 
-        // ---- SMS commands to the buoy (Edge Function "buoy-command" -> queue -> relay app) ----
-        async function sendBuoyCommands(b, list) {
-            if (!b || !isHostUser() || !sb || !supabaseReady || !list || !list.length) return;
+        // ================= COMMANDS WITH THE BUOY'S CONFIRMATION (handshake) =================
+        //  1) the dashboard asks the server (Edge Function "buoy-command"), which queues the SMS with a SEQ number
+        //  2) the relay phone sends it to the buoy, 3) the buoy answers "ACK=<SEQ>", 4) only THEN is the change applied.
+        const CMD_WAIT_MS = 180000, CMD_LATE_MS = 900000;
+        let pendingCmdCount = 0;
+        const sleepMs = ms => new Promise(r => setTimeout(r, ms));
+
+        function updatePendingPill() {
+            let el = document.getElementById('cmd-pending-pill');
+            if (!el) { el = document.createElement('div'); el.id = 'cmd-pending-pill'; document.body.appendChild(el); }
             const t = translations[currentLang()];
-            let todo = list, skipped = false;
-            if (b.pairStatus && b.pairStatus !== 'connected') {      // not connected yet: only the relay number is stored
-                todo = list.filter(c => c[0] === 'relay'); skipped = true;
-            }
-            let ok = 0, bad = 0;
-            for (const [kind, params] of todo) {
+            el.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>' + t.cmdPendingPill.replace('{n}', pendingCmdCount) + '</span>';
+            el.classList.toggle('show', pendingCmdCount > 0);
+        }
+
+        async function sendBuoyCommand(b, kind, params) {
+            try {
+                const { data, error } = await sb.functions.invoke('buoy-command', { body: Object.assign({ buoy_id: b.id, kind }, params || {}) });
+                if (error) return { ok: false, state: 'error' };
+                return { ok: !!(data && data.ok), state: data && data.state, commandId: data && data.command_id };
+            } catch (e) { return { ok: false, state: 'error' }; }
+        }
+
+        // waits (polling every second) until the buoy confirms; returns acked | rejected | failed | superseded | timeout
+        async function waitCommand(cmdId, onLate) {
+            const t0 = Date.now();
+            while (Date.now() - t0 < CMD_WAIT_MS) {
+                await sleepMs(1000);
                 try {
-                    const { data, error } = await sb.functions.invoke('buoy-command', { body: Object.assign({ buoy_id: b.id, kind }, params || {}) });
-                    if (!error && data && data.ok) { if (data.state === 'queued') ok++; else skipped = true; } else bad++;
-                } catch (e) { bad++; }
+                    const { data } = await sb.from('commands').select('status, error').eq('id', cmdId).maybeSingle();
+                    if (!data) continue;
+                    if (data.status === 'acked') return 'acked';
+                    if (data.status === 'rejected') return 'rejected';
+                    if (data.status === 'failed') return 'failed';
+                    if (data.status === 'expired') return data.error === 'superseded' ? 'superseded' : 'timeout';
+                } catch (e) { /* network hiccup: try again */ }
             }
-            if (bad) sxToast(t.cmdFailed, 'err');
-            else if (skipped) sxToast(t.cmdNotConnected, 'err');
-            else if (ok) sxToast(t.cmdQueued, 'ok');
+            if (onLate) lateWatch(cmdId, onLate);
+            return 'timeout';
+        }
+        // after the timeout keep watching quietly: SMS can be slow, a late confirmation still updates the screen
+        function lateWatch(cmdId, onAck) {
+            const t0 = Date.now();
+            const iv = setInterval(async () => {
+                if (Date.now() - t0 > CMD_LATE_MS) { clearInterval(iv); return; }
+                try {
+                    const { data } = await sb.from('commands').select('status').eq('id', cmdId).maybeSingle();
+                    if (!data) return;
+                    if (data.status === 'acked') { clearInterval(iv); onAck(); }
+                    else if (['rejected', 'failed'].includes(data.status)) clearInterval(iv);
+                } catch (e) {}
+            }, 5000);
+        }
+
+        // send one command and wait for the buoy; onAck() applies the change on screen
+        async function runBuoyCommand(b, kind, params, onAck) {
+            if (!b || !isHostUser() || !sb || !supabaseReady) return 'denied';
+            const t = translations[currentLang()];
+            pendingCmdCount++; updatePendingPill();
+            try {
+                const r = await sendBuoyCommand(b, kind, params);
+                if (!r.ok) {
+                    sxToast(r.state === 'not_connected' ? t.cmdNotConnected : t.cmdFailed, 'err');
+                    return r.state === 'not_connected' ? 'not_connected' : 'error';
+                }
+                if (r.state === 'saved_no_sms') { onAck(true); return 'saved'; }   // buoy not connected yet: stored on the server only
+                const res = await waitCommand(r.commandId, () => { onAck(false); sxToast(t.cmdAckedLate, 'ok'); });
+                if (res === 'acked') { onAck(false); sxToast(t.cmdAcked, 'ok'); sxFeedback('success'); }
+                else if (res !== 'superseded') sxToast(res === 'rejected' ? t.cmdRejected : res === 'failed' ? t.cmdSmsFailed : t.cmdTimeout, 'err');
+                return res;
+            } finally {
+                pendingCmdCount--; updatePendingPill();
+            }
+        }
+
+        // applies a confirmed change to this device (the server applied the same patch to buoys.meta when the ACK arrived)
+        function commitBuoyPatch(bid, patch, persist) {
+            const b = buoysFleet.find(x => x.id === bid); if (!b) return;
+            b.meta = Object.assign({}, b.meta, patch);
+            if (persist) saveBuoyMeta(b); else { try { localStorage.setItem(META_KEY(b.id), JSON.stringify(b.meta)); } catch (e) {} }
+            if (typeof patch.relayPhone === 'string') b.relayPhone = patch.relayPhone;
+            if ('display' in patch) b.display = patch.display;
+            if ('rs485' in patch) b.rs485 = patch.rs485;
+            if (b.id === appState.buoyId) { applyBuoyConfigToApp(b); syncSwitchesFromBuoy(b); }
+            const cur = (typeof bsCurrent === 'function') ? bsCurrent() : null;
+            if (cur && cur.id === bid && document.getElementById('missionToggle')) bsLoadSpecs();
+        }
+
+        // relay numbers: ADD / DEL / RELAY go to the buoy in ONE sms and need ONE confirmation
+        function changeRelays(b, newList, newMainIdx) {
+            const m = b.meta || {};
+            const oldList = (Array.isArray(m.recipients) ? m.recipients : []).map(cleanPhone).filter(Boolean);
+            const oldMain = oldList[m.mainIdx || 0] || '';
+            const list = newList.map(cleanPhone).filter(Boolean);
+            const newMain = list[newMainIdx] || '';
+            const add = list.filter(n => !oldList.includes(n)), del = oldList.filter(n => !list.includes(n));
+            const mainChanged = !!newMain && newMain !== oldMain;
+            const patch = { recipients: list, mainIdx: newMainIdx };
+            if (mainChanged) patch.relayPhone = newMain;
+            if (!add.length && !del.length && !mainChanged) {
+                if (newMainIdx === (m.mainIdx || 0) && list.length === oldList.length) return Promise.resolve('nochange');
+                commitBuoyPatch(b.id, patch, true);        // only the order changed: nothing for the buoy to learn
+                return Promise.resolve('saved');
+            }
+            const params = { add, del, recipients: list, main_idx: newMainIdx };
+            if (mainChanged) params.main = newMain;
+            return runBuoyCommand(b, 'relays', params, () => commitBuoyPatch(b.id, patch));
+        }
+
+        // ---- the three switches (robot power / RS485 socket / display) ----
+        const pendingSwitch = {};
+        const SWITCH_INPUT = { robot: 'robotPowerSwitch', rs485: 'rs485Toggle', display: 'displayToggle' };
+        function setSwitchPending(key, on) {
+            pendingSwitch[key] = on;
+            const el = document.getElementById('pend-' + key); if (el) el.classList.toggle('on', on);
+            const inp = document.getElementById(SWITCH_INPUT[key]); if (inp) inp.disabled = on || !isHostUser();
+        }
+        async function applySwitchWithConfirm(key, to) {
+            if (!isHostUser() || pendingSwitch[key]) return;
+            const t = translations[currentLang()];
+            const b = buoysFleet.find(x => x.id === appState.buoyId); if (!b) return;
+            if (b.pairStatus && b.pairStatus !== 'connected') { sxToast(t.cmdNotConnected, 'err'); return; }
+            setSwitchPending(key, true);
+            try { await runBuoyCommand(b, 'switch', { [key]: to }, () => commitBuoyPatch(b.id, { [key]: to })); }
+            finally { setSwitchPending(key, false); }
+        }
+        function syncSwitchesFromBuoy(b) {
+            const t = translations[currentLang()]; const m = b.meta || {};
+            const r485 = document.getElementById('rs485Toggle'); if (r485) r485.checked = !!b.rs485;
+            const st = document.getElementById('val-rs485-status'); if (st) st.innerText = b.rs485 ? t.rs485On : t.rs485Off;
+            const dsp = document.getElementById('displayToggle'); if (dsp) dsp.checked = b.display !== false;
+            appState.robotPower = (typeof m.robot === 'boolean') ? m.robot : true;
+            pendingState.robotPower = appState.robotPower;
+            updateTopRobotPowerButton();
+        }
+
+        // ================= ALERTS: water leak / low battery (the buoy shuts itself down) =================
+        //  The buoy sends the alert SMS at the moment it happens (any time, not only at the send interval).
+        //  The dashboard shows a full-screen alarm and repeats sound + vibration + notification
+        //  until the host presses the acknowledge button.
+        let alertRows = [], alertChannel = null, alertPollTimer = null, alarmTimer = null, alertTitleTimer = null, alertTitleOrig = null;
+
+        async function fetchAlerts() {
+            if (!isHostUser() || !sb || !supabaseReady) return;
+            try {
+                const { data, error } = await sb.from('buoy_alerts').select('*').is('acked_at', null).order('created_at', { ascending: false });
+                if (error) { console.warn('alerts:', error.message); return; }
+                const sig = rows => rows.map(r => r.id + ':' + (r.updated_at || '')).join('|');
+                const changed = sig(data || []) !== sig(alertRows);
+                alertRows = data || [];
+                if (changed || !document.getElementById('alert-overlay')) renderAlertOverlay();
+            } catch (e) { console.warn('alerts failed', e); }
+        }
+        function startAlertWatch() {
+            if (alertPollTimer || !isHostUser() || !sb || !supabaseReady) return;
+            fetchAlerts();
+            alertPollTimer = setInterval(fetchAlerts, 5000);
+            try {
+                alertChannel = sb.channel('buoy-alerts-' + currentUser.uid)
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'buoy_alerts', filter: 'owner_id=eq.' + currentUser.uid }, () => fetchAlerts())
+                    .subscribe();
+            } catch (e) { console.warn('alerts realtime', e); }
+            // browsers only allow the notification question after a tap
+            document.addEventListener('pointerdown', () => {
+                if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission().then(renderAlertOverlay).catch(() => {});
+            }, { once: true });
+        }
+        function stopAlertWatch() {
+            clearInterval(alertPollTimer); alertPollTimer = null;
+            try { if (alertChannel && sb) sb.removeChannel(alertChannel); } catch (e) {}
+            alertChannel = null; alertRows = [];
+            const ov = document.getElementById('alert-overlay'); if (ov) ov.classList.remove('show');
+            stopAlarm();
+        }
+
+        function alertCardHtml(a) {
+            const t = translations[currentLang()];
+            const bu = buoysFleet.find(x => x.id === a.buoy_id);
+            const num = (v, d, u) => (v === null || v === undefined) ? '—' : Number(v).toFixed(d) + u;
+            const pos = (a.lat !== null && a.lat !== undefined && a.lon !== null && a.lon !== undefined)
+                ? `<a href="https://maps.google.com/?q=${a.lat},${a.lon}" target="_blank" rel="noopener" dir="ltr">${Number(a.lat).toFixed(5)}, ${Number(a.lon).toFixed(5)}</a>` : '—';
+            const when = fmtDT(new Date(a.device_ts || a.created_at), true);
+            return `<div class="al-card ${a.kind}">
+                <div class="al-title">${a.kind === 'leak' ? t.alLeakTitle : t.alBatTitle}</div>
+                <div class="al-row">${t.alBuoy}: <b>${escHtml(bu ? bu.name : '')}</b> <span dir="ltr">(${escHtml(a.buoy_id)})</span></div>
+                <div class="al-row">${t.alTime}: ${when}</div>
+                <div class="al-row">${t.alPos}: ${pos}</div>
+                <div class="al-row">${t.alVolt}: <b dir="ltr">${num(a.battery_voltage, 2, ' V')}</b> · ${t.alTemp}: <span dir="ltr">${num(a.temp_ext, 1, '°C')}</span> · ${t.alHum}: <span dir="ltr">${num(a.hum_int, 0, '%')}</span> · ${t.alRssi}: <span dir="ltr">${a.rssi === null || a.rssi === undefined ? '—' : a.rssi}</span></div>
+                <div class="al-note">${a.kind === 'leak' ? t.alLeakNote : t.alBatNote}</div></div>`;
+        }
+        function ensureAlertOverlay() {
+            let ov = document.getElementById('alert-overlay');
+            if (!ov) {
+                ov = document.createElement('div'); ov.id = 'alert-overlay';
+                ov.innerHTML = '<div class="al-box"><div class="al-head al-pulse"><i class="fa-solid fa-triangle-exclamation me-2"></i><span id="al-head-text"></span></div>' +
+                    '<div id="al-list"></div><div id="al-notif-row" class="text-center mb-2"></div>' +
+                    '<div class="al-actions"><button type="button" class="al-ack" id="al-ack-btn"></button></div></div>';
+                document.body.appendChild(ov);
+                ov.querySelector('#al-ack-btn').addEventListener('click', ackAllAlerts);
+            }
+            return ov;
+        }
+        function renderAlertOverlay() {
+            if (!alertRows.length) {
+                const ov0 = document.getElementById('alert-overlay'); if (ov0) ov0.classList.remove('show');
+                stopAlarm(); return;
+            }
+            const t = translations[currentLang()];
+            const ov = ensureAlertOverlay();
+            ov.querySelector('#al-head-text').innerText = alertRows.some(a => a.kind === 'leak') ? t.alLeakTitle : t.alBatTitle;
+            ov.querySelector('#al-list').innerHTML = alertRows.map(alertCardHtml).join('');
+            ov.querySelector('#al-ack-btn').innerText = t.alAck;
+            const nr = ov.querySelector('#al-notif-row');
+            if (!('Notification' in window)) nr.innerHTML = '';
+            else if (Notification.permission === 'default') {
+                nr.innerHTML = `<button type="button" class="al-notif-btn" id="al-notif-btn">${t.alEnableNotif}</button>`;
+                nr.querySelector('#al-notif-btn').addEventListener('click', () => Notification.requestPermission().then(renderAlertOverlay).catch(() => {}));
+            } else if (Notification.permission === 'denied') nr.innerHTML = `<span style="color:#fecaca;font-size:.78rem">${t.alNotifBlocked}</span>`;
+            else nr.innerHTML = '';
+            ov.classList.add('show');
+            startAlarm();
+        }
+
+        function playSiren() {   // deliberately ignores the "sound off" setting: this is a safety alarm
+            try {
+                audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const t0 = audioCtx.currentTime;
+                for (let i = 0; i < 6; i++) {
+                    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                    o.type = 'square'; o.frequency.value = i % 2 ? 660 : 990;
+                    g.gain.setValueAtTime(0.0001, t0 + i * 0.25);
+                    g.gain.exponentialRampToValueAtTime(0.35, t0 + i * 0.25 + 0.02);
+                    g.gain.exponentialRampToValueAtTime(0.0001, t0 + i * 0.25 + 0.23);
+                    o.connect(g); g.connect(audioCtx.destination); o.start(t0 + i * 0.25); o.stop(t0 + i * 0.25 + 0.24);
+                }
+            } catch (e) {}
+        }
+        function notifyAlerts() {
+            if (!('Notification' in window) || Notification.permission !== 'granted' || !alertRows.length) return;
+            const t = translations[currentLang()]; const a = alertRows[0];
+            const bu = buoysFleet.find(x => x.id === a.buoy_id);
+            const title = a.kind === 'leak' ? t.alLeakTitle : t.alBatTitle;
+            const opts = { body: t.alNotifBody.replace('{id}', a.buoy_id).replace('{name}', bu ? bu.name : ''), tag: 'rayka-alert', renotify: true,
+                requireInteraction: true, vibrate: [500, 200, 500, 200, 900], icon: './icon-192.png' };
+            const fallback = () => { try { new Notification(title, opts); } catch (e) {} };
+            if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+                navigator.serviceWorker.getRegistration().then(reg => { if (reg) reg.showNotification(title, opts); else fallback(); }).catch(fallback);
+            } else fallback();
+        }
+        function startAlarm() {
+            if (alarmTimer) return;
+            const fire = () => { playSiren(); try { navigator.vibrate && navigator.vibrate([500, 200, 500, 200, 900]); } catch (e) {} notifyAlerts(); };
+            fire(); alarmTimer = setInterval(fire, 10000);
+            if (!alertTitleTimer) {
+                alertTitleOrig = document.title; let on = false;
+                const label = '⚠ ' + translations[currentLang()].alLeakTitle;
+                alertTitleTimer = setInterval(() => { document.title = (on = !on) ? label : alertTitleOrig; }, 900);
+            }
+        }
+        function stopAlarm() {
+            clearInterval(alarmTimer); alarmTimer = null;
+            clearInterval(alertTitleTimer); alertTitleTimer = null;
+            if (alertTitleOrig !== null) { document.title = alertTitleOrig; alertTitleOrig = null; }
+            try { navigator.vibrate && navigator.vibrate(0); } catch (e) {}
+            try {
+                if (navigator.serviceWorker && navigator.serviceWorker.getRegistration) {
+                    navigator.serviceWorker.getRegistration().then(reg => reg && reg.getNotifications({ tag: 'rayka-alert' }).then(ns => ns.forEach(n => n.close()))).catch(() => {});
+                }
+            } catch (e) {}
+        }
+        async function ackAllAlerts() {
+            const t = translations[currentLang()];
+            const btn = document.getElementById('al-ack-btn'); if (btn) btn.disabled = true;
+            try {
+                const { error } = await sb.rpc('ack_all_buoy_alerts');
+                if (error) { sxToast(t.cmdFailed, 'err'); return; }
+                alertRows = []; renderAlertOverlay(); sxFeedback('success');
+            } finally { if (btn) btn.disabled = false; }
+            fetchAlerts();
         }
 
         // ---- guests: login / logout log (host sees it in System settings, second tab) ----
@@ -5129,7 +5351,8 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             missionEnd = m.missionEnd ? new Date(m.missionEnd) : new Date(+missionStart + 14 * 864e5);
             renderMissionBar();
         }
-        function saveBuoySettings() {
+                let bsSaving = false;
+        async function saveBuoySettings() {
             const t = translations[currentLang()];
             if (!isHostUser()) { sxToast(t.phonesLockedText, 'err'); return; }
             const b = bsCurrent();
@@ -5143,33 +5366,43 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             const list = pendingState.smsRecipients.map(n => normDigits(String(n)).replace(/[\s\-]/g, '')).filter(n => n !== '');
             if (list.some(n => !PHONE_RE.test(n))) { sxToast(t.errPhones, 'err'); return; }
             let mainIdx = list.indexOf(mainRaw); if (mainIdx < 0) mainIdx = 0;
-            // values before saving, to know what changed and must be sent to the buoy
-            const pm = b.meta || {};
-            const prevRecipients = (Array.isArray(pm.recipients) ? pm.recipients : []).map(cleanPhone).filter(Boolean);
-            const prevMain = prevRecipients[pm.mainIdx || 0] || '';
-            const prevInterval = pm.intervalSeconds || 900;
-            const prevMs = pm.missionStart ? new Date(pm.missionStart) : new Date(DEFAULT_MISSION_START);
-            const prevMe = pm.missionEnd ? new Date(pm.missionEnd) : new Date(+prevMs + 14 * 864e5);
-            const prevOn = pm.missionOn !== false;
-            b.meta = Object.assign({}, b.meta, {
-                robotWeightKg: rw, anchorLengthM: al, anchorWeightKg: aw,
-                missionOn: document.getElementById('missionToggle').checked, missionStart: ms.toISOString(), missionEnd: me.toISOString(),
-                intervalSeconds: pendingState.smsIntervalSeconds, recipients: list, mainIdx
-            });
-            saveBuoyMeta(b);
-            { const cmds = [];
-              const nowOn = document.getElementById('missionToggle').checked;
-              if (pendingState.smsIntervalSeconds !== prevInterval) cmds.push(['interval', { seconds: pendingState.smsIntervalSeconds }]);
-              if (nowOn !== prevOn || ms.toISOString() !== prevMs.toISOString() || me.toISOString() !== prevMe.toISOString()) cmds.push(['mission', { on: nowOn, start: ms.toISOString(), end: me.toISOString() }]);
-              const added = list.filter(n => !prevRecipients.includes(n)), removed = prevRecipients.filter(n => !list.includes(n));
-              if (added.length) cmds.push(['add_relay', { numbers: added }]);
-              if (removed.length) cmds.push(['del_relay', { numbers: removed }]);
-              const newMain = list[mainIdx] || '';
-              if (newMain && newMain !== prevMain) cmds.push(['relay', { relay: newMain }]);
-              if (cmds.length) sendBuoyCommands(b, cmds); }
-            pendingState.smsRecipients = list.slice(); pendingState.mainIdx = mainIdx; renderPhoneRows();
-            if (b.id === appState.buoyId) applyBuoyConfigToApp(b);
-            flashSaveFeedback('settings-save-feedback');
+            if (bsSaving) return;
+            bsSaving = true;
+            try {
+                // 1) settings the buoy does not need to know about are saved right away
+                b.meta = Object.assign({}, b.meta, { robotWeightKg: rw, anchorLengthM: al, anchorWeightKg: aw });
+                saveBuoyMeta(b);
+                flashSaveFeedback('settings-save-feedback');
+
+                // 2) settings the buoy must CONFIRM (interval, mission, relay numbers): applied only after its ACK
+                const pm = b.meta || {};
+                const connected = !b.pairStatus || b.pairStatus === 'connected';
+                const prevInterval = pm.intervalSeconds || 900;
+                const prevMs = pm.missionStart ? new Date(pm.missionStart) : new Date(DEFAULT_MISSION_START);
+                const prevMe = pm.missionEnd ? new Date(pm.missionEnd) : new Date(+prevMs + 14 * 864e5);
+                const prevOn = pm.missionOn !== false;
+                const nowOn = document.getElementById('missionToggle').checked;
+                const sec = pendingState.smsIntervalSeconds;
+                const jobs = [];
+                let skipped = false;
+                if (sec !== prevInterval) {
+                    if (connected) jobs.push(runBuoyCommand(b, 'interval', { seconds: sec }, () => commitBuoyPatch(b.id, { intervalSeconds: sec })));
+                    else skipped = true;
+                }
+                if (nowOn !== prevOn || ms.toISOString() !== prevMs.toISOString() || me.toISOString() !== prevMe.toISOString()) {
+                    if (connected) jobs.push(runBuoyCommand(b, 'mission', { on: nowOn, start: ms.toISOString(), end: me.toISOString() },
+                        () => commitBuoyPatch(b.id, { missionOn: nowOn, missionStart: ms.toISOString(), missionEnd: me.toISOString() })));
+                    else skipped = true;
+                }
+                jobs.push(changeRelays(b, list, mainIdx));
+                if (skipped) sxToast(t.cmdNotConnected, 'err');
+                const results = await Promise.all(jobs);
+                // whatever the buoy did not confirm: put the form back to the values the buoy really has
+                const good = ['acked', 'saved', 'nochange', 'superseded'];
+                if (skipped || results.some(r => !good.includes(r))) bsLoadSpecs();
+            } finally {
+                bsSaving = false;
+            }
         }
 
         // ---- host QR + guest scan ----
@@ -5375,6 +5608,7 @@ html[data-bs-theme="light"] .btn-close-white{filter:none;opacity:.6}
             document.getElementById('sys-tabs').style.display = isHost ? 'flex' : 'none';
             showSysTab('general');
             if (isHost) loadRelayKey();
+            if (isHost) startAlertWatch(); else stopAlertWatch();
 
             renderPhoneRows();
             renderFleetLists();
